@@ -48,8 +48,9 @@ public class MainActivityFragment extends Fragment{
         cal.setTime(now);
 
 
-        ArrayList<String> prayerTimes = new ArrayList<>();
+        ArrayList<String> prayerTimes;
         prayerTimes = Utility.getPrayTimes(cal,getContext());
+
 
         //ss:temp adapter that don't user cursor
         PrayerAdapter mAdapter = new PrayerAdapter(prayerTimes,getActivity(), new PrayerAdapter.PrayerAdapterOnClickHandler() {
@@ -83,6 +84,12 @@ public class MainActivityFragment extends Fragment{
 
 
         return rootView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
     }
 
     @Override

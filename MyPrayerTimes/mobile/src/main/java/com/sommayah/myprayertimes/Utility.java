@@ -60,6 +60,12 @@ public class Utility {
                 context.getString(R.string.pref_location_default));
     }
 
+    public static int getPreferredTimeFormat(Context context){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getInt(context.getString(R.string.pref_time_format_key),
+                PrayTime.TIME12);
+    }
+
     /**
      * Given a day, returns just the name to use for that day.
      * E.g "Monday", "Tuesday", "wednesday".
@@ -146,7 +152,7 @@ public class Utility {
     public static ArrayList<String> getPrayTimes(Calendar cal,Context context){
         mPrayTime = new PrayTime();
         ArrayList<String> prayerTimes;
-        mPrayTime.setTimeFormat(mPrayTime.TIME12);
+        mPrayTime.setTimeFormat(mPrayTime.TIME24); //determine 12 or 24 in prayeradapter
         mPrayTime.setCalcMethod(mPrayTime.ISNA);
         mPrayTime.setAsrJuristic(mPrayTime.SHAFII);
         mPrayTime.setAdjustHighLats(mPrayTime.ANGLEBASED);
@@ -157,6 +163,9 @@ public class Utility {
         prayerTimes.remove(5); // i don't need the maghrib and sunset just the sunset as maghrib
         return prayerTimes;
     }
+
+
+
 
     public static float getQiblaDirection(Context context){
         float longitude = getLocationLongitude(context);

@@ -3,10 +3,18 @@ package com.sommayah.myprayertimes;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.sommayah.myprayertimes.data.PrayTime;
+
+import org.joda.time.LocalTime;
+import org.joda.time.Minutes;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
 
@@ -17,13 +25,15 @@ public class PrayerAdapter extends RecyclerView.Adapter<PrayerAdapter.PrayerAdap
     private static final int VIEW_TYPE_NEXT = 0; //representing the next prayer
     private static final int VIEW_TYPE_ALL = 1;  //representing all other prayers
 
-    private boolean mUseNextPrayerLayout = true;
+    private boolean mUseNextPrayerLayout = true; //for the coming prayer use a bigger list item with time remaining
 
     private Cursor mCursor;
     final private Context mContext;
     final private PrayerAdapterOnClickHandler mClickHandler;
     final private View mEmptyView;
     ArrayList<String> prayerTimes;
+    ArrayList<String> friendlyPrayerTimes;
+
 
     PrayerAdapter(Context context, PrayerAdapterOnClickHandler ch, View emptyView){
         mContext = context;
@@ -37,10 +47,11 @@ public class PrayerAdapter extends RecyclerView.Adapter<PrayerAdapter.PrayerAdap
         mClickHandler = ch;
         mEmptyView = emptyView;
         prayerTimes = new ArrayList<>();
+        friendlyPrayerTimes = new ArrayList<>();
+        //times = new double[array.size()];
         for(int i=0 ; i<array.size();i++){
             prayerTimes.add(array.get(i));
         }
-
 
     }
 
@@ -95,7 +106,37 @@ public class PrayerAdapter extends RecyclerView.Adapter<PrayerAdapter.PrayerAdap
 
         }
         holder.mPrayerName.setText(name);
-        holder.mPrayerTime.setText(prayerTimes.get(position));
+        LocalTime time = new LocalTime(prayerTimes.get(position));
+        DateTimeFormatter fmt = DateTimeFormat.forPattern("hh:mm aa");
+        if(Utility.getPreferredTimeFormat(mContext) == PrayTime.TIME12) { //12 hr or 24 formate
+            String str = fmt.print(time);
+            holder.mPrayerTime.setText(str);
+        }else{
+            holder.mPrayerTime.setText(prayerTimes.get(position));
+        }
+        if(getItemViewType(position) == VIEW_TYPE_NEXT){
+            LocalTime now = LocalTime.now();
+            int minutes = Minutes.minutesBetween(now, time).getMinutes();
+            holder.mTimeRemaining.setText( /*Minutes.minutesBetween(time, now).getMinutes()*/getFriendlyTimeString(minutes));
+        }
+
+    }
+
+    private String getFriendlyTimeString(int minutes) {
+        String remainingTime = "";
+        long hours = 0;
+        if(minutes<0)
+            minutes = 24*60 + minutes;
+        if(minutes >59){
+            hours = minutes/60;
+            minutes = minutes%60;
+            remainingTime = String.valueOf(hours)+ " hours, and " + String.valueOf(minutes)
+                    +" minutes remaining.";
+            return remainingTime;
+        }else if(minutes == 0){
+            return "Time for Prayer.";
+        }
+        return String.valueOf(minutes) + "minutes remaining";
 
     }
 
@@ -104,14 +145,30 @@ public class PrayerAdapter extends RecyclerView.Adapter<PrayerAdapter.PrayerAdap
         return prayerTimes.size();
     }
 
-    public void setUseNextPrayerLayout(boolean useBigLayout) {
-        mUseNextPrayerLayout = useBigLayout;
-    }
-
 
     @Override
     public int getItemViewType(int position) {
-        return (position == 0 && mUseNextPrayerLayout) ? VIEW_TYPE_NEXT : VIEW_TYPE_ALL;
+        return (position == getNextPos() && mUseNextPrayerLayout) ? VIEW_TYPE_NEXT : VIEW_TYPE_ALL;
+    }
+
+    public int getNextPos(){
+        int pos = 0;
+        LocalTime now = LocalTime.now();
+        Log.d("get current time",now.toString());
+        LocalTime limit;
+        mUseNextPrayerLayout = true;
+        for(int i=0; i<prayerTimes.size() - 1; i++){
+            limit = new LocalTime(prayerTimes.get(i));
+            Boolean isLate = now.isAfter(limit);
+            if(isLate)
+                pos++;
+        }
+        //case pos is out of bound
+        if(pos == prayerTimes.size() - 1 ){
+           // mUseNextPrayerLayout = false;
+            pos = 0; //just for now
+        }
+        return pos;
     }
 
     public class PrayerAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {

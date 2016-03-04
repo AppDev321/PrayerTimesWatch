@@ -10,6 +10,7 @@
     <string name="no_addresses_found">no addresses found</string>
     <string name="address_found">address found</string>
     <string name="pref_location_default">no_address</string>
+    <string name="pref_time_format_key">time-format</string>
     <string name="title_activity_compass">CompassActivity</string>
     <string name="title_activity_settings">Settings</string>
     <!-- strings related to hijri months names-->
