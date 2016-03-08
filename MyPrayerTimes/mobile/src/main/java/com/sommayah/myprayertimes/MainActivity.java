@@ -1,16 +1,17 @@
 package com.sommayah.myprayertimes;
 
 import android.Manifest;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -21,10 +22,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -99,7 +96,9 @@ public class MainActivity extends AppCompatActivity {
         }
         else {
             Location lastKnownLocation = mLocationManager.getLastKnownLocation(locationProvider);
+
             if(lastKnownLocation != null){
+                makeUseOfNewLocation(lastKnownLocation);
                 Log.d("known location long", String.valueOf(lastKnownLocation.getLongitude()));
                 Log.d("known location lat", String.valueOf(lastKnownLocation.getLatitude()));
             }else{
@@ -110,6 +109,16 @@ public class MainActivity extends AppCompatActivity {
 
         Utility.testPrayertimes(getApplicationContext());
 
+        AlarmManager alarmMgr;
+        PendingIntent alarmIntent;
+        alarmMgr = (AlarmManager)getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(getApplicationContext(), PrayerAlarmReceiver.class);
+        alarmIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, intent, 0);
+
+        alarmMgr.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                SystemClock.elapsedRealtime() +
+                        60 * 1000, alarmIntent);
+
 
 
     }
@@ -117,11 +126,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        mhijriDateText = (TextView) findViewById(R.id.dateTextView);
+        mhijriDateText.setText(Utility.getHijriDate(getApplicationContext()));
         if(Utility.isLocationLatLonAvailable(getApplicationContext())) {
             mTitleText = (TextView) findViewById(R.id.title);
             mTitleText.setText(Utility.getPreferredLocation(getApplicationContext()));
-            mhijriDateText = (TextView) findViewById(R.id.dateTextView);
-            mhijriDateText.setText(Utility.getHijriDate(getApplicationContext()));
         }
         // Define a listener that responds to location updates
         mLocationListener = new LocationListener() {
@@ -191,68 +200,68 @@ public class MainActivity extends AppCompatActivity {
     private void makeUseOfNewLocation(Location location) {
         double longitude = location.getLongitude();
         double latitude = location.getLatitude();
-        String address = "";
-        String countryName = "";
-        String cityName = "";
-        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-        List<Address> addresses = null;
-        try {
-            addresses = geocoder.getFromLocation(
-                    latitude,
-                    longitude,
-                    // In this sample, get just a single address.
-                    5);
-        } catch (IOException ioException) {
-            // Catch network or other I/O problems.
-            Log.e(TAG, getString(R.string.service_not_available), ioException);
-        } catch (IllegalArgumentException illegalArgumentException) {
-            // Catch invalid latitude or longitude values.
-            Log.e(TAG, getString(R.string.invalid_lat_long_used) + ". " +
-                    "Latitude = " + latitude +
-                    ", Longitude = " +
-                    longitude, illegalArgumentException);
-        }
-
-        // Handle case where no address was found.
-        if (addresses == null || addresses.size()  == 0) {
-            Log.d(TAG, getString(R.string.no_addresses_found));
-            // If the provided place doesn't have an address, we'll form a display-friendly
-            // string from the latlng values.
-            address = String.format("(%.2f, %.2f)",latitude, longitude);
-        } else {
-            for (Address addr : addresses) {
-//                String result = addr.getAdminArea() != null ? addr.getAdminArea() : "?";
-//                result += " | ";
-//                result += addr.getSubAdminArea() != null ? addr.getSubAdminArea() : "?";
-//                result += " | ";
-//                result += addr.getLocality() != null ? addr.getLocality() : "?";
-//                result += " | ";
-//                result += addr.getSubLocality() != null ? addr.getSubLocality() : "?";
-//                result += " | ";
-//                result += addr.getThoroughfare() != null ? addr.getThoroughfare() : "?";
-//                result += " | ";
-//                result += addr.getSubThoroughfare() != null ? addr.getSubThoroughfare() : "?";
-//                Log.i(TAG, result);
-                countryName = addr.getCountryName();
-                if(cityName == null || cityName.equals("")) {
-                    cityName = addr.getLocality();
-                }if(cityName == null || cityName.equals("")){
-                    cityName = addr.getSubAdminArea();
-                }if(cityName == null || cityName.equals("")){
-                    cityName = addr.getAdminArea();
-                }
-                Log.i(TAG, "country: "+ countryName +" ,city: "+ cityName);
-                address = cityName +", " + countryName;
-                if(cityName != null  && countryName != null) //we got one good address
-                    break;
-            }
-            
-            Log.i(TAG, getString(R.string.address_found));
-            //cityName = addresses.get(0).getAddressLine(0);
-            //String stateName = addresses.get(0).getAddressLine(1);
-            //countryName = addresses.get(0).getAddressLine(2);
-            Log.d(TAG, addresses.get(0).toString());
-        }
+        String address = Utility.getLocationAddress(getApplicationContext(),longitude,latitude);
+//        String countryName = "";
+//        String cityName = "";
+//        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+//        List<Address> addresses = null;
+//        try {
+//            addresses = geocoder.getFromLocation(
+//                    latitude,
+//                    longitude,
+//                    // In this sample, get just a single address.
+//                    5);
+//        } catch (IOException ioException) {
+//            // Catch network or other I/O problems.
+//            Log.e(TAG, getString(R.string.service_not_available), ioException);
+//        } catch (IllegalArgumentException illegalArgumentException) {
+//            // Catch invalid latitude or longitude values.
+//            Log.e(TAG, getString(R.string.invalid_lat_long_used) + ". " +
+//                    "Latitude = " + latitude +
+//                    ", Longitude = " +
+//                    longitude, illegalArgumentException);
+//        }
+//
+//        // Handle case where no address was found.
+//        if (addresses == null || addresses.size()  == 0) {
+//            Log.d(TAG, getString(R.string.no_addresses_found));
+//            // If the provided place doesn't have an address, we'll form a display-friendly
+//            // string from the latlng values.
+//            address = String.format("(%.2f, %.2f)",latitude, longitude);
+//        } else {
+//            for (Address addr : addresses) {
+////                String result = addr.getAdminArea() != null ? addr.getAdminArea() : "?";
+////                result += " | ";
+////                result += addr.getSubAdminArea() != null ? addr.getSubAdminArea() : "?";
+////                result += " | ";
+////                result += addr.getLocality() != null ? addr.getLocality() : "?";
+////                result += " | ";
+////                result += addr.getSubLocality() != null ? addr.getSubLocality() : "?";
+////                result += " | ";
+////                result += addr.getThoroughfare() != null ? addr.getThoroughfare() : "?";
+////                result += " | ";
+////                result += addr.getSubThoroughfare() != null ? addr.getSubThoroughfare() : "?";
+////                Log.i(TAG, result);
+//                countryName = addr.getCountryName();
+//                if(cityName == null || cityName.equals("")) {
+//                    cityName = addr.getLocality();
+//                }if(cityName == null || cityName.equals("")){
+//                    cityName = addr.getSubAdminArea();
+//                }if(cityName == null || cityName.equals("")){
+//                    cityName = addr.getAdminArea();
+//                }
+//                Log.i(TAG, "country: "+ countryName +" ,city: "+ cityName);
+//                address = cityName +", " + countryName;
+//                if(cityName != null  && countryName != null) //we got one good address
+//                    break;
+//            }
+//
+//            Log.i(TAG, getString(R.string.address_found));
+//            //cityName = addresses.get(0).getAddressLine(0);
+//            //String stateName = addresses.get(0).getAddressLine(1);
+//            //countryName = addresses.get(0).getAddressLine(2);
+//            Log.d(TAG, addresses.get(0).toString());
+//        }
 
 
 

@@ -2,6 +2,8 @@ package com.sommayah.myprayertimes;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.preference.PreferenceManager;
 import android.text.format.Time;
@@ -14,10 +16,13 @@ import org.joda.time.LocalDate;
 import org.joda.time.chrono.ISOChronology;
 import org.joda.time.chrono.IslamicChronology;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by sommayahsoliman on 2/25/16.
@@ -38,6 +43,14 @@ public class Utility {
                 = PreferenceManager.getDefaultSharedPreferences(context);
         return prefs.contains(context.getString(R.string.pref_location_latitude))
                 && prefs.contains(context.getString(R.string.pref_location_longitude));
+    }
+
+    public static boolean isAlarmEnabled(Context context){
+        SharedPreferences prefs
+                = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getBoolean(context.getString(R.string.pref_alarm_enabled),
+                true);
+
     }
 
     public static float getLocationLatitude(Context context) {
@@ -64,6 +77,68 @@ public class Utility {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         return prefs.getInt(context.getString(R.string.pref_time_format_key),
                 PrayTime.TIME12);
+    }
+
+    public static String getLocationAddress(Context context, double longitude, double latitude){
+        String TAG = "get Location Address";
+        String address = "";
+        String countryName = "";
+        String cityName = "";
+        Geocoder geocoder = new Geocoder(context, Locale.getDefault());
+        List<Address> addresses = null;
+        try {
+            addresses = geocoder.getFromLocation(
+                    latitude,
+                    longitude,
+                    // In this sample, get just a single address.
+                    5);
+        } catch (IOException ioException) {
+            // Catch network or other I/O problems.
+            Log.e(TAG, context.getResources().getString(R.string.service_not_available), ioException);
+        } catch (IllegalArgumentException illegalArgumentException) {
+            // Catch invalid latitude or longitude values.
+            Log.e(TAG, context.getResources().getString(R.string.invalid_lat_long_used) + ". " +
+                    "Latitude = " + latitude +
+                    ", Longitude = " +
+                    longitude, illegalArgumentException);
+        }
+
+        // Handle case where no address was found.
+        if (addresses == null || addresses.size()  == 0) {
+            Log.d(TAG, context.getResources().getString(R.string.no_addresses_found));
+            // If the provided place doesn't have an address, we'll form a display-friendly
+            // string from the latlng values.
+            address = String.format("(%.2f, %.2f)",latitude, longitude);
+        } else {
+            for (Address addr : addresses) {
+//                String result = addr.getAdminArea() != null ? addr.getAdminArea() : "?";
+//                result += " | ";
+//                result += addr.getSubAdminArea() != null ? addr.getSubAdminArea() : "?";
+//                result += " | ";
+//                result += addr.getLocality() != null ? addr.getLocality() : "?";
+//                result += " | ";
+//                result += addr.getSubLocality() != null ? addr.getSubLocality() : "?";
+//                result += " | ";
+//                result += addr.getThoroughfare() != null ? addr.getThoroughfare() : "?";
+//                result += " | ";
+//                result += addr.getSubThoroughfare() != null ? addr.getSubThoroughfare() : "?";
+//                Log.i(TAG, result);
+                countryName = addr.getCountryName();
+                if(cityName == null || cityName.equals("")) {
+                    cityName = addr.getLocality();
+                }if(cityName == null || cityName.equals("")){
+                    cityName = addr.getSubAdminArea();
+                }if(cityName == null || cityName.equals("")){
+                    cityName = addr.getAdminArea();
+                }
+                Log.i(TAG, "country: "+ countryName +" ,city: "+ cityName);
+                address = cityName +", " + countryName;
+                if(cityName != null  && countryName != null) //we got one good address
+                    break;
+            }
+
+        }
+        return address;
     }
 
     /**

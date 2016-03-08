@@ -53,12 +53,7 @@ public class MainActivityFragment extends Fragment{
 
 
         //ss:temp adapter that don't user cursor
-        PrayerAdapter mAdapter = new PrayerAdapter(prayerTimes,getActivity(), new PrayerAdapter.PrayerAdapterOnClickHandler() {
-            @Override
-            public void onClick(int prayerPos, PrayerAdapter.PrayerAdapterViewHolder vh) {
-                //leave it empty now till i impelement the click action
-            }
-        }, emptyView);
+        PrayerAdapter mAdapter = new PrayerAdapter(prayerTimes,getActivity(), emptyView);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 

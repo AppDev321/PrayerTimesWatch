@@ -29,22 +29,19 @@ public class PrayerAdapter extends RecyclerView.Adapter<PrayerAdapter.PrayerAdap
 
     private Cursor mCursor;
     final private Context mContext;
-    final private PrayerAdapterOnClickHandler mClickHandler;
     final private View mEmptyView;
     ArrayList<String> prayerTimes;
     ArrayList<String> friendlyPrayerTimes;
 
 
-    PrayerAdapter(Context context, PrayerAdapterOnClickHandler ch, View emptyView){
+    PrayerAdapter(Context context, View emptyView){
         mContext = context;
-        mClickHandler = ch;
         mEmptyView = emptyView;
 
     }
 
-    public PrayerAdapter(ArrayList<String> array,Context context, PrayerAdapterOnClickHandler ch, View emptyView) {
+    public PrayerAdapter(ArrayList<String> array,Context context, View emptyView) {
         mContext = context;
-        mClickHandler = ch;
         mEmptyView = emptyView;
         prayerTimes = new ArrayList<>();
         friendlyPrayerTimes = new ArrayList<>();
@@ -171,7 +168,7 @@ public class PrayerAdapter extends RecyclerView.Adapter<PrayerAdapter.PrayerAdap
         return pos;
     }
 
-    public class PrayerAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class PrayerAdapterViewHolder extends RecyclerView.ViewHolder  {
         public final TextView mPrayerName;
         public final TextView mPrayerTime;
         public final TextView mTimeRemaining;
@@ -182,16 +179,9 @@ public class PrayerAdapter extends RecyclerView.Adapter<PrayerAdapter.PrayerAdap
             mPrayerName = (TextView) view.findViewById(R.id.prayer_name);
             mPrayerTime = (TextView) view.findViewById(R.id.prayer_time);
             mTimeRemaining = (TextView) view.findViewById(R.id.prayer_time_remaining);
-            view.setOnClickListener(this);
-        }
-
-        @Override
-        public void onClick(View v) {
 
         }
+
     }
 
-    public static interface PrayerAdapterOnClickHandler{
-        void onClick(int prayerPos, PrayerAdapterViewHolder vh);
-    }
 }
