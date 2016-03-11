@@ -1,6 +1,8 @@
 package com.sommayah.myprayertimes;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -50,6 +52,16 @@ public class MainActivityFragment extends Fragment{
 
         ArrayList<String> prayerTimes;
         prayerTimes = Utility.getPrayTimes(cal,getContext());
+
+        if(!Utility.isAlarmInitiated(getContext())){
+            SharedPreferences sharedPreferences =
+                    PreferenceManager.getDefaultSharedPreferences(getContext());
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean(getString(R.string.pref_alarm_initiated), true);
+            PrayerAlarmReceiver prayerAlarmReceiver = new PrayerAlarmReceiver();
+            prayerAlarmReceiver.addPrayerAlarm(getContext());
+
+        }
 
 
         //ss:temp adapter that don't user cursor

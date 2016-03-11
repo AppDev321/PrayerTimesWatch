@@ -1,8 +1,6 @@
 package com.sommayah.myprayertimes;
 
 import android.Manifest;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,7 +9,6 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -56,12 +53,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        String day = Utility.getDayName();
-        String date = Utility.getGregoreanDayString();
-        String hDate = Utility.getHijriDate(getApplicationContext());
-        Log.d("day of week:", day);
-        Log.d("date:", date);
-        Log.d("hijri date:", hDate);
+//        String day = Utility.getDayName();
+//        String date = Utility.getGregoreanDayString();
+//        String hDate = Utility.getHijriDate(getApplicationContext());
+//        Log.d("day of week:", day);
+//        Log.d("date:", date);
+//        Log.d("hijri date:", hDate);
 
 
         // Acquire a reference to the system Location Manager
@@ -107,31 +104,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        Utility.testPrayertimes(getApplicationContext());
-
-        AlarmManager alarmMgr;
-        PendingIntent alarmIntent;
-        alarmMgr = (AlarmManager)getApplicationContext().getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(getApplicationContext(), PrayerAlarmReceiver.class);
-        alarmIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, intent, 0);
-
-        alarmMgr.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                SystemClock.elapsedRealtime() +
-                        60 * 1000, alarmIntent);
-
-
-
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mhijriDateText = (TextView) findViewById(R.id.dateTextView);
-        mhijriDateText.setText(Utility.getHijriDate(getApplicationContext()));
-        if(Utility.isLocationLatLonAvailable(getApplicationContext())) {
-            mTitleText = (TextView) findViewById(R.id.title);
-            mTitleText.setText(Utility.getPreferredLocation(getApplicationContext()));
-        }
         // Define a listener that responds to location updates
         mLocationListener = new LocationListener() {
             public void onLocationChanged(Location location) {
@@ -148,6 +120,33 @@ public class MainActivity extends AppCompatActivity {
             public void onProviderDisabled(String provider) {
             }
         };
+
+//        Utility.testPrayertimes(getApplicationContext());
+
+//        AlarmManager alarmMgr;
+//        PendingIntent alarmIntent;
+//        alarmMgr = (AlarmManager)getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+//        Intent intent = new Intent(getApplicationContext(), PrayerAlarmReceiver.class);
+//        alarmIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, intent, 0);
+//
+//        alarmMgr.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+//                SystemClock.elapsedRealtime() +
+//                        60 * 1000, alarmIntent);
+
+
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mhijriDateText = (TextView) findViewById(R.id.dateTextView);
+        mhijriDateText.setText(Utility.getHijriDate(getApplicationContext()));
+        if(Utility.isLocationLatLonAvailable(getApplicationContext())) {
+            mTitleText = (TextView) findViewById(R.id.title);
+            mTitleText.setText(Utility.getPreferredLocation(getApplicationContext()));
+        }
+
 
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -285,5 +284,6 @@ public class MainActivity extends AppCompatActivity {
             mTitleText = (TextView) findViewById(R.id.title);
             mTitleText.setText(Utility.getPreferredLocation(getApplicationContext()));
         }
+
     }
 }

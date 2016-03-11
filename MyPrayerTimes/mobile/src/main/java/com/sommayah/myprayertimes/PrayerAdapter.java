@@ -77,31 +77,7 @@ public class PrayerAdapter extends RecyclerView.Adapter<PrayerAdapter.PrayerAdap
     @Override
     public void onBindViewHolder(PrayerAdapterViewHolder holder, int position) {
 
-        String name = "";
-        switch (position){
-            case 0:
-                name = "Fajr";
-                break;
-            case 1:
-                name = "SunRise";
-                break;
-            case 2:
-                name = "Zuhr";
-                break;
-            case 3:
-                name = "Asr";
-                break;
-            case 4:
-                name = "Maghrib";
-                break;
-            case 5:
-                name = "Isha";
-                break;
-            default:
-                name = "error";
-                break;
-
-        }
+        String name = Utility.getPrayerName(position);
         holder.mPrayerName.setText(name);
         LocalTime time = new LocalTime(prayerTimes.get(position));
         DateTimeFormatter fmt = DateTimeFormat.forPattern("hh:mm aa");
@@ -114,7 +90,7 @@ public class PrayerAdapter extends RecyclerView.Adapter<PrayerAdapter.PrayerAdap
         if(getItemViewType(position) == VIEW_TYPE_NEXT){
             LocalTime now = LocalTime.now();
             int minutes = Minutes.minutesBetween(now, time).getMinutes();
-            holder.mTimeRemaining.setText( /*Minutes.minutesBetween(time, now).getMinutes()*/getFriendlyTimeString(minutes));
+            holder.mTimeRemaining.setText(getFriendlyTimeString(minutes));
         }
 
     }
@@ -128,12 +104,12 @@ public class PrayerAdapter extends RecyclerView.Adapter<PrayerAdapter.PrayerAdap
             hours = minutes/60;
             minutes = minutes%60;
             remainingTime = String.valueOf(hours)+ " hours, and " + String.valueOf(minutes)
-                    +" minutes remaining.";
+                    + " minutes remaining.";
             return remainingTime;
         }else if(minutes == 0){
             return "Time for Prayer.";
         }
-        return String.valueOf(minutes) + "minutes remaining";
+        return String.valueOf(minutes) + " minutes remaining";
 
     }
 
@@ -154,14 +130,14 @@ public class PrayerAdapter extends RecyclerView.Adapter<PrayerAdapter.PrayerAdap
         Log.d("get current time",now.toString());
         LocalTime limit;
         mUseNextPrayerLayout = true;
-        for(int i=0; i<prayerTimes.size() - 1; i++){
+        for(int i=0; i<prayerTimes.size(); i++){
             limit = new LocalTime(prayerTimes.get(i));
             Boolean isLate = now.isAfter(limit);
             if(isLate)
                 pos++;
         }
         //case pos is out of bound
-        if(pos == prayerTimes.size() - 1 ){
+        if(pos == prayerTimes.size()){
            // mUseNextPrayerLayout = false;
             pos = 0; //just for now
         }

@@ -54,7 +54,12 @@
         <receiver
             android:name=".PassiveLocationChangeReceiver"
             android:enabled="true"
-            android:exported="true"></receiver>
+            android:exported="true" />
+
+        <service
+            android:name=".RemoveNotificationService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>

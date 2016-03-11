@@ -53,6 +53,13 @@ public class Utility {
 
     }
 
+    public static boolean isAlarmInitiated(Context context){
+        SharedPreferences prefs
+                = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getBoolean(context.getString(R.string.pref_alarm_initiated),
+                false);
+    }
+
     public static float getLocationLatitude(Context context) {
         SharedPreferences prefs
                 = PreferenceManager.getDefaultSharedPreferences(context);
@@ -361,4 +368,32 @@ public class Utility {
         return monthName;
     }
 
+    public static String getPrayerName(int pos) {
+        String name = "";
+        switch (pos){
+            case 0:
+                name = "Fajr";
+                break;
+            case 1:
+                name = "SunRise";
+                break;
+            case 2:
+                name = "Zuhr";
+                break;
+            case 3:
+                name = "Asr";
+                break;
+            case 4:
+                name = "Maghrib";
+                break;
+            case 5:
+                name = "Isha";
+                break;
+            default:
+                name = "error";
+                break;
+
+        }
+        return name;
+    }
 }

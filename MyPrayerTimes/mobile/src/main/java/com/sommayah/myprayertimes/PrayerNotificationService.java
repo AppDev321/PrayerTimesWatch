@@ -1,5 +1,6 @@
 package com.sommayah.myprayertimes;
 
+import android.app.AlarmManager;
 import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -9,7 +10,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
-import android.os.Handler;
 import android.support.v4.app.NotificationCompat;
 
 /**
@@ -77,15 +77,13 @@ public class PrayerNotificationService extends IntentService {
         notificationManager.notify(NOTIFICATION_ID,
                 mBuilder.build());
 
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent alarmIntent = new Intent(this, RemoveNotificationService.class);
+        PendingIntent pendingIntent = PendingIntent.getService(this, 1, alarmIntent, 0);
+        alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 15000 * 60, pendingIntent); //remove notifications after 15 minutes
 
-            @Override
-            public void run() {
-                notificationManager.cancel(NOTIFICATION_ID);
-            }
 
-        }, 15000*60); //remove notification after 15 minutes
+
     }
 }
 

@@ -6,11 +6,28 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.LocationManager;
+import android.os.Build;
 import android.support.v4.content.WakefulBroadcastReceiver;
+import android.util.Log;
+
+import com.sommayah.myprayertimes.data.Prayer;
+
+import org.joda.time.DateTimeZone;
+import org.joda.time.LocalTime;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
 
 public class PrayerAlarmReceiver extends WakefulBroadcastReceiver {
     public static final String ACTION_PRAYER_TIME_ALARM = "com.sommayah.myprayertimes.ACTION_PRAYER_TIME_ALARM";
     public static final String EXTRA_PRAYER_NAME = "prayer_name";
+    public static final String EXTRA_PRAYER_TIME = "prayer_time";
+    public static final int ALARM_ID = 1000;
+    public static final int PASSIVE_LOCATION_ID = 2000;
+    public static final int TWO_MIN = 2000 *60;
     // The app's AlarmManager, which provides access to the system alarm services.
     private AlarmManager alarmManager;
     // The pending intent that is triggered when the alarm fires.
@@ -26,19 +43,49 @@ public class PrayerAlarmReceiver extends WakefulBroadcastReceiver {
 
         // Start the service, keeping the device awake while it is launching.
         String prayerName =  intent.getStringExtra(EXTRA_PRAYER_NAME);
+        long alarmTime = intent.getLongExtra(EXTRA_PRAYER_TIME, -1);
         if(prayerName == null)
             prayerName = ""; // in case error in prayer name
+        if(alarmTime != -1 && Math.abs(alarmTime - System.currentTimeMillis()) < TWO_MIN) {
+            if (Utility.isAlarmEnabled(context)) {
 
-        if(Utility.isAlarmEnabled(context)) {
-            Intent sendNotificationIntent = new Intent(context, PrayerNotificationService.class);
-            sendNotificationIntent.putExtra(EXTRA_PRAYER_NAME, prayerName);
-            startWakefulService(context, sendNotificationIntent);
+                Intent sendNotificationIntent = new Intent(context, PrayerNotificationService.class);
+                sendNotificationIntent.putExtra(EXTRA_PRAYER_NAME, prayerName);
+                startWakefulService(context, sendNotificationIntent);
+
+            }
+            //set the next prayer alarm
+            addPrayerAlarm(context);
         }
-        //set the next prayer alarm
-        addPrayerAlarm(context);
     }
 
     public void addPrayerAlarm(Context context){
+        alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(context,PrayerAlarmReceiver.class);
+        //get the next prayer
+
+        Prayer next_prayer_time = getNextPrayer(context);
+        Calendar cal = getCalendarFromPrayerTime(next_prayer_time.getTime(),next_prayer_time.getTomorrow());
+        intent.putExtra(EXTRA_PRAYER_NAME,next_prayer_time.getName());
+        intent.putExtra(EXTRA_PRAYER_TIME, cal.getTimeInMillis());
+        alarmIntent = PendingIntent.getBroadcast(context, ALARM_ID, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
+            //lollipop_mr1 is 22, this is only 23 and above
+            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), alarmIntent);
+        } else if (Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            //JB_MR2 is 18, this is only 19 and above.
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), alarmIntent);
+        } else {
+            //available since api1
+            alarmManager.set(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), alarmIntent);
+        }
+
+        // SET PASSIVE LOCATION RECEIVER
+        Intent passiveIntent = new Intent(context, PassiveLocationChangeReceiver.class);
+        PendingIntent locationListenerPassivePendingIntent = PendingIntent.getActivity(context, PASSIVE_LOCATION_ID, passiveIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        requestPassiveLocationUpdates(context, locationListenerPassivePendingIntent);
+
         // Enable {@code SampleBootReceiver} to automatically restart the alarm when the
         // device is rebooted.
         ComponentName receiver = new ComponentName(context, PrayerOnBootReceiver.class);
@@ -50,7 +97,93 @@ public class PrayerAlarmReceiver extends WakefulBroadcastReceiver {
 
     }
 
-    public void cancelAlarm(Context context) {
+    private Prayer getNextPrayer(Context context) {
+        Calendar now = Calendar.getInstance(TimeZone.getDefault());
+        now.setTimeInMillis(System.currentTimeMillis());
+        ArrayList<String> prayerTimes = Utility.getPrayTimes(now,context);
+        prayerTimes.remove(1); //this is sunrise we don't need an alarm for that, or can make it as a feature?
+        int pos = 0;
+        LocalTime nowLocal = LocalTime.now();
+        Log.d("get current time", nowLocal.toString());
+        LocalTime limit;
+        for(int i=0; i<prayerTimes.size(); i++){
+            limit = new LocalTime(prayerTimes.get(i));
+            Boolean isLate = nowLocal.isAfter(limit);
+            if(isLate)
+                pos++;
+        }
+        //case pos is out of bound, get first prayer of tomorrow
+        if(pos == prayerTimes.size() ){
+            Calendar tomorrow= Calendar.getInstance(TimeZone.getDefault());
+            tomorrow.setTimeInMillis(System.currentTimeMillis());
+            tomorrow.add(Calendar.DAY_OF_YEAR, 1);
+            prayerTimes = Utility.getPrayTimes(tomorrow,context);
+            return new Prayer("Fajr",prayerTimes.get(0), true); //true: tomorrow
+        }
+        int prayer_pos = pos;
+        if(pos >=1){ //sunrise is not a prayer get name of next
+            prayer_pos++;
+        }
+        String name = Utility.getPrayerName(prayer_pos);
+        return new Prayer(name,prayerTimes.get(pos));
+    }
 
+    public Calendar getCalendarFromPrayerTime(String prayTime, boolean tomorrow){
+        LocalTime time = new LocalTime(prayTime);
+        Calendar cal= Calendar.getInstance(TimeZone.getDefault());
+        Date date = time.toDateTimeToday(DateTimeZone.getDefault()).toDate();
+        cal.setTime(date);
+        if(tomorrow == true){
+            cal.add(Calendar.DAY_OF_YEAR, 1);
+        }
+        return cal;
+    }
+
+    public void cancelAlarm(Context context) {
+        if(alarmManager == null){
+            alarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+        }
+        if(alarmIntent == null){
+            Intent intent = new Intent(context, PrayerAlarmReceiver.class);
+            alarmIntent = PendingIntent.getBroadcast(context,ALARM_ID,intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        }
+        alarmManager.cancel(alarmIntent);
+        //REMOVE PASSIVE LOCATION RECEIVER
+        Intent passiveIntent = new Intent(context, PassiveLocationChangeReceiver.class);
+        PendingIntent locationListenerPassivePendingIntent = PendingIntent.getActivity(context, PASSIVE_LOCATION_ID, passiveIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        removePassiveLocationUpdates(context, locationListenerPassivePendingIntent);
+        // Disable {@code SampleBootReceiver} so that it doesn't automatically restart the
+        // alarm when the device is rebooted.
+        ComponentName receiver = new ComponentName(context, PrayerOnBootReceiver.class);
+        PackageManager pm = context.getPackageManager();
+
+        pm.setComponentEnabledSetting(receiver,
+                PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                PackageManager.DONT_KILL_APP);
+    }
+
+
+
+    public void removePassiveLocationUpdates(Context context, PendingIntent pendingIntent) {
+        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        try {
+            locationManager.removeUpdates(pendingIntent);
+        } catch (SecurityException se) {
+            //do nothing. We should always have permision in order to reach this screen.
+        }
+    }
+
+    public void requestPassiveLocationUpdates(Context context, PendingIntent pendingIntent) {
+        long oneHourInMillis = 1000 * 60 * 60;
+        long fiftyKinMeters = 50000;
+
+        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        try {
+            locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER,
+                    oneHourInMillis, fiftyKinMeters, pendingIntent);
+        } catch (SecurityException se) {
+            Log.w("SetAlarmReceiver", se.getMessage(), se);
+            //do nothing. We should always have permision in order to reach this screen.
+        }
     }
 }
