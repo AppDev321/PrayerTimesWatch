@@ -9,7 +9,7 @@ import android.preference.PreferenceManager;
 import android.text.format.Time;
 import android.util.Log;
 
-import com.sommayah.myprayertimes.data.PrayTime;
+import com.sommayah.myprayertimes.dataModels.PrayTime;
 
 import org.joda.time.Chronology;
 import org.joda.time.LocalDate;
@@ -23,6 +23,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 /**
  * Created by sommayahsoliman on 2/25/16.
@@ -211,6 +212,7 @@ public class Utility {
         // Test Prayer times here
         PrayTime prayers = new PrayTime();
         double timezone = prayers.getBaseTimeZone();
+        double dst = prayers.detectDaylightSaving();
         prayers.setTimeFormat(prayers.TIME12);
         prayers.setCalcMethod(prayers.ISNA);
         prayers.setAsrJuristic(prayers.SHAFII);
@@ -238,6 +240,7 @@ public class Utility {
         mPrayTime.setCalcMethod(mPrayTime.ISNA);
         mPrayTime.setAsrJuristic(mPrayTime.SHAFII);
         mPrayTime.setAdjustHighLats(mPrayTime.ANGLEBASED);
+        double dst = mPrayTime.detectDaylightSaving();
         int[] offsets = {0, 0, 0, 0, 0, 0, 0}; // {Fajr,Sunrise,Dhuhr,Asr,Sunset,Maghrib,Isha}
         mPrayTime.tune(offsets);
         prayerTimes = mPrayTime.getPrayerTimes(cal,getLocationLatitude(context),
@@ -368,26 +371,27 @@ public class Utility {
         return monthName;
     }
 
-    public static String getPrayerName(int pos) {
+    public static String getPrayerName(int pos, Context context) {
         String name = "";
         switch (pos){
             case 0:
-                name = "Fajr";
+                name = context.getString(R.string.fajr);
                 break;
             case 1:
-                name = "SunRise";
+                name = context.getString(R.string.sunrise);
                 break;
             case 2:
-                name = "Zuhr";
+                Calendar cal = Calendar.getInstance(TimeZone.getDefault());
+                name = (cal.get(Calendar.DAY_OF_WEEK) == 6)?context.getString(R.string.jumuah):context.getString(R.string.dhuhr);
                 break;
             case 3:
-                name = "Asr";
+                name = context.getString(R.string.asr);
                 break;
             case 4:
-                name = "Maghrib";
+                name = context.getString(R.string.maghrib);
                 break;
             case 5:
-                name = "Isha";
+                name = context.getString(R.string.isha);
                 break;
             default:
                 name = "error";

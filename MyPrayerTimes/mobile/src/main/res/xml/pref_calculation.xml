@@ -1,0 +1,68 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="hour_switch"
+        android:summary="@string/pref_description_hour_calculation"
+        android:title="@string/pref_title_hour_calculation" />
+
+    <ListPreference
+        android:defaultValue="1"
+        android:entries="@array/pref_asr_list_titles"
+        android:entryValues="@array/pref_asr_list_values"
+        android:key="asr_list"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null"
+        android:title="@string/pref_title_asr_calculation" />
+
+    <ListPreference
+        android:defaultValue="0"
+        android:entries="@array/pref_dst_list_titles"
+        android:entryValues="@array/pref_dst_list_values"
+        android:key="dst_list"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null"
+        android:title="@string/pref_title_dst" />
+
+    <ListPreference
+        android:defaultValue="0"
+        android:entries="@array/pref_hijri_list_titles"
+        android:entryValues="@array/pref_hijri_list_values"
+        android:key="hijri_list"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null"
+        android:title="@string/pref_title_hijri_adj" />
+
+    <ListPreference
+        android:defaultValue="1"
+        android:entries="@array/pref_language_list_titles"
+        android:entryValues="@array/pref_language_list_values"
+        android:key="language_list"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null"
+        android:title="@string/pref_title_language_calculation" />
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="high_alt_switch"
+        android:summary="@string/pref_description_high_alt"
+        android:title="@string/pref_title_high_alt" />
+
+    <!-- NOTE: EditTextPreference accepts EditText attributes. -->
+    <!-- NOTE: EditTextPreference's summary should be set to its value by the activity code. -->
+    <!--<EditTextPreference-->
+        <!--android:capitalize="words"-->
+        <!--android:defaultValue="@string/pref_default_display_name"-->
+        <!--android:inputType="textCapWords"-->
+        <!--android:key="example_text"-->
+        <!--android:maxLines="1"-->
+        <!--android:selectAllOnFocus="true"-->
+        <!--android:singleLine="true"-->
+        <!--android:title="@string/pref_title_display_name" />-->
+
+    <!-- NOTE: Hide buttons to simplify the UI. Users can touch outside the dialog to
+         dismiss it. -->
+    <!-- NOTE: ListPreference's summary should be set to its value by the activity code. -->
+
+
+</PreferenceScreen>

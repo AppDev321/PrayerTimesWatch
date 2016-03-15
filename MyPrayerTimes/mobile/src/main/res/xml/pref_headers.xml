@@ -3,9 +3,14 @@
     <!-- These settings headers are only used on tablets. -->
 
     <header
+        android:fragment="com.sommayah.myprayertimes.SettingsActivity$LocationPreferenceFragment"
+        android:icon="@drawable/ic_location_24dp"
+        android:title="@string/pref_header_location" />
+
+    <header
         android:fragment="com.sommayah.myprayertimes.SettingsActivity$GeneralPreferenceFragment"
         android:icon="@drawable/ic_info_black_24dp"
-        android:title="@string/pref_header_general" />
+        android:title="@string/pref_header_calculation" />
 
     <header
         android:fragment="com.sommayah.myprayertimes.SettingsActivity$NotificationPreferenceFragment"

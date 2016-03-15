@@ -37,7 +37,8 @@ public class PrayerNotificationService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
             String name= intent.getStringExtra(PrayerAlarmReceiver.EXTRA_PRAYER_NAME);
-            broadcastNotification(getApplicationContext(),name);
+            long time = intent.getLongExtra(PrayerAlarmReceiver.EXTRA_PRAYER_TIME, -1);
+            broadcastNotification(getApplicationContext(),name, time);
             // Release the wake lock provided by the BroadcastReceiver.
             PrayerAlarmReceiver.completeWakefulIntent(intent);
             // END_INCLUDE(service_onhandle)
@@ -47,7 +48,7 @@ public class PrayerNotificationService extends IntentService {
 
 
 
-    private void broadcastNotification(Context context, String prayer) {
+    private void broadcastNotification(Context context, String prayer, long time) {
         //ss:incorporate the preferences later
 
         NotificationCompat.Builder mBuilder =
@@ -55,9 +56,12 @@ public class PrayerNotificationService extends IntentService {
                         .setColor(context.getResources().getColor(R.color.primary_light))
                         .setSmallIcon(R.drawable.notification_icon)
                         .setContentTitle("Time for prayer")
-                        .setContentText("Time for " + prayer + " prayer.")
-                        .setTicker("Time to Pray:ticker")
+                        .setContentText("Time for " + prayer + " prayer")
+                        .setTicker("Time to Pray")
                         .setAutoCancel(true);
+
+        if(time != -1)
+            mBuilder.setWhen(time);
 
         Intent startActivityIntent = new Intent(this, MainActivity.class);
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);

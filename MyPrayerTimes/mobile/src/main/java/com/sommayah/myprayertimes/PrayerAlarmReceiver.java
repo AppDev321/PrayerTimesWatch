@@ -11,7 +11,7 @@ import android.os.Build;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
 
-import com.sommayah.myprayertimes.data.Prayer;
+import com.sommayah.myprayertimes.dataModels.Prayer;
 
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalTime;
@@ -27,7 +27,7 @@ public class PrayerAlarmReceiver extends WakefulBroadcastReceiver {
     public static final String EXTRA_PRAYER_TIME = "prayer_time";
     public static final int ALARM_ID = 1000;
     public static final int PASSIVE_LOCATION_ID = 2000;
-    public static final int TWO_MIN = 2000 *60;
+    public static final int FIVE_MIN = 5000 *60;
     // The app's AlarmManager, which provides access to the system alarm services.
     private AlarmManager alarmManager;
     // The pending intent that is triggered when the alarm fires.
@@ -46,11 +46,12 @@ public class PrayerAlarmReceiver extends WakefulBroadcastReceiver {
         long alarmTime = intent.getLongExtra(EXTRA_PRAYER_TIME, -1);
         if(prayerName == null)
             prayerName = ""; // in case error in prayer name
-        if(alarmTime != -1 && Math.abs(alarmTime - System.currentTimeMillis()) < TWO_MIN) {
+        if(alarmTime != -1 && Math.abs(alarmTime - System.currentTimeMillis()) < FIVE_MIN) {
             if (Utility.isAlarmEnabled(context)) {
 
                 Intent sendNotificationIntent = new Intent(context, PrayerNotificationService.class);
                 sendNotificationIntent.putExtra(EXTRA_PRAYER_NAME, prayerName);
+                sendNotificationIntent.putExtra(EXTRA_PRAYER_TIME, alarmTime);
                 startWakefulService(context, sendNotificationIntent);
 
             }
@@ -65,7 +66,7 @@ public class PrayerAlarmReceiver extends WakefulBroadcastReceiver {
         //get the next prayer
 
         Prayer next_prayer_time = getNextPrayer(context);
-        Calendar cal = getCalendarFromPrayerTime(next_prayer_time.getTime(),next_prayer_time.getTomorrow());
+        Calendar cal = getCalendarFromPrayerTime(next_prayer_time.getTime(), next_prayer_time.getTomorrow());
         intent.putExtra(EXTRA_PRAYER_NAME,next_prayer_time.getName());
         intent.putExtra(EXTRA_PRAYER_TIME, cal.getTimeInMillis());
         alarmIntent = PendingIntent.getBroadcast(context, ALARM_ID, intent, PendingIntent.FLAG_CANCEL_CURRENT);
@@ -124,7 +125,7 @@ public class PrayerAlarmReceiver extends WakefulBroadcastReceiver {
         if(pos >=1){ //sunrise is not a prayer get name of next
             prayer_pos++;
         }
-        String name = Utility.getPrayerName(prayer_pos);
+        String name = Utility.getPrayerName(prayer_pos,context);
         return new Prayer(name,prayerTimes.get(pos));
     }
 

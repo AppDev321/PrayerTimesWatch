@@ -4,6 +4,7 @@ package com.sommayah.myprayertimes;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
@@ -13,12 +14,19 @@ import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
 import android.text.TextUtils;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
+
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.List;
 
@@ -33,7 +41,9 @@ import java.util.List;
  * href="http://developer.android.com/guide/topics/ui/settings.html">Settings
  * API Guide</a> for more information on developing a Settings UI.
  */
-public class SettingsActivity extends AppCompatPreferenceActivity {
+public class SettingsActivity extends AppCompatPreferenceActivity  {
+    protected final static int PLACE_PICKER_REQUEST = 9090;
+    private ImageView mAttribution;
     /**
      * A preference value change listener that updates the preference's summary
      * to reflect its new value.
@@ -120,6 +130,18 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupActionBar();
+
+        // If we are using a PlacePicker location, we need to show attributions.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            mAttribution = new ImageView(this);
+            mAttribution.setImageResource(R.drawable.powered_by_google_light);
+
+            if (!Utility.isLocationLatLonAvailable(this)) {
+                mAttribution.setVisibility(View.GONE);
+            }
+
+            setListFooter(mAttribution);
+        }
     }
 
     /**
@@ -128,8 +150,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     private void setupActionBar() {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
-            // Show the Up button in the action bar.
-            actionBar.setDisplayHomeAsUpEnabled(true);
+            // don't Show the Up button in the action bar.
+            actionBar.setDisplayHomeAsUpEnabled(false);
         }
     }
 
@@ -158,11 +180,15 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         return PreferenceFragment.class.getName().equals(fragmentName)
                 || GeneralPreferenceFragment.class.getName().equals(fragmentName)
                 || DataSyncPreferenceFragment.class.getName().equals(fragmentName)
-                || NotificationPreferenceFragment.class.getName().equals(fragmentName);
+                || NotificationPreferenceFragment.class.getName().equals(fragmentName)
+                || LocationPreferenceFragment.class.getName().equals(fragmentName);
     }
 
+
+
+
     /**
-     * This fragment shows general preferences only. It is used when the
+     * This fragment shows calculation methode preferences only. It is used when the
      * activity is showing a two-pane settings UI.
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -170,15 +196,17 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.pref_general);
+            addPreferencesFromResource(R.xml.pref_calculation);
             setHasOptionsMenu(true);
 
             // Bind the summaries of EditText/List/Dialog/Ringtone preferences
             // to their values. When their values change, their summaries are
             // updated to reflect the new value, per the Android Design
             // guidelines.
-            bindPreferenceSummaryToValue(findPreference("example_text"));
-            bindPreferenceSummaryToValue(findPreference("example_list"));
+            bindPreferenceSummaryToValue(findPreference("dst_list"));
+            bindPreferenceSummaryToValue(findPreference("asr_list"));
+            bindPreferenceSummaryToValue(findPreference("hijri_list"));
+            bindPreferenceSummaryToValue(findPreference("language_list"));
         }
 
         @Override
@@ -208,7 +236,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             // to their values. When their values change, their summaries are
             // updated to reflect the new value, per the Android Design
             // guidelines.
-            bindPreferenceSummaryToValue(findPreference("notifications_new_message_ringtone"));
+            bindPreferenceSummaryToValue(findPreference("notifications_prayer_ringtone"));
         }
 
         @Override
@@ -251,4 +279,93 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             return super.onOptionsItemSelected(item);
         }
     }
+
+    /**
+     * This fragment shows calculation methode preferences only. It is used when the
+     * activity is showing a two-pane settings UI.
+     */
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    public static class LocationPreferenceFragment extends PreferenceFragment {
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            addPreferencesFromResource(R.xml.pref_location);
+            setHasOptionsMenu(true);
+
+            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
+            // to their values. When their values change, their summaries are
+            // updated to reflect the new value, per the Android Design
+            // guidelines.
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_location_key)));
+
+
+
+        }
+
+        @Override
+        public boolean onOptionsItemSelected(MenuItem item) {
+            int id = item.getItemId();
+            if (id == android.R.id.home) {
+                startActivity(new Intent(getActivity(), SettingsActivity.class));
+                return true;
+            }
+            return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // Check to see if the result is from our Place Picker intent
+        if (requestCode == PLACE_PICKER_REQUEST) {
+            // Make sure the request was successful
+            if (resultCode == RESULT_OK) {
+                Place place = PlacePicker.getPlace(data, this);
+                String address = place.getAddress().toString();
+                LatLng latLong = place.getLatLng();
+
+                // If the provided place doesn't have an address, we'll form a display-friendly
+                // string from the latlng values.
+                if (TextUtils.isEmpty(address)) {
+                    address = String.format("(%.2f, %.2f)",latLong.latitude, latLong.longitude);
+                }
+
+                SharedPreferences sharedPreferences =
+                        PreferenceManager.getDefaultSharedPreferences(this);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString(getString(R.string.pref_location_key), address);
+
+                // Also store the latitude and longitude so that we can use these to get a precise
+                // result from our weather service. We cannot expect the weather service to
+                // understand addresses that Google formats.
+                editor.putFloat(getString(R.string.pref_location_latitude),
+                        (float) latLong.latitude);
+                editor.putFloat(getString(R.string.pref_location_longitude),
+                        (float) latLong.longitude);
+                editor.commit();
+
+                // Tell the SyncAdapter that we've changed the location, so that we can update
+                // our UI with new values. We need to do this manually because we are responding
+                // to the PlacePicker widget result here instead of allowing the
+                // LocationEditTextPreference to handle these changes and invoke our callbacks.
+                Preference locationPreference = findPreference(getString(R.string.pref_location_key));
+              //  setPreferenceSummary(locationPreference, address);
+
+                // Add attributions for our new PlacePicker location.
+                if (mAttribution != null) {
+                    mAttribution.setVisibility(View.VISIBLE);
+                } else {
+                    // For pre-Honeycomb devices, we cannot add a footer, so we will use a snackbar
+                    View rootView = findViewById(android.R.id.content);
+                    Snackbar.make(rootView, getString(R.string.attribution_text),
+                            Snackbar.LENGTH_LONG).show();
+                }
+
+            //    Utility.resetLocationStatus(this);
+            //    SunshineSyncAdapter.syncImmediately(this);
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
 }

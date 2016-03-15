@@ -11,7 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.sommayah.myprayertimes.data.PrayTime;
+import com.sommayah.myprayertimes.dataModels.PrayTime;
 
 import java.util.ArrayList;
 import java.util.Calendar;

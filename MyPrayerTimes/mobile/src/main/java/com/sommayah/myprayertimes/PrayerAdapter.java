@@ -9,7 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.sommayah.myprayertimes.data.PrayTime;
+import com.sommayah.myprayertimes.dataModels.PrayTime;
 
 import org.joda.time.LocalTime;
 import org.joda.time.Minutes;
@@ -77,7 +77,7 @@ public class PrayerAdapter extends RecyclerView.Adapter<PrayerAdapter.PrayerAdap
     @Override
     public void onBindViewHolder(PrayerAdapterViewHolder holder, int position) {
 
-        String name = Utility.getPrayerName(position);
+        String name = Utility.getPrayerName(position,mContext);
         holder.mPrayerName.setText(name);
         LocalTime time = new LocalTime(prayerTimes.get(position));
         DateTimeFormatter fmt = DateTimeFormat.forPattern("hh:mm aa");

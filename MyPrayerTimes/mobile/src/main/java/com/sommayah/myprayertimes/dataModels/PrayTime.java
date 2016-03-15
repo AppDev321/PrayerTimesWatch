@@ -1,4 +1,4 @@
-package com.sommayah.myprayertimes.data;
+package com.sommayah.myprayertimes.dataModels;
 
 //--------------------- Copyright Block ----------------------
 /*
@@ -52,6 +52,7 @@ public class PrayTime {
     private double lng; // longitude
     private double timeZone; // time-zone
     private double JDate; // Julian date
+    private double dst; //day light saving
     // ------------------------------------------------------------
     // Calculation Methods
     public static final int JAFARI = 0; // Ithna Ashari
@@ -102,6 +103,7 @@ public class PrayTime {
         this.setDhuhrMinutes(0);
         this.setAdjustHighLats(1);
         this.setTimeFormat(1);
+        this.setDst(detectDaylightSaving()); //default is auto dst
 
         // Time Names
         timeNames = new ArrayList<String>();
@@ -265,9 +267,9 @@ public class PrayTime {
     }
 
     // detect daylight saving in a given date
-    private double detectDaylightSaving() {
+    public double detectDaylightSaving() {
         TimeZone timez = TimeZone.getDefault();
-        double hoursDiff = timez.getDSTSavings();
+        double hoursDiff = (timez.getDSTSavings() / 1000.0) / 3600;
         return hoursDiff;
     }
 
@@ -564,7 +566,7 @@ public class PrayTime {
     // adjust times in a prayer time array
     private double[] adjustTimes(double[] times) {
         for (int i = 0; i < times.length; i++) {
-            times[i] += this.getTimeZone() - this.getLng() / 15;
+            times[i] += this.getTimeZone() + this.getDst() - this.getLng() / 15;
         }
 
         times[2] += this.getDhuhrMinutes() / 60; // Dhuhr
@@ -773,6 +775,10 @@ public class PrayTime {
     public void setTimeZone(double timeZone) {
         this.timeZone = timeZone;
     }
+
+    public double getDst(){return dst;}
+
+    public void setDst(double dst){this.dst = dst;}
 
     public double getJDate() {
         return JDate;

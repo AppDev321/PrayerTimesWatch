@@ -1,4 +1,4 @@
-package com.sommayah.myprayertimes.data;
+package com.sommayah.myprayertimes.dataModels;
 
 /**
  * Created by sommayahsoliman on 3/10/16.

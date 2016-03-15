@@ -59,7 +59,13 @@
         <service
             android:name=".RemoveNotificationService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
+
+        <provider
+            android:name=".data.PrayerProvider"
+            android:authorities="com.sommayah.myprayertimes"
+            android:enabled="true"
+            android:exported="true"></provider>
     </application>
 
 </manifest>

@@ -13,43 +13,75 @@
     <string name="pref_time_format_key">time-format</string>
     <string name="title_activity_compass">CompassActivity</string>
     <string name="title_activity_settings">Settings</string>
-    <!-- strings related to hijri months names-->
-    <string name="muharam">Muharam</string>
-    <string name="safar">Safar</string>
-    <string name="rabee31">Rabea Al Awal</string>
-    <string name="rabee32">Rabea Al Thani</string>
-    <string name="jumada1">Jumada Al Awal</string>
-    <string name="jumada2">Jumada Al Thani</string>
-    <string name="rajab">Rajab</string>
-    <string name="shaban">Shaban</string>
-    <string name="ramadan">Ramadan</string>
-    <string name="shawal">Shawal</string>
-    <string name="dhulqe3da">Dhu-l Qida</string>
-    <string name="dhulhija">Dhu-l Hija</string>
+
 
     <!-- Strings related to Settings -->
 
-    <!-- Example General settings -->
-    <string name="pref_header_general">General</string>
+    <string name="pref_header_calculation">Calculation Method Setting</string>
 
-    <string name="pref_title_social_recommendations">Enable social recommendations</string>
-    <string name="pref_description_social_recommendations">Recommendations for people to contact
-        based on your message history
-    </string>
+    <string name="pref_title_hour_calculation">24 hour display</string>
+    <string name="pref_description_hour_calculation">"13:00" or "1:00 PM"</string>
+
+    <string name="pref_title_high_alt">High Altitude</string>
+    <string name="pref_description_high_alt">Turn it on for high altitudes only</string>
 
     <string name="pref_title_display_name">Display name</string>
     <string name="pref_default_display_name">John Smith</string>
 
-    <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
-    <string-array name="pref_example_list_titles">
-        <item>Always</item>
-        <item>When possible</item>
-        <item>Never</item>
+    <!--hijri date adjustment-->
+
+    <string name="pref_title_hijri_adj">Hijri Date Adjustment</string>
+    <string-array name="pref_hijri_list_titles">
+        <item>-2 days</item>
+        <item>-1 day</item>
+        <item>0 days</item>
+        <item>+1 day</item>
+        <item>+2 days</item>
     </string-array>
-    <string-array name="pref_example_list_values">
+    <string-array name="pref_hijri_list_values">
+        <item>-2</item>
+        <item>-1</item>
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <!--asr calculation-->
+
+    <string name="pref_title_asr_calculation">Asr Calculation Method</string>
+    <string-array name="pref_asr_list_titles">
+        <item>Shafii</item>
+        <item>Hanafi</item>
+    </string-array>
+    <string-array name="pref_asr_list_values">
         <item>1</item>
         <item>0</item>
-        <item>-1</item>
+    </string-array>
+
+    <!--language-->
+
+    <string name="pref_title_language_calculation">Display Language</string>
+    <string-array name="pref_language_list_titles">
+        <item>English</item>
+        <item>Arabic</item>
+    </string-array>
+    <string-array name="pref_language_list_values">
+        <item>1</item>
+        <item>0</item>
+    </string-array>
+
+    <!--DST adjustment-->
+
+    <string name="pref_title_dst">Daylight Saving Adjustment</string>
+    <string-array name="pref_dst_list_titles">
+        <item>+1 hour</item>
+        <item>Default value</item>
+        <item>-1 hour</item>
+    </string-array>
+    <string-array name="pref_dst_list_values">
+        <item>1</item>
+        <item>0</item>
+        <item>1</item>
     </string-array>
 
     <!-- Example settings for Data & Sync -->
@@ -78,13 +110,42 @@
     <!-- Example settings for Notifications -->
     <string name="pref_header_notifications">Notifications</string>
 
-    <string name="pref_title_new_message_notifications">New message notifications</string>
+    <string name="pref_title_prayer_notifications">Prayer notifications</string>
 
-    <string name="pref_title_ringtone">Ringtone</string>
+    <string name="pref_title_ringtone">Notification Sound</string>
     <string name="pref_ringtone_silent">Silent</string>
-
     <string name="pref_title_vibrate">Vibrate</string>
+
     <string name="pref_alarm_enabled">alarm-enabled</string>
     <string name="pref_alarm_initiated">alarm-initated</string>
+
+    <string name="pref_current_location_desc">Use my current location</string>
+    <!-- For Google Places API Attributions -->
+    <string name="attribution_text">Powered by Google</string>
+    <!-- Label for the location preference [CHAR LIMIT=30] -->
+    <string name="pref_location_label">Location</string>
+    <string name="pref_header_location">Location Settings</string>
+
+    <!--translatable strings-->
+    <string name="fajr">Fajr</string>
+    <string name="sunrise">SunRise</string>
+    <string name="dhuhr">Dhuhr</string>
+    <string name="asr">Asr</string>
+    <string name="maghrib">Maghrib</string>
+    <string name="isha">Isha</string>
+    <string name="jumuah">Jumuah</string>
+    <!-- strings related to hijri months names-->
+    <string name="muharam">Muharam</string>
+    <string name="safar">Safar</string>
+    <string name="rabee31">Rabea Al Awal</string>
+    <string name="rabee32">Rabea Al Thani</string>
+    <string name="jumada1">Jumada Al Awal</string>
+    <string name="jumada2">Jumada Al Thani</string>
+    <string name="rajab">Rajab</string>
+    <string name="shaban">Shaban</string>
+    <string name="ramadan">Ramadan</string>
+    <string name="shawal">Shawal</string>
+    <string name="dhulqe3da">Dhu-l Qida</string>
+    <string name="dhulhija">Dhu-l Hija</string>
 
 </resources>
