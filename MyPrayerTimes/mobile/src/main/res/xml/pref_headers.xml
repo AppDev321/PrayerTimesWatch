@@ -4,7 +4,7 @@
 
     <header
         android:fragment="com.sommayah.myprayertimes.SettingsActivity$LocationPreferenceFragment"
-        android:icon="@drawable/ic_location_24dp"
+        android:icon="@drawable/ic_place_24dp"
         android:title="@string/pref_header_location" />
 
     <header

@@ -1,17 +1,30 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:custom="http://schemas.android.com/apk/res/com.sommayah.myprayertimes">
 
+    <com.sommayah.myprayertimes.CurrentLocationDialog
+        android:title="Get Current Location"
+        android:key="@string/pref_location_key"
+        android:defaultValue="@string/pref_location_default"
+        android:dialogTitle="Your current location"
+        android:dialogMessage="@string/pref_location_key"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@string/ok"
+        />
+
+
+    <CheckBoxPreference
+        android:title="Enter Manual Location"
+        android:summary="@string/pref_loc_manual"
+        android:key="@string/pref_loc_manual_set"
+        android:defaultValue="false"
+        />
 
     <com.sommayah.myprayertimes.LocationEditTextPreference
         android:title="@string/pref_location_label"
         android:key="@string/pref_location_key"
+        android:dependency="@string/pref_loc_manual_set"
         android:defaultValue="@string/pref_location_default"
         android:inputType="text"
         android:singleLine="true"
         custom:minLength="3"/>
-
-
-
-
-
 </PreferenceScreen>

@@ -27,6 +27,11 @@
 
     <string name="pref_title_display_name">Display name</string>
     <string name="pref_default_display_name">John Smith</string>
+    <string name="pref_loc_manual_set">loc-manual</string>
+    <string name="pref_loc_manual">Setting the location manually</string>
+    <string name="ok">O.K</string>
+    <string name="automatic_location_disabled">Cannot retrieve automatic location</string>
+    <string name="location_not_valid">Location not valid</string>
 
     <!--hijri date adjustment-->
 

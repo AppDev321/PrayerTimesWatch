@@ -22,7 +22,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="100dp"
-            android:background="@android:color/holo_green_dark"
+            android:background="@color/colorPrimary"
             android:orientation="vertical">
             <TextView
                 android:id="@+id/title"
@@ -59,6 +59,9 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        android:src="@android:drawable/ic_dialog_email" />
+        android:src="@drawable/compass_icon"
+        android:tint="@android:color/white"
+        />
+        <!--android:src="@android:drawable/ic_menu_compass" />-->
 
 </android.support.design.widget.CoordinatorLayout>

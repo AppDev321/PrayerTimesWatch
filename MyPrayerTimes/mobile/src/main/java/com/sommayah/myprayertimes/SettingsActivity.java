@@ -14,12 +14,13 @@ import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.ActionBar;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
+import android.support.design.widget.Snackbar;
+import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -322,6 +323,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity  {
                 Place place = PlacePicker.getPlace(data, this);
                 String address = place.getAddress().toString();
                 LatLng latLong = place.getLatLng();
+                Log.d("lat setting", latLong.toString());
 
                 // If the provided place doesn't have an address, we'll form a display-friendly
                 // string from the latlng values.
@@ -348,7 +350,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity  {
                 // to the PlacePicker widget result here instead of allowing the
                 // LocationEditTextPreference to handle these changes and invoke our callbacks.
                 Preference locationPreference = findPreference(getString(R.string.pref_location_key));
-              //  setPreferenceSummary(locationPreference, address);
+                //  setPreferenceSummary(locationPreference, address);
 
                 // Add attributions for our new PlacePicker location.
                 if (mAttribution != null) {
@@ -360,12 +362,14 @@ public class SettingsActivity extends AppCompatPreferenceActivity  {
                             Snackbar.LENGTH_LONG).show();
                 }
 
-            //    Utility.resetLocationStatus(this);
-            //    SunshineSyncAdapter.syncImmediately(this);
+                //    Utility.resetLocationStatus(this);
+                //    SunshineSyncAdapter.syncImmediately(this);
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
+
+
 
 }

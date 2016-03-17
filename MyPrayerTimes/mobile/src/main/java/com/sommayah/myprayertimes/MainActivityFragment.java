@@ -1,6 +1,7 @@
 package com.sommayah.myprayertimes;
 
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -20,7 +21,7 @@ import java.util.Date;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends Fragment{
+public class MainActivityFragment extends Fragment implements OnSharedPreferenceChangeListener{
     RecyclerView mRecyclerView;
     private boolean mUseNextPrayerLayout;
     private PrayerAdapter mPrayerAdapter;
@@ -95,8 +96,17 @@ public class MainActivityFragment extends Fragment{
 
     @Override
     public void onResume() {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        sp.registerOnSharedPreferenceChangeListener(this);
         super.onResume();
 
+    }
+
+    @Override
+    public void onPause() {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        sp.unregisterOnSharedPreferenceChangeListener(this);
+        super.onPause();
     }
 
     @Override
@@ -105,4 +115,8 @@ public class MainActivityFragment extends Fragment{
         setHasOptionsMenu(true);
     }
 
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+
+    }
 }

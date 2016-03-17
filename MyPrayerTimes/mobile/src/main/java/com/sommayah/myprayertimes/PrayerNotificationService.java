@@ -53,7 +53,7 @@ public class PrayerNotificationService extends IntentService {
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(context)
-                        .setColor(context.getResources().getColor(R.color.primary_light))
+                        .setColor(context.getResources().getColor(R.color.colorPrimary))
                         .setSmallIcon(R.drawable.notification_icon)
                         .setContentTitle("Time for prayer")
                         .setContentText("Time for " + prayer + " prayer")
