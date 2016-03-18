@@ -2,7 +2,7 @@
     xmlns:custom="http://schemas.android.com/apk/res/com.sommayah.myprayertimes">
 
     <com.sommayah.myprayertimes.CurrentLocationDialog
-        android:title="Get Current Location"
+        android:title="@string/use_current_location"
         android:key="@string/pref_location_key"
         android:defaultValue="@string/pref_location_default"
         android:dialogTitle="Your current location"
@@ -21,7 +21,7 @@
 
     <com.sommayah.myprayertimes.LocationEditTextPreference
         android:title="@string/pref_location_label"
-        android:key="@string/pref_location_key"
+        android:key="@string/pref_location_key_manual"
         android:dependency="@string/pref_loc_manual_set"
         android:defaultValue="@string/pref_location_default"
         android:inputType="text"

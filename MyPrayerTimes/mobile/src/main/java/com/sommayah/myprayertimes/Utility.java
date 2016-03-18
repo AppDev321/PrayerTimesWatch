@@ -25,6 +25,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
+
+
+
 /**
  * Created by sommayahsoliman on 2/25/16.
  */
@@ -83,8 +86,7 @@ public class Utility {
 
     public static int getPreferredTimeFormat(Context context){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return prefs.getInt(context.getString(R.string.pref_time_format_key),
-                PrayTime.TIME12);
+        return prefs.getBoolean(context.getString(R.string.pref_time_format_key),false)?PrayTime.TIME24:PrayTime.TIME12;
     }
 
     public static String getLocationAddress(Context context, double longitude, double latitude){
@@ -195,9 +197,15 @@ public class Utility {
         LocalDate todayIso = new LocalDate();
         LocalDate todayHijri = new LocalDate(todayIso.toDateTimeAtStartOfDay(),
                 hijri);
-        int year = todayHijri.getYear();
+        int adjustment = adjustHijriDate(context);
+        if(adjustment>0)
+            todayHijri.plusDays(adjustment);
+        else if(adjustment<0){
+            todayHijri.minusDays(adjustment);
+        }
         int day =  todayHijri.getDayOfMonth();
         int month = todayHijri.getMonthOfYear();
+        int year = todayHijri.getYear();
         String hijriDate = String.valueOf(day) + " "+ getHijriMonthName(month,context)+ " " + String.valueOf(year);
         return hijriDate;
 
@@ -236,11 +244,11 @@ public class Utility {
     public static ArrayList<String> getPrayTimes(Calendar cal,Context context){
         mPrayTime = new PrayTime();
         ArrayList<String> prayerTimes;
+        updateCalculationMethods(mPrayTime, context);
         mPrayTime.setTimeFormat(mPrayTime.TIME24); //determine 12 or 24 in prayeradapter
-        mPrayTime.setCalcMethod(mPrayTime.ISNA);
-        mPrayTime.setAsrJuristic(mPrayTime.SHAFII);
-        mPrayTime.setAdjustHighLats(mPrayTime.ANGLEBASED);
-        double dst = mPrayTime.detectDaylightSaving();
+//        mPrayTime.setCalcMethod(mPrayTime.ISNA);
+//        mPrayTime.setAsrJuristic(mPrayTime.SHAFII);
+//        mPrayTime.setAdjustHighLats(mPrayTime.ANGLEBASED);
         int[] offsets = {0, 0, 0, 0, 0, 0, 0}; // {Fajr,Sunrise,Dhuhr,Asr,Sunset,Maghrib,Isha}
         mPrayTime.tune(offsets);
         prayerTimes = mPrayTime.getPrayerTimes(cal,getLocationLatitude(context),
@@ -249,7 +257,64 @@ public class Utility {
         return prayerTimes;
     }
 
+    private static void updateCalculationMethods(PrayTime prayTime, Context context) {
+        //update all calculation methods from preferences
+        //time format is set in prayer adapter not here
+        SharedPreferences prefs
+                = PreferenceManager.getDefaultSharedPreferences(context);
+        setAsrCalculation(prayTime, context, prefs);
+        adjDst(prayTime, context, prefs);
+        setHighAltMethod(prayTime, context, prefs);
+        adjCalculationMethod(prayTime, context, prefs);
+    }
 
+    public static void adjCalculationMethod(PrayTime praytime,Context context, SharedPreferences prefs){
+        int calc_method = Integer.valueOf(prefs.getString(context.getString(R.string.pref_calculation_methods_key), "2"));
+        praytime.setCalcMethod(calc_method);
+    }
+
+    public static void adjDst(PrayTime praytime, Context context, SharedPreferences prefs){
+        //dst -1 hour, 0 hour, +1 hour, 2 default
+        int dst_calculation = Integer.valueOf(prefs.getString(context.getString(R.string.pref_dst_value), "2"));
+        if(dst_calculation != 2){
+            praytime.setDst(dst_calculation);
+        }else{
+            praytime.setDst(praytime.detectDaylightSaving());
+        }
+
+    }
+
+//    public static void setTimeFormat(PrayTime praytime, Context context, SharedPreferences prefs){
+//        // time format 24/12
+//        boolean hour_format = prefs.getBoolean(context.getString(R.string.pref_hour_format), false); //12 is default
+//       // praytime.setTimeFormat(hour_format ? PrayTime.TIME24 : PrayTime.TIME12);
+//    }
+
+    public static void setHighAltMethod(PrayTime praytime, Context context, SharedPreferences prefs){
+        int high_alt = Integer.valueOf(prefs.getString(context.getString(R.string.pref_high_alt_key), "1"));
+        praytime.setAdjustHighLats(high_alt + 1); //0 value was none, here we want other values so add one to adjust index
+    }
+
+    public static void setAsrCalculation(PrayTime praytime, Context context, SharedPreferences prefs){
+        // asr calculation methode Hanafii 1 /shafii 0
+        int asr_calculation = Integer.valueOf(prefs.getString(context.getString(R.string.pref_asr_calculation_key), "0"));
+        praytime.setAsrJuristic(asr_calculation);
+    }
+
+    public static int adjustHijriDate(Context context){
+        SharedPreferences prefs
+                = PreferenceManager.getDefaultSharedPreferences(context);
+        //-2 to +2 values
+        return Integer.valueOf(prefs.getString(context.getString(R.string.pref_hijri_date_adj), "0"));
+    }
+
+    public static int getLanguage(Context context){
+        SharedPreferences prefs
+                = PreferenceManager.getDefaultSharedPreferences(context);
+        //-2 to +2 values
+        return Integer.valueOf(prefs.getString(context.getString(R.string.pref_language_list_key), "0")); //0 english 1 arabic
+
+    }
 
 
     public static float getQiblaDirection(Context context){

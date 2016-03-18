@@ -29,6 +29,7 @@
     <string name="pref_default_display_name">John Smith</string>
     <string name="pref_loc_manual_set">loc-manual</string>
     <string name="pref_loc_manual">Setting the location manually</string>
+    <string name="pref_location_key_manual">location-manual</string>
     <string name="ok">O.K</string>
     <string name="automatic_location_disabled">Cannot retrieve automatic location</string>
     <string name="location_not_valid">Location not valid</string>
@@ -59,8 +60,8 @@
         <item>Hanafi</item>
     </string-array>
     <string-array name="pref_asr_list_values">
-        <item>1</item>
         <item>0</item>
+        <item>1</item>
     </string-array>
 
     <!--language-->
@@ -71,22 +72,24 @@
         <item>Arabic</item>
     </string-array>
     <string-array name="pref_language_list_values">
-        <item>1</item>
         <item>0</item>
+        <item>1</item>
     </string-array>
 
     <!--DST adjustment-->
 
     <string name="pref_title_dst">Daylight Saving Adjustment</string>
     <string-array name="pref_dst_list_titles">
+        <item>Default</item>
         <item>+1 hour</item>
-        <item>Default value</item>
+        <item>0 hours</item>
         <item>-1 hour</item>
     </string-array>
     <string-array name="pref_dst_list_values">
+        <item>2</item>
         <item>1</item>
         <item>0</item>
-        <item>1</item>
+        <item>-1</item>
     </string-array>
 
     <!-- Example settings for Data & Sync -->
@@ -130,6 +133,17 @@
     <!-- Label for the location preference [CHAR LIMIT=30] -->
     <string name="pref_location_label">Location</string>
     <string name="pref_header_location">Location Settings</string>
+    <string name="pref_asr_calculation_key">asr_calculation</string>
+    <string name="pref_dst_value">dst_value</string>
+    <string name="pref_hijri_date_adj">date_adjustment</string>
+    <string name="pref_high_alt_key">high_alt</string>
+    <string name="pref_title_high_alt_method">High altitude calculation method</string>
+    <string name="pref_high_alt_switch">high_alt_switch</string>
+    <string name="pref_language_list_key">language_list</string>
+    <string name="pref_calculation_methods_key">calc_method</string>
+    <string name="pref_title_calculation_methods">Prayer Calculation Method</string>
+
+    <string name="use_current_location">Use current location</string>
 
     <!--translatable strings-->
     <string name="fajr">Fajr</string>
@@ -152,5 +166,7 @@
     <string name="shawal">Shawal</string>
     <string name="dhulqe3da">Dhu-l Qida</string>
     <string name="dhulhija">Dhu-l Hija</string>
+
+
 
 </resources>

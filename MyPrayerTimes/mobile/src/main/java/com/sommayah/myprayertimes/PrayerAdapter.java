@@ -118,6 +118,18 @@ public class PrayerAdapter extends RecyclerView.Adapter<PrayerAdapter.PrayerAdap
         return prayerTimes.size();
     }
 
+    void clear(){
+        prayerTimes.clear();
+    }
+
+    void add(ArrayList<String> times){
+
+        for(String time: times){
+            prayerTimes.add(time);
+        }
+
+    }
+
 
     @Override
     public int getItemViewType(int position) {

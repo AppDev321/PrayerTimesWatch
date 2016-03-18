@@ -24,8 +24,8 @@ public class MainActivity extends AppCompatActivity {
 
     public static final String TAG = MainActivity.class.getSimpleName();
 
-    public static final int MIN_TIME =0/*1000 * 60 * 20*/; //twenty minutes
-    public static final int MIN_DIST = 3000; //set to 3 kilometers
+    public static final int MIN_TIME =1000 * 60 * 120; //two hours
+    public static final int MIN_DIST = 20000; //set to 20 kilometers
     LocationManager mLocationManager;
     LocationListener mLocationListener;
     TextView mTitleText;
@@ -60,7 +60,6 @@ public class MainActivity extends AppCompatActivity {
 //        Log.d("date:", date);
 //        Log.d("hijri date:", hDate);
 
-
         // Acquire a reference to the system Location Manager
         mLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
@@ -73,15 +72,15 @@ public class MainActivity extends AppCompatActivity {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             Log.d(TAG, "no network available");
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.ACCESS_FINE_LOCATION) &&
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION) &&
                     (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_COARSE_LOCATION))) {
                 // If the user has previously denied permission , and do not check marked " never show this warning
                 // We can show an alert explaining to the user because permission is important.
-                Log.d(TAG,"permissions are denied");
+                Log.d(TAG, "permissions are denied");
             } else {
 
-                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},0);
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},0);
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 0);
             }
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
@@ -90,17 +89,16 @@ public class MainActivity extends AppCompatActivity {
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
 
-        }
-        else {
+        } else {
             Location lastKnownLocation = mLocationManager.getLastKnownLocation(locationProvider);
 
-            if(lastKnownLocation != null){
+            if (lastKnownLocation != null) {
                 makeUseOfNewLocation(lastKnownLocation);
                 Log.d("known location long", String.valueOf(lastKnownLocation.getLongitude()));
                 Log.d("known location lat", String.valueOf(lastKnownLocation.getLatitude()));
-            }else{
+            } else {
                 //location null no previous location
-                Log.d(TAG,"last known location null");
+                Log.d(TAG, "last known location null");
             }
         }
 
@@ -156,6 +154,8 @@ public class MainActivity extends AppCompatActivity {
         }else {
             mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME, MIN_DIST, mLocationListener);
         }
+
+
     }
 
     @Override

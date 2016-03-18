@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="pref_high_alt_titles">
+        <item>Middle of the night</item>
+        <item>1/7 of the night</item>
+        <item>Angle based</item>
+    </string-array>
+    <string-array name="pref_high_alt_values" >
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+    <string-array name="pref_calc_method_titles">
+        <item>Ithna Ashari</item>
+        <item>University of Islamic Sciences, Karachi</item>
+        <item>Islamic Society of North America (ISNA)</item>
+        <item>Muslim World League (MWL)</item>
+        <item>Umm al-Qura, Makkah</item>
+        <item>Egyptian General Authority of Survey</item>
+        <item>Institute of Geophysics, University of Tehran</item>
+    </string-array>
+    <string-array name="pref_calc_method_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+    </string-array>
+</resources>

@@ -204,10 +204,13 @@ public class SettingsActivity extends AppCompatPreferenceActivity  {
             // to their values. When their values change, their summaries are
             // updated to reflect the new value, per the Android Design
             // guidelines.
-            bindPreferenceSummaryToValue(findPreference("dst_list"));
-            bindPreferenceSummaryToValue(findPreference("asr_list"));
-            bindPreferenceSummaryToValue(findPreference("hijri_list"));
-            bindPreferenceSummaryToValue(findPreference("language_list"));
+
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_calculation_methods_key)));
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_asr_calculation_key)));
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_dst_value)));
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_hijri_date_adj)));
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_language_list_key)));
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_high_alt_key)));
         }
 
         @Override

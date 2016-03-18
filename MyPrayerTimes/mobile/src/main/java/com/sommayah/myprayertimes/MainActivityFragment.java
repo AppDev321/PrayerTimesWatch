@@ -1,7 +1,6 @@
 package com.sommayah.myprayertimes;
 
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -21,11 +20,15 @@ import java.util.Date;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends Fragment implements OnSharedPreferenceChangeListener{
+public class MainActivityFragment extends Fragment{
+    SharedPreferences.OnSharedPreferenceChangeListener listener;
     RecyclerView mRecyclerView;
     private boolean mUseNextPrayerLayout;
     private PrayerAdapter mPrayerAdapter;
     private PrayTime mPraytime;
+    private PrayerAdapter mAdapter;
+    private ArrayList<String> mPrayerTimes;
+    private View mEmptyView;
 
     public MainActivityFragment() {
     }
@@ -33,13 +36,25 @@ public class MainActivityFragment extends Fragment implements OnSharedPreference
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(getActivity());
+
+        listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+            public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+                onChangedSettings(prefs, key);
+
+            }
+        };
+        prefs.registerOnSharedPreferenceChangeListener(listener);
+
         View rootView =  inflater.inflate(R.layout.fragment_main, container, false);
 
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerview_prayer);
 
         // Set the layout manager
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        View emptyView = rootView.findViewById(R.id.recyclerview_prayer_empty);
+        mEmptyView = rootView.findViewById(R.id.recyclerview_prayer_empty);
 
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
@@ -51,8 +66,8 @@ public class MainActivityFragment extends Fragment implements OnSharedPreference
         cal.setTime(now);
 
 
-        ArrayList<String> prayerTimes;
-        prayerTimes = Utility.getPrayTimes(cal,getContext());
+
+        mPrayerTimes = Utility.getPrayTimes(cal,getContext());
 
         if(!Utility.isAlarmInitiated(getContext())){
             SharedPreferences sharedPreferences =
@@ -66,7 +81,7 @@ public class MainActivityFragment extends Fragment implements OnSharedPreference
 
 
         //ss:temp adapter that don't user cursor
-        PrayerAdapter mAdapter = new PrayerAdapter(prayerTimes,getActivity(), emptyView);
+        mAdapter = new PrayerAdapter(mPrayerTimes,getActivity(), mEmptyView);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
@@ -96,16 +111,19 @@ public class MainActivityFragment extends Fragment implements OnSharedPreference
 
     @Override
     public void onResume() {
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        sp.registerOnSharedPreferenceChangeListener(this);
         super.onResume();
+    }
 
+    @Override
+    public void onDestroyView() {
+        SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(getActivity());
+        prefs.unregisterOnSharedPreferenceChangeListener(listener);
+        super.onDestroyView();
     }
 
     @Override
     public void onPause() {
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        sp.unregisterOnSharedPreferenceChangeListener(this);
         super.onPause();
     }
 
@@ -115,8 +133,29 @@ public class MainActivityFragment extends Fragment implements OnSharedPreference
         setHasOptionsMenu(true);
     }
 
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+    private void onChangedSettings(SharedPreferences prefs, String key){
+        if(key.equals(getString(R.string.pref_calculation_methods_key))
+                || key.equals(getString(R.string.pref_asr_calculation_key))
+                || key.equals(getString(R.string.pref_dst_value))
+                || key.equals(getString(R.string.pref_high_alt_key))
+                || key.equals(getString(R.string.pref_time_format_key))){
+            if(!key.equals(getString(R.string.pref_time_format_key))){ //in case of format we dont need to grab data again
+                Date now = new Date();
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(now);
+                mPrayerTimes = Utility.getPrayTimes(cal, getContext());
+            }
+            //update ui
+            if (mAdapter != null) {
+                mAdapter.clear();
+                mAdapter.add(mPrayerTimes);
+                mAdapter.notifyDataSetChanged();
+            }
+
+        }
 
     }
+
+
+
 }
