@@ -111,6 +111,13 @@ public class MainActivityFragment extends Fragment{
 
     @Override
     public void onResume() {
+        //so that the next prayer is updated
+        //update ui
+        if (mAdapter != null) {
+            mAdapter.clear();
+            mAdapter.add(mPrayerTimes);
+            mAdapter.notifyDataSetChanged();
+        }
         super.onResume();
     }
 
@@ -153,8 +160,11 @@ public class MainActivityFragment extends Fragment{
             }
 
         }
+        //no need to listen to hijri date adjustment because we display the new one onresume
 
     }
+
+
 
 
 

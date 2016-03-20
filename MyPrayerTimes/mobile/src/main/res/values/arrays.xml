@@ -28,4 +28,48 @@
         <item>5</item>
         <item>6</item>
     </string-array>
+
+    <string-array name="pref_dst_list_titles">
+        <item>Default</item>
+        <item>+1 hour</item>
+        <item>0 hours</item>
+        <item>-1 hour</item>
+    </string-array>
+    <string-array name="pref_dst_list_values">
+        <item>2</item>
+        <item>1</item>
+        <item>0</item>
+        <item>-1</item>
+    </string-array>
+
+    <string-array name="pref_language_list_titles">
+        <item>English</item>
+        <item>Arabic</item>
+    </string-array>
+    <string-array name="pref_language_list_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+    <string-array name="pref_hijri_list_titles">
+        <item>-2 days</item>
+        <item>-1 day</item>
+        <item>0 days</item>
+        <item>+1 day</item>
+        <item>+2 days</item>
+    </string-array>
+    <string-array name="pref_hijri_list_values">
+        <item>-2</item>
+        <item>-1</item>
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+    <string-array name="pref_asr_list_titles">
+        <item>Shafii</item>
+        <item>Hanafi</item>
+    </string-array>
+    <string-array name="pref_asr_list_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
 </resources>

@@ -61,6 +61,7 @@
         android:layout_margin="@dimen/fab_margin"
         android:src="@drawable/compass_icon"
         android:tint="@android:color/white"
+        android:contentDescription="@string/compass_button_description"
         />
         <!--android:src="@android:drawable/ic_menu_compass" />-->
 

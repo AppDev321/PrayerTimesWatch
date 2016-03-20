@@ -35,63 +35,13 @@
     <string name="location_not_valid">Location not valid</string>
 
     <!--hijri date adjustment-->
-
     <string name="pref_title_hijri_adj">Hijri Date Adjustment</string>
-    <string-array name="pref_hijri_list_titles">
-        <item>-2 days</item>
-        <item>-1 day</item>
-        <item>0 days</item>
-        <item>+1 day</item>
-        <item>+2 days</item>
-    </string-array>
-    <string-array name="pref_hijri_list_values">
-        <item>-2</item>
-        <item>-1</item>
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
-    </string-array>
-
     <!--asr calculation-->
-
     <string name="pref_title_asr_calculation">Asr Calculation Method</string>
-    <string-array name="pref_asr_list_titles">
-        <item>Shafii</item>
-        <item>Hanafi</item>
-    </string-array>
-    <string-array name="pref_asr_list_values">
-        <item>0</item>
-        <item>1</item>
-    </string-array>
-
     <!--language-->
-
     <string name="pref_title_language_calculation">Display Language</string>
-    <string-array name="pref_language_list_titles">
-        <item>English</item>
-        <item>Arabic</item>
-    </string-array>
-    <string-array name="pref_language_list_values">
-        <item>0</item>
-        <item>1</item>
-    </string-array>
-
     <!--DST adjustment-->
-
     <string name="pref_title_dst">Daylight Saving Adjustment</string>
-    <string-array name="pref_dst_list_titles">
-        <item>Default</item>
-        <item>+1 hour</item>
-        <item>0 hours</item>
-        <item>-1 hour</item>
-    </string-array>
-    <string-array name="pref_dst_list_values">
-        <item>2</item>
-        <item>1</item>
-        <item>0</item>
-        <item>-1</item>
-    </string-array>
-
     <!-- Example settings for Data & Sync -->
     <string name="pref_header_data_sync">Data &amp; sync</string>
 
@@ -144,6 +94,7 @@
     <string name="pref_title_calculation_methods">Prayer Calculation Method</string>
 
     <string name="use_current_location">Use current location</string>
+    <string name="compass_button_description">Compass button</string>
 
     <!--translatable strings-->
     <string name="fajr">Fajr</string>

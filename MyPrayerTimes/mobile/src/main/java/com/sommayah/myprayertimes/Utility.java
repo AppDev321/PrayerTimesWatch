@@ -193,16 +193,11 @@ public class Utility {
     public static String getHijriDate(Context context){
         Chronology iso = ISOChronology.getInstanceUTC();
         Chronology hijri = IslamicChronology.getInstanceUTC();
-
         LocalDate todayIso = new LocalDate();
         LocalDate todayHijri = new LocalDate(todayIso.toDateTimeAtStartOfDay(),
                 hijri);
         int adjustment = adjustHijriDate(context);
-        if(adjustment>0)
-            todayHijri.plusDays(adjustment);
-        else if(adjustment<0){
-            todayHijri.minusDays(adjustment);
-        }
+        todayHijri = todayHijri.plusDays(adjustment);
         int day =  todayHijri.getDayOfMonth();
         int month = todayHijri.getMonthOfYear();
         int year = todayHijri.getYear();
@@ -305,7 +300,7 @@ public class Utility {
         SharedPreferences prefs
                 = PreferenceManager.getDefaultSharedPreferences(context);
         //-2 to +2 values
-        return Integer.valueOf(prefs.getString(context.getString(R.string.pref_hijri_date_adj), "0"));
+        return Integer.valueOf(prefs.getString(context.getString(R.string.pref_hijri_date_adj), "2"));
     }
 
     public static int getLanguage(Context context){
