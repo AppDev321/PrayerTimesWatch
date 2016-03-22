@@ -42,6 +42,15 @@
         android:positiveButtonText="@null"
         android:title="@string/pref_title_hijri_adj" />
 
+    <com.sommayah.myprayertimes.OffsetDialogPreference
+        android:title="@string/offset_prayers_title"
+        android:dialogTitle="@string/offset_prayers_title"
+        android:summary="@string/adjust_prayer_times"
+        android:defaultValue="@string/zero"
+        android:inputType="text"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@string/ok"/>
+
     <ListPreference
         android:defaultValue="0"
         android:entries="@array/pref_language_list_titles"

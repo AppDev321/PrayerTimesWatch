@@ -95,6 +95,9 @@
 
     <string name="use_current_location">Use current location</string>
     <string name="compass_button_description">Compass button</string>
+    <string name="offset_prayers_title">Edit prayer times in minutes</string>
+    <string name="adjust_prayer_times">manual change to prayer times</string>
+    <string name="zero">0</string>
 
     <!--translatable strings-->
     <string name="fajr">Fajr</string>
