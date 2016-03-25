@@ -18,6 +18,9 @@ import org.joda.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+
 /**
  * Created by sommayahsoliman on 2/25/16.
  */
@@ -157,16 +160,20 @@ public class PrayerAdapter extends RecyclerView.Adapter<PrayerAdapter.PrayerAdap
     }
 
     public class PrayerAdapterViewHolder extends RecyclerView.ViewHolder  {
-        public final TextView mPrayerName;
-        public final TextView mPrayerTime;
+        @Bind(R.id.prayer_name) TextView mPrayerName;
+        @Bind(R.id.prayer_time) TextView mPrayerTime;
+     //   @Bind(R.id.prayer_time_remaining) TextView mTimeRemaining;
         public final TextView mTimeRemaining;
 
         public PrayerAdapterViewHolder(View view) {
             super(view);
+//            mPrayerName = (TextView) view.findViewById(R.id.prayer_name);
+//            mPrayerTime = (TextView) view.findViewById(R.id.prayer_time);
+            ButterKnife.bind(this,view);
+            mTimeRemaining = (TextView)view.findViewById(R.id.prayer_time_remaining);
+
             mEmptyView.setVisibility(getItemCount() == 0 ? View.VISIBLE : View.GONE);
-            mPrayerName = (TextView) view.findViewById(R.id.prayer_name);
-            mPrayerTime = (TextView) view.findViewById(R.id.prayer_time);
-            mTimeRemaining = (TextView) view.findViewById(R.id.prayer_time_remaining);
+
 
         }
 

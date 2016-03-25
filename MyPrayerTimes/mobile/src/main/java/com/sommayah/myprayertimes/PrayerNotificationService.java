@@ -75,7 +75,10 @@ public class PrayerNotificationService extends IntentService {
         Uri ringURI = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         mBuilder.setSound(ringURI);
         long[] vibrate = new long[] {100, 100, 100 };
-        mBuilder.setVibrate(vibrate);
+        //check if user has vibration enabled.
+        if(Utility.isVibrateEnabled(context)){
+            mBuilder.setVibrate(vibrate);
+        }
         final NotificationManager notificationManager
                 = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(NOTIFICATION_ID,
@@ -85,10 +88,8 @@ public class PrayerNotificationService extends IntentService {
         Intent alarmIntent = new Intent(this, RemoveNotificationService.class);
         PendingIntent pendingIntent = PendingIntent.getService(this, 1, alarmIntent, 0);
         alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 15000 * 60, pendingIntent); //remove notifications after 15 minutes
-
-
-
     }
+
 }
 
 

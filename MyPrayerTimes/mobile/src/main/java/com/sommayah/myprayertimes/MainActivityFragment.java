@@ -17,12 +17,15 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+
 /**
  * A placeholder fragment containing a simple view.
  */
 public class MainActivityFragment extends Fragment{
     SharedPreferences.OnSharedPreferenceChangeListener listener;
-    RecyclerView mRecyclerView;
+    @Bind(R.id.recyclerview_prayer) RecyclerView mRecyclerView;
     private boolean mUseNextPrayerLayout;
     private PrayerAdapter mPrayerAdapter;
     private PrayTime mPraytime;
@@ -49,8 +52,7 @@ public class MainActivityFragment extends Fragment{
         prefs.registerOnSharedPreferenceChangeListener(listener);
 
         View rootView =  inflater.inflate(R.layout.fragment_main, container, false);
-
-        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerview_prayer);
+        ButterKnife.bind(this,rootView);
 
         // Set the layout manager
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -74,6 +76,7 @@ public class MainActivityFragment extends Fragment{
                     PreferenceManager.getDefaultSharedPreferences(getContext());
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean(getString(R.string.pref_alarm_initiated), true);
+            editor.commit();
             PrayerAlarmReceiver prayerAlarmReceiver = new PrayerAlarmReceiver();
             prayerAlarmReceiver.addPrayerAlarm(getContext());
 
@@ -127,6 +130,7 @@ public class MainActivityFragment extends Fragment{
                 PreferenceManager.getDefaultSharedPreferences(getActivity());
         prefs.unregisterOnSharedPreferenceChangeListener(listener);
         super.onDestroyView();
+        ButterKnife.unbind(this);
     }
 
     @Override
@@ -141,25 +145,21 @@ public class MainActivityFragment extends Fragment{
     }
 
     private void onChangedSettings(SharedPreferences prefs, String key){
-        if(key.equals(getString(R.string.pref_calculation_methods_key))
-                || key.equals(getString(R.string.pref_asr_calculation_key))
-                || key.equals(getString(R.string.pref_dst_value))
-                || key.equals(getString(R.string.pref_high_alt_key))
-                || key.equals(getString(R.string.pref_time_format_key))){
-            if(!key.equals(getString(R.string.pref_time_format_key))){ //in case of format we dont need to grab data again
-                Date now = new Date();
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(now);
-                mPrayerTimes = Utility.getPrayTimes(cal, getContext());
-            }
-            //update ui
-            if (mAdapter != null) {
-                mAdapter.clear();
-                mAdapter.add(mPrayerTimes);
-                mAdapter.notifyDataSetChanged();
-            }
 
+        if (!key.equals(getString(R.string.pref_time_format_key))) { //in case of format we dont need to grab data again
+            Date now = new Date();
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(now);
+            mPrayerTimes = Utility.getPrayTimes(cal, getContext());
         }
+        //update ui
+        if (mAdapter != null) {
+            mAdapter.clear();
+            mAdapter.add(mPrayerTimes);
+            mAdapter.notifyDataSetChanged();
+        }
+
+
         //no need to listen to hijri date adjustment because we display the new one onresume
 
     }

@@ -89,6 +89,11 @@ public class Utility {
         return prefs.getBoolean(context.getString(R.string.pref_time_format_key),false)?PrayTime.TIME24:PrayTime.TIME12;
     }
 
+    public static boolean isVibrateEnabled(Context context){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getBoolean(context.getString(R.string.pref_vibrate_key),true);
+    }
+
     public static String getLocationAddress(Context context, double longitude, double latitude){
         String TAG = "get Location Address";
         String address = "";
@@ -206,6 +211,22 @@ public class Utility {
 
     }
 
+    public static int[] getOffsetArray(Context context){
+        int[] offsets = {0, 0, 0, 0, 0, 0, 0};
+        int[] prayeroffsets = {0, 0, 0, 0, 0};
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        for(int i = 0; i<5 ;i++){ //five offsets
+            String key = context.getString(R.string.pref_prayer_offsets)+String.valueOf(i);
+            prayeroffsets[i] = prefs.getInt(key,0);
+        }
+        offsets[0] = prayeroffsets[0];
+        offsets[2] = prayeroffsets[1];
+        offsets[3] = prayeroffsets[2];
+        offsets[5] = prayeroffsets[3];
+        offsets[6] = prayeroffsets[4]; //skipped sunrise and sunset no need for change
+        return  offsets;
+    }
+
     public static void testPrayertimes(Context context){
         double latitude = 37.3533088;
         double longitude = -121.9871216;
@@ -245,6 +266,7 @@ public class Utility {
 //        mPrayTime.setAsrJuristic(mPrayTime.SHAFII);
 //        mPrayTime.setAdjustHighLats(mPrayTime.ANGLEBASED);
         int[] offsets = {0, 0, 0, 0, 0, 0, 0}; // {Fajr,Sunrise,Dhuhr,Asr,Sunset,Maghrib,Isha}
+        offsets = getOffsetArray(context);
         mPrayTime.tune(offsets);
         prayerTimes = mPrayTime.getPrayerTimes(cal,getLocationLatitude(context),
                 getLocationLongitude(context),mPrayTime.getBaseTimeZone());

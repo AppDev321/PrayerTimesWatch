@@ -14,18 +14,23 @@ import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+
 /* got the code from: http://www.javacodegeeks.com/2013/09/android-compass-code-example.html */
 
 public class CompassActivity extends AppCompatActivity implements SensorEventListener {
     // define the display assembly compass picture
-    private ImageView image;
-    private ImageView imageArrow;
-            // record the compass picture angle turned
+    @Bind(R.id.imageViewCompass) ImageView image;
+    @Bind(R.id.imageViewArrow) ImageView imageArrow;
+    // TextView that will tell the user what degree is he heading
+    @Bind(R.id.tvHeading) TextView tvHeading;
+    // record the compass picture angle turned
     private float currentDegree = 0f;
     private float qiblaDegree = 0f;
             // device sensor manager
     private SensorManager mSensorManager;
-    TextView tvHeading;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,11 +39,7 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        image = (ImageView) findViewById(R.id.imageViewCompass);
-        imageArrow = (ImageView) findViewById(R.id.imageViewArrow);
-
-        // TextView that will tell the user what degree is he heading
-        tvHeading = (TextView) findViewById(R.id.tvHeading);
+        ButterKnife.bind(this);
         // initialize your android device sensor capabilities
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
     }

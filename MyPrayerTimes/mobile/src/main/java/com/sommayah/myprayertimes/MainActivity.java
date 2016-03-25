@@ -20,6 +20,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+
 public class MainActivity extends AppCompatActivity {
 
     public static final String TAG = MainActivity.class.getSimpleName();
@@ -28,18 +31,17 @@ public class MainActivity extends AppCompatActivity {
     public static final int MIN_DIST = 20000; //set to 20 kilometers
     LocationManager mLocationManager;
     LocationListener mLocationListener;
-    TextView mTitleText;
-    TextView mhijriDateText;
-
+    @Bind(R.id.title) TextView mTitleText;
+    @Bind(R.id.dateTextView) TextView mhijriDateText;
+    @Bind(R.id.toolbar) Toolbar toolbar;
+    @Bind(R.id.fab) FloatingActionButton fab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        ButterKnife.bind(this);
         setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -138,10 +140,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        mhijriDateText = (TextView) findViewById(R.id.dateTextView);
         mhijriDateText.setText(Utility.getHijriDate(getApplicationContext()));
         if(Utility.isLocationLatLonAvailable(getApplicationContext())) {
-            mTitleText = (TextView) findViewById(R.id.title);
             mTitleText.setText(Utility.getPreferredLocation(getApplicationContext()));
         }
 
@@ -281,7 +281,6 @@ public class MainActivity extends AppCompatActivity {
         Log.d("location lat", String.valueOf(location.getLatitude()));
         Utility.testPrayertimes(getApplicationContext());
         if(Utility.isLocationLatLonAvailable(getApplicationContext())) {
-            mTitleText = (TextView) findViewById(R.id.title);
             mTitleText.setText(Utility.getPreferredLocation(getApplicationContext()));
         }
 

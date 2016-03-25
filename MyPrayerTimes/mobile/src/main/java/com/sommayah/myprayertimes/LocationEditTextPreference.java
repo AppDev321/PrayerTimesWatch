@@ -37,7 +37,6 @@ import java.util.List;
 public class LocationEditTextPreference extends EditTextPreference {
     static final private int DEFAULT_MINIMUM_LOCATION_LENGTH = 2;
     private int mMinLength;
-    private String preAddress;
 
     public LocationEditTextPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -65,7 +64,6 @@ public class LocationEditTextPreference extends EditTextPreference {
         super.showDialog(state);
 
         EditText et = getEditText();
-        preAddress = et.getText().toString();
         et.addTextChangedListener(new TextWatcher() {
 
 
@@ -106,7 +104,7 @@ public class LocationEditTextPreference extends EditTextPreference {
         Log.d("location after dismiss", et.getText().toString());
         boolean valid = validateLocation(et.getText().toString());
         if(valid == false){
-            et.setText(preAddress);
+            et.setText("");
         }
 
 

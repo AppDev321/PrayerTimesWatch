@@ -3,8 +3,10 @@ package com.sommayah.myprayertimes;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.DialogPreference;
+import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
@@ -33,6 +35,7 @@ public class OffsetDialogPreference extends DialogPreference {
     public OffsetDialogPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
         setPersistent(false); //to indicate to the super Preference class that you persist the preference value on your own.
+        setSummary(getPrayerSummary());
         setDialogLayoutResource(R.layout.offset_dialog);
     }
 
@@ -58,6 +61,20 @@ public class OffsetDialogPreference extends DialogPreference {
     protected void onDialogClosed(boolean positiveResult) {
         super.onDialogClosed(positiveResult);
         // if positiveResult is true then persist the value(s) from your view to the SharedPreferences.
+        if(positiveResult == true){
+            String[] prayerOffsets = {editText1.getText().toString(), editText2.getText().toString(),
+                    editText3.getText().toString(), editText4.getText().toString(), editText5.getText().toString()};
+            SharedPreferences sharedPreferences =
+                    PreferenceManager.getDefaultSharedPreferences(getContext());
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            for(int i = 0; i<5 ;i++){ //five offsets
+                String key = getContext().getString(R.string.pref_prayer_offsets)+String.valueOf(i);
+                int offset = Integer.valueOf(prayerOffsets[i]);
+                editor.putInt(key , offset);
+                editor.commit();
+            }
+            setSummary(getPrayerSummary());
+        }
     }
 
     @Override
@@ -107,6 +124,8 @@ public class OffsetDialogPreference extends DialogPreference {
         editText5.addTextChangedListener(textWatcher);
     }
 
+
+
     private boolean is_valid(Editable s1) {
         try {
             int value = (s1 == null || s1.length() <= 0) ? 0 : Integer.valueOf(s1.toString());
@@ -117,5 +136,14 @@ public class OffsetDialogPreference extends DialogPreference {
         } catch (NumberFormatException e) {
             return false;
         }
+    }
+
+    private String getPrayerSummary(){
+        String summary = "[0, 0, 0, 0, 0]";
+                PreferenceManager.getDefaultSharedPreferences(getContext());
+        int[] offsetArray = Utility.getOffsetArray(getContext());
+        summary = "[ "+ offsetArray[0] +" , " +  offsetArray[2] + " , " + offsetArray[3] + " , "
+                + offsetArray[5] + " , " + offsetArray[6] + " ]";
+        return summary;
     }
 }
