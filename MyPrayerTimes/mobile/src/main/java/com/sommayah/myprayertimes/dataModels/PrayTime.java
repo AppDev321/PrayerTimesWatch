@@ -266,6 +266,12 @@ public class PrayTime {
 
     }
 
+    public double getTimeZoneForLocation(String loc){
+        TimeZone timez = TimeZone.getTimeZone(loc);
+        double hoursDiff = (timez.getRawOffset() / 1000.0) / 3600;
+        return hoursDiff;
+    }
+
     // detect daylight saving in a given date
     public double detectDaylightSaving() {
         TimeZone timez = TimeZone.getDefault();

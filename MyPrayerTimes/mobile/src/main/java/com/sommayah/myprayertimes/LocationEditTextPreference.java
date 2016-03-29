@@ -18,11 +18,13 @@ package com.sommayah.myprayertimes;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
+import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
@@ -120,6 +122,7 @@ public class LocationEditTextPreference extends EditTextPreference {
                 if (addressList != null && addressList.size() > 0) {
                     double lat = addressList.get(0).getLatitude();
                     double lng = addressList.get(0).getLongitude();
+                    addManualLocation(lat,lng);
                     setSummary(address);
                     return true;
                 }else{
@@ -132,5 +135,17 @@ public class LocationEditTextPreference extends EditTextPreference {
         } // end if
         return false;
 
+    }
+
+    private void addManualLocation(double lat, double lng) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+        SharedPreferences.Editor editor = prefs.edit();
+        // Also store the latitude and longitude so that we can use these to get a precise
+        // result from our prayer service.
+        editor.putFloat(getContext().getString(R.string.pref_location_latitude_manual),
+                (float) lat);
+        editor.putFloat(getContext().getString(R.string.pref_location_longitude_manual),
+                (float) lng);
+        editor.commit();
     }
 }

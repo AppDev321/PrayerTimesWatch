@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.sommayah.myprayertimes.broadcastReceivers.PrayerAlarmReceiver;
 import com.sommayah.myprayertimes.dataModels.PrayTime;
 
 import java.util.ArrayList;
@@ -77,9 +78,10 @@ public class MainActivityFragment extends Fragment{
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean(getString(R.string.pref_alarm_initiated), true);
             editor.commit();
-            PrayerAlarmReceiver prayerAlarmReceiver = new PrayerAlarmReceiver();
-            prayerAlarmReceiver.addPrayerAlarm(getContext());
-
+            if (Utility.isAlarmEnabled(getContext())) {
+                PrayerAlarmReceiver prayerAlarmReceiver = new PrayerAlarmReceiver();
+                prayerAlarmReceiver.addPrayerAlarm(getContext());
+            }
         }
 
 
@@ -157,6 +159,15 @@ public class MainActivityFragment extends Fragment{
             mAdapter.clear();
             mAdapter.add(mPrayerTimes);
             mAdapter.notifyDataSetChanged();
+        }
+
+        if(key.equals(getString(R.string.pref_notification_key))){
+            PrayerAlarmReceiver prayerAlarmReceiver = new PrayerAlarmReceiver();
+            if(!Utility.isAlarmEnabled(getContext())){
+                prayerAlarmReceiver.cancelAlarm(getContext());
+            }else{
+                prayerAlarmReceiver.addPrayerAlarm(getContext());
+            }
         }
 
 

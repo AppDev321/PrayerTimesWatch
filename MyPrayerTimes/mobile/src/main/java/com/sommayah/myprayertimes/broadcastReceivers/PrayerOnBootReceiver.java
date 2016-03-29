@@ -1,8 +1,11 @@
-package com.sommayah.myprayertimes;
+package com.sommayah.myprayertimes.broadcastReceivers;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+
+import com.sommayah.myprayertimes.Utility;
+import com.sommayah.myprayertimes.broadcastReceivers.PrayerAlarmReceiver;
 
 public class PrayerOnBootReceiver extends BroadcastReceiver {
     PrayerAlarmReceiver prayerAlarm = new PrayerAlarmReceiver();

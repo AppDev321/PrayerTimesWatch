@@ -52,7 +52,7 @@ public class Utility {
     public static boolean isAlarmEnabled(Context context){
         SharedPreferences prefs
                 = PreferenceManager.getDefaultSharedPreferences(context);
-        return prefs.getBoolean(context.getString(R.string.pref_alarm_enabled),
+        return prefs.getBoolean(context.getString(R.string.pref_notification_key),
                 true);
 
     }
@@ -64,9 +64,22 @@ public class Utility {
                 false);
     }
 
+    public static boolean isManualLocation(Context context){
+        SharedPreferences prefs
+                = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getBoolean(context.getString(R.string.pref_loc_manual_set), false);
+    }
+
     public static float getLocationLatitude(Context context) {
         SharedPreferences prefs
                 = PreferenceManager.getDefaultSharedPreferences(context);
+        boolean isManualLocation = prefs.getBoolean(context.getString(R.string.pref_loc_manual_set), false);
+        if(isManualLocation){
+            float lat = prefs.getFloat(context.getString(R.string.pref_location_latitude_manual), DEFAULT_LATLONG);
+            if(lat != DEFAULT_LATLONG){
+                return lat;
+            }
+        }
         return prefs.getFloat(context.getString(R.string.pref_location_latitude),
                 DEFAULT_LATLONG);
     }
@@ -74,6 +87,14 @@ public class Utility {
     public static float getLocationLongitude(Context context) {
         SharedPreferences prefs
                 = PreferenceManager.getDefaultSharedPreferences(context);
+        boolean isManualLocation = prefs.getBoolean(context.getString(R.string.pref_loc_manual_set), false);
+        if(isManualLocation){
+            float longitude = prefs.getFloat(context.getString(R.string.pref_location_longitude_manual), DEFAULT_LATLONG);
+            if(longitude != DEFAULT_LATLONG){
+                return longitude;
+            }
+
+        }
         return prefs.getFloat(context.getString(R.string.pref_location_longitude),
                 DEFAULT_LATLONG);
     }
@@ -81,6 +102,12 @@ public class Utility {
     public static String getPreferredLocation(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         return prefs.getString(context.getString(R.string.pref_location_key),
+                context.getString(R.string.pref_location_default));
+    }
+
+    public static String getManualLocation(Context context){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getString(context.getString(R.string.pref_location_key_manual),
                 context.getString(R.string.pref_location_default));
     }
 
@@ -258,16 +285,15 @@ public class Utility {
     }
 
     public static ArrayList<String> getPrayTimes(Calendar cal,Context context){
+        //get location manual or automatic:
         mPrayTime = new PrayTime();
         ArrayList<String> prayerTimes;
         updateCalculationMethods(mPrayTime, context);
         mPrayTime.setTimeFormat(mPrayTime.TIME24); //determine 12 or 24 in prayeradapter
-//        mPrayTime.setCalcMethod(mPrayTime.ISNA);
-//        mPrayTime.setAsrJuristic(mPrayTime.SHAFII);
-//        mPrayTime.setAdjustHighLats(mPrayTime.ANGLEBASED);
         int[] offsets = {0, 0, 0, 0, 0, 0, 0}; // {Fajr,Sunrise,Dhuhr,Asr,Sunset,Maghrib,Isha}
         offsets = getOffsetArray(context);
         mPrayTime.tune(offsets);
+        //ss: in next version grab the manual locaiton timezone
         prayerTimes = mPrayTime.getPrayerTimes(cal,getLocationLatitude(context),
                 getLocationLongitude(context),mPrayTime.getBaseTimeZone());
         prayerTimes.remove(5); // i don't need the maghrib and sunset just the sunset as maghrib

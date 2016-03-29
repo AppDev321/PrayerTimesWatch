@@ -1,4 +1,4 @@
-package com.sommayah.myprayertimes;
+package com.sommayah.myprayertimes.services;
 
 import android.app.AlarmManager;
 import android.app.IntentService;
@@ -8,9 +8,16 @@ import android.app.PendingIntent;
 import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
+
+import com.sommayah.myprayertimes.MainActivity;
+import com.sommayah.myprayertimes.broadcastReceivers.PrayerAlarmReceiver;
+import com.sommayah.myprayertimes.R;
+import com.sommayah.myprayertimes.Utility;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
@@ -72,8 +79,12 @@ public class PrayerNotificationService extends IntentService {
                         PendingIntent.FLAG_UPDATE_CURRENT
                 );
         mBuilder.setContentIntent(resultPendingIntent);
-        Uri ringURI = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        mBuilder.setSound(ringURI);
+        Uri defaultRingURI = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String ringURIString = preferences.getString(getString(R.string.pref_notification_ringtone_key),defaultRingURI.toString());
+        if(ringURIString != null){
+            mBuilder.setSound(Uri.parse(ringURIString));
+        }
         long[] vibrate = new long[] {100, 100, 100 };
         //check if user has vibration enabled.
         if(Utility.isVibrateEnabled(context)){

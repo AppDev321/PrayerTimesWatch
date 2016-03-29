@@ -240,7 +240,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity  {
             // to their values. When their values change, their summaries are
             // updated to reflect the new value, per the Android Design
             // guidelines.
-            bindPreferenceSummaryToValue(findPreference("notifications_prayer_ringtone"));
+
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_notification_ringtone_key)));
+
         }
 
         @Override
@@ -340,8 +342,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity  {
                 editor.putString(getString(R.string.pref_location_key), address);
 
                 // Also store the latitude and longitude so that we can use these to get a precise
-                // result from our weather service. We cannot expect the weather service to
-                // understand addresses that Google formats.
+                // result from our prayer service.
                 editor.putFloat(getString(R.string.pref_location_latitude),
                         (float) latLong.latitude);
                 editor.putFloat(getString(R.string.pref_location_longitude),

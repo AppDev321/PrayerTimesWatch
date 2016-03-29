@@ -55,21 +55,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-//        String day = Utility.getDayName();
-//        String date = Utility.getGregoreanDayString();
-//        String hDate = Utility.getHijriDate(getApplicationContext());
-//        Log.d("day of week:", day);
-//        Log.d("date:", date);
-//        Log.d("hijri date:", hDate);
-
         // Acquire a reference to the system Location Manager
         mLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-
-
         //String locationProvider = LocationManager.NETWORK_PROVIDER;
         String locationProvider = LocationManager.GPS_PROVIDER;
-
-
         //ss: check here if location is null
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
@@ -95,9 +84,11 @@ public class MainActivity extends AppCompatActivity {
             Location lastKnownLocation = mLocationManager.getLastKnownLocation(locationProvider);
 
             if (lastKnownLocation != null) {
-                makeUseOfNewLocation(lastKnownLocation);
-                Log.d("known location long", String.valueOf(lastKnownLocation.getLongitude()));
-                Log.d("known location lat", String.valueOf(lastKnownLocation.getLatitude()));
+                if(!Utility.isManualLocation(getApplicationContext())) {
+                    makeUseOfNewLocation(lastKnownLocation);
+                    Log.d("known location long", String.valueOf(lastKnownLocation.getLongitude()));
+                    Log.d("known location lat", String.valueOf(lastKnownLocation.getLatitude()));
+                }
             } else {
                 //location null no previous location
                 Log.d(TAG, "last known location null");
@@ -108,7 +99,9 @@ public class MainActivity extends AppCompatActivity {
         mLocationListener = new LocationListener() {
             public void onLocationChanged(Location location) {
                 // Called when a new location is found by the network location provider.
-                makeUseOfNewLocation(location);
+                if(!Utility.isManualLocation(getApplicationContext())){
+                    makeUseOfNewLocation(location);
+                }
             }
 
             public void onStatusChanged(String provider, int status, Bundle extras) {
@@ -120,29 +113,21 @@ public class MainActivity extends AppCompatActivity {
             public void onProviderDisabled(String provider) {
             }
         };
-
-//        Utility.testPrayertimes(getApplicationContext());
-
-//        AlarmManager alarmMgr;
-//        PendingIntent alarmIntent;
-//        alarmMgr = (AlarmManager)getApplicationContext().getSystemService(Context.ALARM_SERVICE);
-//        Intent intent = new Intent(getApplicationContext(), PrayerAlarmReceiver.class);
-//        alarmIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, intent, 0);
-//
-//        alarmMgr.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-//                SystemClock.elapsedRealtime() +
-//                        60 * 1000, alarmIntent);
-
-
-
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         mhijriDateText.setText(Utility.getHijriDate(getApplicationContext()));
-        if(Utility.isLocationLatLonAvailable(getApplicationContext())) {
-            mTitleText.setText(Utility.getPreferredLocation(getApplicationContext()));
+        SharedPreferences prefs
+                = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        boolean isManualLocation = prefs.getBoolean(getApplicationContext().getString(R.string.pref_loc_manual_set), false);
+        if(isManualLocation == false) {
+            if (Utility.isLocationLatLonAvailable(getApplicationContext())) {
+                mTitleText.setText(Utility.getPreferredLocation(getApplicationContext()));
+            }
+        }else{ //set manual location
+            mTitleText.setText(Utility.getManualLocation(getApplicationContext()));
         }
 
 
@@ -277,9 +262,9 @@ public class MainActivity extends AppCompatActivity {
         editor.putFloat(getString(R.string.pref_location_longitude),
                 (float) longitude);
         editor.commit();
-        Log.d("location long:", String.valueOf(location.getLongitude()));
-        Log.d("location lat", String.valueOf(location.getLatitude()));
-        Utility.testPrayertimes(getApplicationContext());
+       // Log.d("location long:", String.valueOf(location.getLongitude()));
+       // Log.d("location lat", String.valueOf(location.getLatitude()));
+       // Utility.testPrayertimes(getApplicationContext());
         if(Utility.isLocationLatLonAvailable(getApplicationContext())) {
             mTitleText.setText(Utility.getPreferredLocation(getApplicationContext()));
         }

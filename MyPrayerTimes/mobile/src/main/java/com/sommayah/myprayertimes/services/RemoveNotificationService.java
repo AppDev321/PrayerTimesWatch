@@ -1,10 +1,12 @@
-package com.sommayah.myprayertimes;
+package com.sommayah.myprayertimes.services;
 
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
+
+import com.sommayah.myprayertimes.services.PrayerNotificationService;
 
 public class RemoveNotificationService extends Service {
     public RemoveNotificationService() {

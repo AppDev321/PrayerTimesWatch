@@ -32,16 +32,16 @@
             android:label="@string/title_activity_settings" />
 
         <receiver
-            android:name=".PrayerAlarmReceiver"
+            android:name=".broadcastReceivers.PrayerAlarmReceiver"
             android:enabled="true"
             android:exported="true" />
 
         <service
-            android:name=".PrayerNotificationService"
+            android:name=".services.PrayerNotificationService"
             android:exported="false" />
 
         <receiver
-            android:name=".PrayerOnBootReceiver"
+            android:name=".broadcastReceivers.PrayerOnBootReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
@@ -52,12 +52,12 @@
             </intent-filter>
         </receiver>
         <receiver
-            android:name=".PassiveLocationChangeReceiver"
+            android:name=".broadcastReceivers.PassiveLocationChangeReceiver"
             android:enabled="true"
             android:exported="true" />
 
         <service
-            android:name=".RemoveNotificationService"
+            android:name=".services.RemoveNotificationService"
             android:enabled="true"
             android:exported="true" />
 

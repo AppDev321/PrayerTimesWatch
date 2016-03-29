@@ -1,4 +1,4 @@
-package com.sommayah.myprayertimes;
+package com.sommayah.myprayertimes.broadcastReceivers;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -7,6 +7,9 @@ import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationManager;
 import android.preference.PreferenceManager;
+
+import com.sommayah.myprayertimes.R;
+import com.sommayah.myprayertimes.Utility;
 
 public class PassiveLocationChangeReceiver extends BroadcastReceiver {
     public PassiveLocationChangeReceiver() {

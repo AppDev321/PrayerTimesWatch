@@ -1,4 +1,4 @@
-package com.sommayah.myprayertimes;
+package com.sommayah.myprayertimes.broadcastReceivers;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -11,7 +11,9 @@ import android.os.Build;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
 
+import com.sommayah.myprayertimes.Utility;
 import com.sommayah.myprayertimes.dataModels.Prayer;
+import com.sommayah.myprayertimes.services.PrayerNotificationService;
 
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalTime;
