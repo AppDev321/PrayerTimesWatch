@@ -13,6 +13,7 @@ import com.sommayah.myprayertimes.dataModels.PrayTime;
 
 import org.joda.time.Chronology;
 import org.joda.time.LocalDate;
+import org.joda.time.LocalTime;
 import org.joda.time.chrono.ISOChronology;
 import org.joda.time.chrono.IslamicChronology;
 
@@ -512,6 +513,25 @@ public class Utility {
 
         }
         return name;
+    }
+
+    public static int getNextPos(ArrayList<String> prayerTimes){
+        int pos = 0;
+        LocalTime now = LocalTime.now();
+        Log.d("get current time", now.toString());
+        LocalTime limit;
+        for(int i=0; i<prayerTimes.size(); i++){
+            limit = new LocalTime(prayerTimes.get(i));
+            Boolean isLate = now.isAfter(limit);
+            if(isLate)
+                pos++;
+        }
+        //case pos is out of bound
+        if(pos == prayerTimes.size()){
+            // mUseNextPrayerLayout = false;
+            pos = 0; //just for now
+        }
+        return pos;
     }
 
 }

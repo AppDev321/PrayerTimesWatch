@@ -15,9 +15,9 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 
 import com.sommayah.myprayertimes.MainActivity;
-import com.sommayah.myprayertimes.broadcastReceivers.PrayerAlarmReceiver;
 import com.sommayah.myprayertimes.R;
 import com.sommayah.myprayertimes.Utility;
+import com.sommayah.myprayertimes.broadcastReceivers.PrayerAlarmReceiver;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
@@ -30,6 +30,7 @@ public class PrayerNotificationService extends IntentService {
     private final String TAG = PrayerNotificationService.class.getSimpleName();
     private Notification.Builder prayerNotificationBuilder;
     public static final int NOTIFICATION_ID = 1;
+    public static final String ACTION_NEXT_PRAYER_UPDATED = "com.sommayah.myprayertimes.ACTION_NEXT_PRAYER_UPDATED";
     private NotificationManager mNotificationManager;
 
     private PendingIntent mAlarmIntent;
@@ -99,6 +100,13 @@ public class PrayerNotificationService extends IntentService {
         Intent alarmIntent = new Intent(this, RemoveNotificationService.class);
         PendingIntent pendingIntent = PendingIntent.getService(this, 1, alarmIntent, 0);
         alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 15000 * 60, pendingIntent); //remove notifications after 15 minutes
+    }
+
+    public void updateWidgets(String prayer){
+        Context context = getApplicationContext();
+        Intent nextPrayerUpdatedIntent = new Intent(ACTION_NEXT_PRAYER_UPDATED).setPackage(context.getPackageName());
+        context.sendBroadcast(nextPrayerUpdatedIntent);
+
     }
 
 }

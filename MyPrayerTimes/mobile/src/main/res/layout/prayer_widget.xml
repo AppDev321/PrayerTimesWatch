@@ -48,6 +48,7 @@
                     android:layout_weight="1"
                     android:layout_centerHorizontal="true"
                     android:textAlignment="center"
+                    android:textColor="@android:color/secondary_text_dark"
                     android:text="@string/fajr" />
 
                 <TextView
@@ -75,6 +76,7 @@
                     android:layout_weight="1"
                     android:layout_centerHorizontal="true"
                     android:textAlignment="center"
+                    android:textColor="@android:color/secondary_text_dark"
                     android:text="@string/sunrise" />
 
                 <TextView
@@ -102,6 +104,7 @@
                     android:layout_weight="1"
                     android:layout_centerHorizontal="true"
                     android:textAlignment="center"
+                    android:textColor="@android:color/secondary_text_dark"
                     android:text="@string/dhuhr" />
 
                 <TextView
@@ -129,6 +132,7 @@
                     android:layout_weight="1"
                     android:layout_centerHorizontal="true"
                     android:textAlignment="center"
+                    android:textColor="@android:color/secondary_text_dark"
                     android:text="@string/asr" />
 
                 <TextView
@@ -156,6 +160,7 @@
                     android:layout_weight="1"
                     android:layout_centerHorizontal="true"
                     android:textAlignment="center"
+                    android:textColor="@android:color/secondary_text_dark"
                     android:text="@string/maghrib" />
 
                 <TextView
@@ -183,6 +188,7 @@
                     android:layout_weight="1"
                     android:layout_centerHorizontal="true"
                     android:textAlignment="center"
+                    android:textColor="@android:color/secondary_text_dark"
                     android:text="@string/isha" />
 
                 <TextView

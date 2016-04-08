@@ -52,6 +52,7 @@ public class PrayerWidgetIntentService extends IntentService {
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(now);
                 prayTimes = Utility.getPrayTimes(cal, getApplicationContext());
+                int nextPrayer = Utility.getNextPos(prayTimes);
                 if (Utility.getPreferredTimeFormat(getApplicationContext()) == PrayTime.TIME12) { //12 hr or 24 formate{
                     //update if 12 format
                     for (int i = 0; i < prayTimes.size(); i++) {
@@ -64,12 +65,34 @@ public class PrayerWidgetIntentService extends IntentService {
                 }
                 // Add the data to the RemoteViews
                 views.setTextViewText(R.id.appwidget_date, Utility.getHijriDate(getApplicationContext()));
-                views.setTextViewText(R.id.textViewFajrTime, prayTimes.get(0));
-                views.setTextViewText(R.id.textViewSunRiseTime, prayTimes.get(1));
-                views.setTextViewText(R.id.textViewDhuhrTime, prayTimes.get(2));
-                views.setTextViewText(R.id.textViewAsrTime, prayTimes.get(3));
-                views.setTextViewText(R.id.textViewMaghribTime, prayTimes.get(4));
-                views.setTextViewText(R.id.textViewIshaTime, prayTimes.get(5));
+                int temp, tempName;
+                String[] id = new String[]{"textViewFajrTime", "textViewSunRiseTime", "textViewDhuhrTime", "textViewAsrTime"
+                , "textViewMaghribTime", "textViewIshaTime"};
+                String[] namesId = new String[]{"textViewFajr", "textViewSunRise", "textViewDhuhr", "textViewAsr"
+                        , "textViewMaghrib", "textViewIsha"};
+
+
+                //code from: http://stackoverflow.com/questions/31623126/how-to-put-textviews-in-an-array-and-findviewbyid-of-them
+                for(int i=0; i<id.length; i++){
+                    temp = getResources().getIdentifier(id[i], "id", getPackageName());
+                    tempName = getResources().getIdentifier(namesId[i], "id", getPackageName());
+                    views.setTextViewText(temp, prayTimes.get(i));
+                    if(i == nextPrayer){
+                        views.setInt(temp, "setTextColor", getResources().getColor(android.R.color.white));
+                        views.setInt(tempName, "setTextColor", getResources().getColor(android.R.color.white));
+                    }else{
+                        views.setInt(temp, "setTextColor", getResources().getColor(android.R.color.secondary_text_dark));
+                        views.setInt(tempName, "setTextColor", getResources().getColor(android.R.color.secondary_text_dark));
+                    }
+
+                }
+
+//                views.setTextViewText(R.id.textViewFajrTime, prayTimes.get(0));
+//                views.setTextViewText(R.id.textViewSunRiseTime, prayTimes.get(1));
+//                views.setTextViewText(R.id.textViewDhuhrTime, prayTimes.get(2));
+//                views.setTextViewText(R.id.textViewAsrTime, prayTimes.get(3));
+//                views.setTextViewText(R.id.textViewMaghribTime, prayTimes.get(4));
+//                views.setTextViewText(R.id.textViewIshaTime, prayTimes.get(5));
 
 
                 // Create an Intent to launch MainActivity
@@ -82,6 +105,7 @@ public class PrayerWidgetIntentService extends IntentService {
             }
         }
     }
+
 
 
 }

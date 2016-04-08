@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.sommayah.myprayertimes.services.PrayerNotificationService;
+
 /**
  * Implementation of App Widget functionality.
  */
@@ -33,6 +35,9 @@ public class PrayerWidget extends AppWidgetProvider {
     @Override
     public void onReceive(Context context, Intent intent) {
         super.onReceive(context, intent);
+        if (PrayerNotificationService.ACTION_NEXT_PRAYER_UPDATED.equals(intent.getAction())) {
+            context.startService(new Intent(context, PrayerWidgetIntentService.class));
+        }
     }
 }
 

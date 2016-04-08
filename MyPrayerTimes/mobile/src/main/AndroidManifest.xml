@@ -70,6 +70,7 @@
         <receiver android:name=".widget.PrayerWidget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.sommayah.myprayertimes.ACTION_NEXT_PRAYER_UPDATED" />
             </intent-filter>
 
             <meta-data
