@@ -99,6 +99,7 @@ public class Utility {
                 DEFAULT_LATLONG);
     }
 
+
     public static String getPreferredLocation(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         return prefs.getString(context.getString(R.string.pref_location_key),
@@ -334,7 +335,11 @@ public class Utility {
 //    }
 
     public static void setHighAltMethod(PrayTime praytime, Context context, SharedPreferences prefs){
-        int high_alt = Integer.valueOf(prefs.getString(context.getString(R.string.pref_high_alt_key), "1"));
+        boolean is_high_alt = prefs.getBoolean(context.getString(R.string.pref_high_alt_switch),false);
+        int high_alt = -1; //because we will add one.
+        if(is_high_alt == true) {
+            high_alt = Integer.valueOf(prefs.getString(context.getString(R.string.pref_high_alt_key), "1"));
+        }
         praytime.setAdjustHighLats(high_alt + 1); //0 value was none, here we want other values so add one to adjust index
     }
 
@@ -508,4 +513,5 @@ public class Utility {
         }
         return name;
     }
+
 }

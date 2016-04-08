@@ -128,7 +128,8 @@
     <string name="shawal">Shawal</string>
     <string name="dhulqe3da">Dhu-l Qida</string>
     <string name="dhulhija">Dhu-l Hija</string>
-
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
 
 
 </resources>

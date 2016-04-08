@@ -1,0 +1,205 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/widget_margin">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/widget"
+        android:layout_centerVertical="true"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent"
+        android:orientation="vertical"
+        android:layout_alignParentEnd="true"
+        android:padding="@dimen/widget_layout_margin">
+
+        <TextView
+            android:id="@+id/appwidget_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/appwidget_text"
+            android:text="@string/appwidget_text"
+            android:textColor="@color/colorAccent"
+            android:textSize="12sp"
+            android:textStyle="bold|italic" />
+
+        <LinearLayout
+            android:id="@+id/prayer_names_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:orientation="horizontal"
+            android:weightSum="6">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_weight="1"
+                android:weightSum="2">
+
+                <TextView
+                    android:id="@+id/textViewFajr"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:layout_centerHorizontal="true"
+                    android:textAlignment="center"
+                    android:text="@string/fajr" />
+
+                <TextView
+                    android:id="@+id/textViewFajrTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:layout_centerHorizontal="true"
+                    android:textColor="@android:color/white"
+                    android:textAlignment="center"
+                     />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_weight="1"
+                android:weightSum="2">
+
+                <TextView
+                    android:id="@+id/textViewSunRise"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:layout_centerHorizontal="true"
+                    android:textAlignment="center"
+                    android:text="@string/sunrise" />
+
+                <TextView
+                    android:id="@+id/textViewSunRiseTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:layout_centerHorizontal="true"
+                    android:textColor="@android:color/white"
+                    android:textAlignment="center"
+                     />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_weight="1"
+                android:weightSum="2">
+
+                <TextView
+                    android:id="@+id/textViewDhuhr"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:layout_centerHorizontal="true"
+                    android:textAlignment="center"
+                    android:text="@string/dhuhr" />
+
+                <TextView
+                    android:id="@+id/textViewDhuhrTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:layout_centerHorizontal="true"
+                    android:textColor="@android:color/white"
+                    android:textAlignment="center"
+                    />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_weight="1"
+                android:weightSum="2">
+
+                <TextView
+                    android:id="@+id/textViewAsr"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:layout_centerHorizontal="true"
+                    android:textAlignment="center"
+                    android:text="@string/asr" />
+
+                <TextView
+                    android:id="@+id/textViewAsrTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:layout_centerHorizontal="true"
+                    android:textColor="@android:color/white"
+                    android:textAlignment="center"
+                     />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_weight="1"
+                android:weightSum="2">
+
+                <TextView
+                    android:id="@+id/textViewMaghrib"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:layout_centerHorizontal="true"
+                    android:textAlignment="center"
+                    android:text="@string/maghrib" />
+
+                <TextView
+                    android:id="@+id/textViewMaghribTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:layout_centerHorizontal="true"
+                    android:textColor="@android:color/white"
+                    android:textAlignment="center"
+                    />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_weight="1"
+                android:weightSum="2">
+
+                <TextView
+                    android:id="@+id/textViewIsha"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:layout_centerHorizontal="true"
+                    android:textAlignment="center"
+                    android:text="@string/isha" />
+
+                <TextView
+                    android:id="@+id/textViewIshaTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:layout_centerHorizontal="true"
+                    android:textColor="@android:color/white"
+                    android:textAlignment="center"
+                     />
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+
+</FrameLayout>

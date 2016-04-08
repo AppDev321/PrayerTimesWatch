@@ -148,4 +148,6 @@ public class LocationEditTextPreference extends EditTextPreference {
                 (float) lng);
         editor.commit();
     }
+
+
 }

@@ -65,7 +65,21 @@
             android:name=".data.PrayerProvider"
             android:authorities="com.sommayah.myprayertimes"
             android:enabled="true"
-            android:exported="true"></provider>
+            android:exported="true" />
+
+        <receiver android:name=".widget.PrayerWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/prayer_widget_info" />
+        </receiver>
+
+        <service
+            android:name=".widget.PrayerWidgetIntentService"
+            android:exported="false"></service>
     </application>
 
 </manifest>
