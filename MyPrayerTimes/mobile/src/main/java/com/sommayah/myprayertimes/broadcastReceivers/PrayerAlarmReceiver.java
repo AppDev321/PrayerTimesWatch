@@ -40,9 +40,6 @@ public class PrayerAlarmReceiver extends WakefulBroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         // TODO: This method is called when the BroadcastReceiver is receiving
-
-
-
         // Start the service, keeping the device awake while it is launching.
         String prayerName =  intent.getStringExtra(EXTRA_PRAYER_NAME);
         long alarmTime = intent.getLongExtra(EXTRA_PRAYER_TIME, -1);
@@ -50,12 +47,10 @@ public class PrayerAlarmReceiver extends WakefulBroadcastReceiver {
             prayerName = ""; // in case error in prayer name
         if(alarmTime != -1 && Math.abs(alarmTime - System.currentTimeMillis()) < FIVE_MIN) {
             if (Utility.isAlarmEnabled(context)) {
-
                 Intent sendNotificationIntent = new Intent(context, PrayerNotificationService.class);
                 sendNotificationIntent.putExtra(EXTRA_PRAYER_NAME, prayerName);
                 sendNotificationIntent.putExtra(EXTRA_PRAYER_TIME, alarmTime);
                 startWakefulService(context, sendNotificationIntent);
-
             }
             //set the next prayer alarm
             addPrayerAlarm(context);
@@ -72,7 +67,6 @@ public class PrayerAlarmReceiver extends WakefulBroadcastReceiver {
         intent.putExtra(EXTRA_PRAYER_NAME,next_prayer_time.getName());
         intent.putExtra(EXTRA_PRAYER_TIME, cal.getTimeInMillis());
         alarmIntent = PendingIntent.getBroadcast(context, ALARM_ID, intent, PendingIntent.FLAG_CANCEL_CURRENT);
-
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
             //lollipop_mr1 is 22, this is only 23 and above
             alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), alarmIntent);
@@ -104,7 +98,7 @@ public class PrayerAlarmReceiver extends WakefulBroadcastReceiver {
         Calendar now = Calendar.getInstance(TimeZone.getDefault());
         now.setTimeInMillis(System.currentTimeMillis());
         ArrayList<String> prayerTimes = Utility.getPrayTimes(now,context);
-        prayerTimes.remove(1); //this is sunrise we don't need an alarm for that, or can make it as a feature?
+       // prayerTimes.remove(1); //this is sunrise we don't need an alarm for that, or can make it as a feature?
         int pos = 0;
         LocalTime nowLocal = LocalTime.now();
         Log.d("get current time", nowLocal.toString());
@@ -123,11 +117,8 @@ public class PrayerAlarmReceiver extends WakefulBroadcastReceiver {
             prayerTimes = Utility.getPrayTimes(tomorrow,context);
             return new Prayer("Fajr",prayerTimes.get(0), true); //true: tomorrow
         }
-        int prayer_pos = pos;
-        if(pos >=1){ //sunrise is not a prayer get name of next
-            prayer_pos++;
-        }
-        String name = Utility.getPrayerName(prayer_pos,context);
+
+        String name = Utility.getPrayerName(pos,context);
         return new Prayer(name,prayerTimes.get(pos));
     }
 

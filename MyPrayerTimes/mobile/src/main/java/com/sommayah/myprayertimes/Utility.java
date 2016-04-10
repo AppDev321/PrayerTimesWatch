@@ -239,6 +239,21 @@ public class Utility {
         return hijriDate;
 
     }
+    public static String getSmallHijriDate(Context context){
+        Chronology iso = ISOChronology.getInstanceUTC();
+        Chronology hijri = IslamicChronology.getInstanceUTC();
+        LocalDate todayIso = new LocalDate();
+        LocalDate todayHijri = new LocalDate(todayIso.toDateTimeAtStartOfDay(),
+                hijri);
+        int adjustment = adjustHijriDate(context);
+        todayHijri = todayHijri.plusDays(adjustment);
+        int day =  todayHijri.getDayOfMonth();
+        int month = todayHijri.getMonthOfYear();
+        int year = todayHijri.getYear();
+        String hijriDate = String.valueOf(day) + " "+ getHijriMonthName(month,context);
+        return hijriDate;
+
+    }
 
     public static int[] getOffsetArray(Context context){
         int[] offsets = {0, 0, 0, 0, 0, 0, 0};

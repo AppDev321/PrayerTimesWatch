@@ -80,6 +80,21 @@
 
         <service
             android:name=".widget.PrayerWidgetIntentService"
+            android:exported="false" />
+
+        <receiver android:name=".widget.NextPrayerWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.sommayah.myprayertimes.ACTION_NEXT_PRAYER_UPDATED" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/next_prayer_widget_info" />
+        </receiver>
+
+        <service
+            android:name=".widget.NextPrayerWidgetIntentService"
             android:exported="false"></service>
     </application>
 

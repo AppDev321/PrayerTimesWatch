@@ -1,0 +1,65 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/widget_margin">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/widgetNextPrayer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerHorizontal="true"
+        android:background="@android:color/transparent"
+        android:orientation="vertical"
+        android:padding="@dimen/widget_layout_margin">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:paddingStart="@dimen/title_widget_margin"
+            android:paddingEnd="@dimen/title_widget_margin"
+            android:orientation="horizontal">
+            <TextView
+                android:id="@+id/appwidget_date"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/appwidget_text"
+                android:text="@string/appwidget_text"
+                android:textColor="@color/colorAccent"
+                android:textAlignment="center"
+                android:textSize="12sp"
+                android:textStyle="bold|italic" />
+
+            <TextView
+                android:id="@+id/textViewPrayerName"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="prayer"
+                android:textAlignment="center"
+                android:textColor="@android:color/secondary_text_dark"
+                android:textSize="12sp" />
+
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/textViewPrayerTime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="TIME"
+            android:textAlignment="center"
+            android:fontFamily="sans-serif-thin"
+            android:textSize="32sp"
+            android:textColor="@android:color/white" />
+
+
+    </LinearLayout>
+
+
+</FrameLayout>

@@ -27,25 +27,22 @@ import java.util.Date;
  * TODO: Customize class - update intent actions, extra parameters and static
  * helper methods.
  */
-public class PrayerWidgetIntentService extends IntentService {
+public class NextPrayerWidgetIntentService extends IntentService {
 
-
-    public PrayerWidgetIntentService() {
-        super("PrayerWidgetIntentService");
+    public NextPrayerWidgetIntentService() {
+        super("NextPrayerWidgetIntentService");
     }
-
-
 
     @Override
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
             AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
             int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(this,
-                    PrayerWidget.class));
+                    NextPrayerWidget.class));
 
             // Perform this loop procedure for each Today widget
             for (int appWidgetId : appWidgetIds) {
-                int layoutId = R.layout.prayer_widget;
+                int layoutId = R.layout.next_prayer_widget;
                 RemoteViews views = new RemoteViews(getPackageName(), layoutId);
                 ArrayList<String> prayTimes;
                 Date now = new Date();
@@ -57,44 +54,27 @@ public class PrayerWidgetIntentService extends IntentService {
                     //update if 12 format
                     for (int i = 0; i < prayTimes.size(); i++) {
                         LocalTime time = new LocalTime(prayTimes.get(i));
-                        DateTimeFormatter fmt = DateTimeFormat.forPattern("hh:mm");
+                        DateTimeFormatter fmt = DateTimeFormat.forPattern("h:mm aa");
                         String str = fmt.print(time);
                         prayTimes.set(i, str);
 
                     }
                 }
                 // Add the data to the RemoteViews
-                views.setTextViewText(R.id.appwidget_date, Utility.getHijriDate(getApplicationContext()));
-                int temp, tempName;
-                String[] id = new String[]{"textViewFajrTime", "textViewSunRiseTime", "textViewDhuhrTime", "textViewAsrTime"
-                , "textViewMaghribTime", "textViewIshaTime"};
-                String[] namesId = new String[]{"textViewFajr", "textViewSunRise", "textViewDhuhr", "textViewAsr"
-                        , "textViewMaghrib", "textViewIsha"};
-
-
-                //code from: http://stackoverflow.com/questions/31623126/how-to-put-textviews-in-an-array-and-findviewbyid-of-them
-                for(int i=0; i<id.length; i++){
-                    temp = getResources().getIdentifier(id[i], "id", getPackageName());
-                    tempName = getResources().getIdentifier(namesId[i], "id", getPackageName());
-                    views.setTextViewText(temp, prayTimes.get(i));
-                    if(i == nextPrayer){
-                        views.setInt(temp, "setTextColor", getResources().getColor(android.R.color.white));
-                        views.setInt(tempName, "setTextColor", getResources().getColor(android.R.color.white));
-                    }else{
-                        views.setInt(temp, "setTextColor", getResources().getColor(android.R.color.secondary_text_dark));
-                        views.setInt(tempName, "setTextColor", getResources().getColor(android.R.color.secondary_text_dark));
-                    }
-
-                }
+                views.setTextViewText(R.id.appwidget_date, Utility.getSmallHijriDate(getApplicationContext()));
+                views.setTextViewText(R.id.textViewPrayerName, Utility.getPrayerName(nextPrayer,getApplicationContext()));
+                views.setTextViewText(R.id.textViewPrayerTime, prayTimes.get(nextPrayer));
 
                 // Create an Intent to launch MainActivity
                 Intent launchIntent = new Intent(this, MainActivity.class);
                 PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, launchIntent, 0);
-                views.setOnClickPendingIntent(R.id.widget, pendingIntent);
+                views.setOnClickPendingIntent(R.id.widgetNextPrayer, pendingIntent);
 
                 // Tell the AppWidgetManager to perform an update on the current app widget
                 appWidgetManager.updateAppWidget(appWidgetId, views);
             }
         }
     }
+
+
 }

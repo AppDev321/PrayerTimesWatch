@@ -59,50 +59,54 @@ public class PrayerNotificationService extends IntentService {
     private void broadcastNotification(Context context, String prayer, long time) {
         //ss:incorporate the preferences later
 
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(context)
-                        .setColor(context.getResources().getColor(R.color.colorPrimary))
-                        .setSmallIcon(R.drawable.notification_icon)
-                        .setContentTitle("Time for prayer")
-                        .setContentText("Time for " + prayer + " prayer")
-                        .setTicker("Time to Pray")
-                        .setAutoCancel(true);
+        if(!prayer.equals(getString(R.string.sunrise))) {
 
-        if(time != -1)
-            mBuilder.setWhen(time);
+            NotificationCompat.Builder mBuilder =
+                    new NotificationCompat.Builder(context)
+                            .setColor(context.getResources().getColor(R.color.colorPrimary))
+                            .setSmallIcon(R.drawable.notification_icon)
+                            .setContentTitle("Time for prayer")
+                            .setContentText("Time for " + prayer + " prayer")
+                            .setTicker("Time to Pray")
+                            .setAutoCancel(true);
 
-        Intent startActivityIntent = new Intent(this, MainActivity.class);
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-        stackBuilder.addNextIntent(startActivityIntent);
-        PendingIntent resultPendingIntent =
-                stackBuilder.getPendingIntent(
-                        0,
-                        PendingIntent.FLAG_UPDATE_CURRENT
-                );
-        mBuilder.setContentIntent(resultPendingIntent);
-        Uri defaultRingURI = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        String ringURIString = preferences.getString(getString(R.string.pref_notification_ringtone_key),defaultRingURI.toString());
-        if(ringURIString != null){
-            mBuilder.setSound(Uri.parse(ringURIString));
+            if (time != -1)
+                mBuilder.setWhen(time);
+
+            Intent startActivityIntent = new Intent(this, MainActivity.class);
+            TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+            stackBuilder.addNextIntent(startActivityIntent);
+            PendingIntent resultPendingIntent =
+                    stackBuilder.getPendingIntent(
+                            0,
+                            PendingIntent.FLAG_UPDATE_CURRENT
+                    );
+            mBuilder.setContentIntent(resultPendingIntent);
+            Uri defaultRingURI = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+            String ringURIString = preferences.getString(getString(R.string.pref_notification_ringtone_key), defaultRingURI.toString());
+            if (ringURIString != null) {
+                mBuilder.setSound(Uri.parse(ringURIString));
+            }
+            long[] vibrate = new long[]{100, 100, 100};
+            //check if user has vibration enabled.
+            if (Utility.isVibrateEnabled(context)) {
+                mBuilder.setVibrate(vibrate);
+            }
+            final NotificationManager notificationManager
+                    = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.notify(NOTIFICATION_ID,
+                    mBuilder.build());
+
+            AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+            Intent alarmIntent = new Intent(this, RemoveNotificationService.class);
+            PendingIntent pendingIntent = PendingIntent.getService(this, 1, alarmIntent, 0);
+            alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 15000 * 60, pendingIntent); //remove notifications after 15 minutes
         }
-        long[] vibrate = new long[] {100, 100, 100 };
-        //check if user has vibration enabled.
-        if(Utility.isVibrateEnabled(context)){
-            mBuilder.setVibrate(vibrate);
-        }
-        final NotificationManager notificationManager
-                = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(NOTIFICATION_ID,
-                mBuilder.build());
-
-        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        Intent alarmIntent = new Intent(this, RemoveNotificationService.class);
-        PendingIntent pendingIntent = PendingIntent.getService(this, 1, alarmIntent, 0);
-        alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 15000 * 60, pendingIntent); //remove notifications after 15 minutes
+        updateWidgets();
     }
 
-    public void updateWidgets(String prayer){
+    public void updateWidgets(){
         Context context = getApplicationContext();
         Intent nextPrayerUpdatedIntent = new Intent(ACTION_NEXT_PRAYER_UPDATED).setPackage(context.getPackageName());
         context.sendBroadcast(nextPrayerUpdatedIntent);
