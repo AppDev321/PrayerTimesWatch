@@ -43,6 +43,10 @@
                 android:text="prayer"
                 android:textAlignment="center"
                 android:textColor="@android:color/secondary_text_dark"
+                android:shadowColor="@android:color/black"
+                android:shadowDx="-1"
+                android:shadowDy="-1"
+                android:shadowRadius="1"
                 android:textSize="12sp" />
 
 

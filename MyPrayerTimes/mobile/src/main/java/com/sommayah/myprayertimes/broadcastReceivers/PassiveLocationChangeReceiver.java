@@ -9,7 +9,6 @@ import android.location.LocationManager;
 import android.preference.PreferenceManager;
 
 import com.sommayah.myprayertimes.R;
-import com.sommayah.myprayertimes.Utility;
 
 public class PassiveLocationChangeReceiver extends BroadcastReceiver {
     public PassiveLocationChangeReceiver() {
@@ -47,10 +46,8 @@ public class PassiveLocationChangeReceiver extends BroadcastReceiver {
                 editor.putFloat(context.getResources().getString(R.string.pref_location_longitude),
                         (float) location.getLongitude());
                 editor.commit();
-                if (Utility.isAlarmEnabled(context)) {
-                    alarm.cancelAlarm(context);
-                    alarm.addPrayerAlarm(context);
-                }
+                alarm.cancelAlarm(context);
+                alarm.addPrayerAlarm(context);
             }
         }
     }

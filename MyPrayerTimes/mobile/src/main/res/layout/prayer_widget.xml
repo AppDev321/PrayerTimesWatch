@@ -49,6 +49,10 @@
                     android:layout_centerHorizontal="true"
                     android:textAlignment="center"
                     android:textColor="@android:color/secondary_text_dark"
+                    android:shadowColor="@android:color/black"
+                    android:shadowDx="-1"
+                    android:shadowDy="-1"
+                    android:shadowRadius="1"
                     android:text="@string/fajr" />
 
                 <TextView
@@ -58,6 +62,10 @@
                     android:layout_weight="1"
                     android:layout_centerHorizontal="true"
                     android:textColor="@android:color/white"
+                    android:shadowColor="@android:color/black"
+                    android:shadowDx="-1"
+                    android:shadowDy="-1"
+                    android:shadowRadius="1"
                     android:textAlignment="center"
                      />
             </LinearLayout>
@@ -77,6 +85,10 @@
                     android:layout_centerHorizontal="true"
                     android:textAlignment="center"
                     android:textColor="@android:color/secondary_text_dark"
+                    android:shadowColor="@android:color/black"
+                    android:shadowDx="-1"
+                    android:shadowDy="-1"
+                    android:shadowRadius="1"
                     android:text="@string/sunrise" />
 
                 <TextView
@@ -86,6 +98,10 @@
                     android:layout_weight="1"
                     android:layout_centerHorizontal="true"
                     android:textColor="@android:color/white"
+                    android:shadowColor="@android:color/black"
+                    android:shadowDx="-1"
+                    android:shadowDy="-1"
+                    android:shadowRadius="1"
                     android:textAlignment="center"
                      />
             </LinearLayout>
@@ -105,6 +121,10 @@
                     android:layout_centerHorizontal="true"
                     android:textAlignment="center"
                     android:textColor="@android:color/secondary_text_dark"
+                    android:shadowColor="@android:color/black"
+                    android:shadowDx="-1"
+                    android:shadowDy="-1"
+                    android:shadowRadius="1"
                     android:text="@string/dhuhr" />
 
                 <TextView
@@ -114,6 +134,10 @@
                     android:layout_weight="1"
                     android:layout_centerHorizontal="true"
                     android:textColor="@android:color/white"
+                    android:shadowColor="@android:color/black"
+                    android:shadowDx="-1"
+                    android:shadowDy="-1"
+                    android:shadowRadius="1"
                     android:textAlignment="center"
                     />
             </LinearLayout>
@@ -133,6 +157,10 @@
                     android:layout_centerHorizontal="true"
                     android:textAlignment="center"
                     android:textColor="@android:color/secondary_text_dark"
+                    android:shadowColor="@android:color/black"
+                    android:shadowDx="-1"
+                    android:shadowDy="-1"
+                    android:shadowRadius="1"
                     android:text="@string/asr" />
 
                 <TextView
@@ -142,6 +170,10 @@
                     android:layout_weight="1"
                     android:layout_centerHorizontal="true"
                     android:textColor="@android:color/white"
+                    android:shadowColor="@android:color/black"
+                    android:shadowDx="-1"
+                    android:shadowDy="-1"
+                    android:shadowRadius="1"
                     android:textAlignment="center"
                      />
             </LinearLayout>
@@ -161,6 +193,10 @@
                     android:layout_centerHorizontal="true"
                     android:textAlignment="center"
                     android:textColor="@android:color/secondary_text_dark"
+                    android:shadowColor="@android:color/black"
+                    android:shadowDx="-1"
+                    android:shadowDy="-1"
+                    android:shadowRadius="1"
                     android:text="@string/maghrib" />
 
                 <TextView
@@ -170,6 +206,10 @@
                     android:layout_weight="1"
                     android:layout_centerHorizontal="true"
                     android:textColor="@android:color/white"
+                    android:shadowColor="@android:color/black"
+                    android:shadowDx="-1"
+                    android:shadowDy="-1"
+                    android:shadowRadius="1"
                     android:textAlignment="center"
                     />
             </LinearLayout>
@@ -189,6 +229,10 @@
                     android:layout_centerHorizontal="true"
                     android:textAlignment="center"
                     android:textColor="@android:color/secondary_text_dark"
+                    android:shadowColor="@android:color/black"
+                    android:shadowDx="-1"
+                    android:shadowDy="-1"
+                    android:shadowRadius="1"
                     android:text="@string/isha" />
 
                 <TextView
@@ -198,6 +242,10 @@
                     android:layout_weight="1"
                     android:layout_centerHorizontal="true"
                     android:textColor="@android:color/white"
+                    android:shadowColor="@android:color/black"
+                    android:shadowDx="-1"
+                    android:shadowDy="-1"
+                    android:shadowRadius="1"
                     android:textAlignment="center"
                      />
             </LinearLayout>

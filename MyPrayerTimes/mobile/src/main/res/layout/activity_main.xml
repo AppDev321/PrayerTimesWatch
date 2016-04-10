@@ -33,7 +33,7 @@
                 android:paddingLeft="16dp"
                 android:paddingTop="8dp"
                 android:paddingRight="16dp"
-                android:text="This is today's prayer"
+                android:text="LOADING YOUR LOCATION, PLEASE WAIT"
                 android:ellipsize="end"
                 android:maxLines="4" />
 

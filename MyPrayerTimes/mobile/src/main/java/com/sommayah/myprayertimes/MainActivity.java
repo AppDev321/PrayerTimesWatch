@@ -19,6 +19,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -26,6 +27,7 @@ import butterknife.ButterKnife;
 public class MainActivity extends AppCompatActivity {
 
     public static final String TAG = MainActivity.class.getSimpleName();
+    public static int locationInquires;
 
     public static final int MIN_TIME =1000 * 60 * 120; //two hours
     public static final int MIN_DIST = 20000; //set to 20 kilometers
@@ -42,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
+        locationInquires = 0;
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -185,6 +188,8 @@ public class MainActivity extends AppCompatActivity {
         double longitude = location.getLongitude();
         double latitude = location.getLatitude();
         String address = Utility.getLocationAddress(getApplicationContext(),longitude,latitude);
+        locationInquires++;
+        Toast.makeText(getApplicationContext(), "location inquiries= " + locationInquires, Toast.LENGTH_SHORT).show();
 //        String countryName = "";
 //        String cityName = "";
 //        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
@@ -268,6 +273,11 @@ public class MainActivity extends AppCompatActivity {
         if(Utility.isLocationLatLonAvailable(getApplicationContext())) {
             mTitleText.setText(Utility.getPreferredLocation(getApplicationContext()));
         }
+//        if (Utility.isAlarmEnabled(getApplicationContext())) {
+//            PrayerAlarmReceiver alarm = new PrayerAlarmReceiver();
+//            alarm.cancelAlarm(getApplicationContext());
+//            alarm.addPrayerAlarm(getApplicationContext());
+//        }
 
     }
 

@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.sommayah.myprayertimes.Utility;
-import com.sommayah.myprayertimes.broadcastReceivers.PrayerAlarmReceiver;
 
 public class PrayerOnBootReceiver extends BroadcastReceiver {
     PrayerAlarmReceiver prayerAlarm = new PrayerAlarmReceiver();
@@ -24,11 +23,8 @@ public class PrayerOnBootReceiver extends BroadcastReceiver {
                 action.equals("android.intent.action.MY_PACKAGE_REPLACED")) {
             // Our location could have changed, which means time calculations may be different
             // now so cancel the alarm and set it again.
-            if (Utility.isAlarmEnabled(context)) {
-                prayerAlarm.cancelAlarm(context);
-                prayerAlarm.addPrayerAlarm(context);
-            }
-
+            prayerAlarm.cancelAlarm(context);
+            prayerAlarm.addPrayerAlarm(context);
         }
     }
 

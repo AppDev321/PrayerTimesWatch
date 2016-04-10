@@ -58,8 +58,7 @@ public class PrayerNotificationService extends IntentService {
 
     private void broadcastNotification(Context context, String prayer, long time) {
         //ss:incorporate the preferences later
-
-        if(!prayer.equals(getString(R.string.sunrise))) {
+        if(!prayer.equals(getString(R.string.sunrise)) && Utility.isAlarmEnabled(context)) {
 
             NotificationCompat.Builder mBuilder =
                     new NotificationCompat.Builder(context)

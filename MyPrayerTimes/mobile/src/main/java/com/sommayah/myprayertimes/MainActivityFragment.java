@@ -78,10 +78,9 @@ public class MainActivityFragment extends Fragment{
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean(getString(R.string.pref_alarm_initiated), true);
             editor.commit();
-            if (Utility.isAlarmEnabled(getContext())) {
-                PrayerAlarmReceiver prayerAlarmReceiver = new PrayerAlarmReceiver();
-                prayerAlarmReceiver.addPrayerAlarm(getContext());
-            }
+            PrayerAlarmReceiver prayerAlarmReceiver = new PrayerAlarmReceiver();
+            prayerAlarmReceiver.addPrayerAlarm(getContext());
+
         }
 
 
@@ -160,17 +159,6 @@ public class MainActivityFragment extends Fragment{
             mAdapter.add(mPrayerTimes);
             mAdapter.notifyDataSetChanged();
         }
-
-        if(key.equals(getString(R.string.pref_notification_key))){
-            PrayerAlarmReceiver prayerAlarmReceiver = new PrayerAlarmReceiver();
-            if(!Utility.isAlarmEnabled(getContext())){
-                prayerAlarmReceiver.cancelAlarm(getContext());
-            }else{
-                prayerAlarmReceiver.addPrayerAlarm(getContext());
-            }
-        }
-
-
         //no need to listen to hijri date adjustment because we display the new one onresume
 
     }

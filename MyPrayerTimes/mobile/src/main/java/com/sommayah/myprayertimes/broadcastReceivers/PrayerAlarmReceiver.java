@@ -25,6 +25,7 @@ import java.util.TimeZone;
 
 public class PrayerAlarmReceiver extends WakefulBroadcastReceiver {
     public static final String ACTION_PRAYER_TIME_ALARM = "com.sommayah.myprayertimes.ACTION_PRAYER_TIME_ALARM";
+    public static final String ACTION_NEXT_PRAYER_UPDATED = "com.sommayah.myprayertimes.ACTION_NEXT_PRAYER_UPDATED";
     public static final String EXTRA_PRAYER_NAME = "prayer_name";
     public static final String EXTRA_PRAYER_TIME = "prayer_time";
     public static final int ALARM_ID = 1000;
@@ -45,13 +46,11 @@ public class PrayerAlarmReceiver extends WakefulBroadcastReceiver {
         long alarmTime = intent.getLongExtra(EXTRA_PRAYER_TIME, -1);
         if(prayerName == null)
             prayerName = ""; // in case error in prayer name
-        if(alarmTime != -1 && Math.abs(alarmTime - System.currentTimeMillis()) < FIVE_MIN) {
-            if (Utility.isAlarmEnabled(context)) {
-                Intent sendNotificationIntent = new Intent(context, PrayerNotificationService.class);
-                sendNotificationIntent.putExtra(EXTRA_PRAYER_NAME, prayerName);
-                sendNotificationIntent.putExtra(EXTRA_PRAYER_TIME, alarmTime);
-                startWakefulService(context, sendNotificationIntent);
-            }
+        if (alarmTime != -1 && Math.abs(alarmTime - System.currentTimeMillis()) < FIVE_MIN) {
+            Intent sendNotificationIntent = new Intent(context, PrayerNotificationService.class);
+            sendNotificationIntent.putExtra(EXTRA_PRAYER_NAME, prayerName);
+            sendNotificationIntent.putExtra(EXTRA_PRAYER_TIME, alarmTime);
+            startWakefulService(context, sendNotificationIntent);
             //set the next prayer alarm
             addPrayerAlarm(context);
         }
@@ -94,6 +93,7 @@ public class PrayerAlarmReceiver extends WakefulBroadcastReceiver {
 
     }
 
+
     private Prayer getNextPrayer(Context context) {
         Calendar now = Calendar.getInstance(TimeZone.getDefault());
         now.setTimeInMillis(System.currentTimeMillis());
@@ -115,7 +115,7 @@ public class PrayerAlarmReceiver extends WakefulBroadcastReceiver {
             tomorrow.setTimeInMillis(System.currentTimeMillis());
             tomorrow.add(Calendar.DAY_OF_YEAR, 1);
             prayerTimes = Utility.getPrayTimes(tomorrow,context);
-            return new Prayer("Fajr",prayerTimes.get(0), true); //true: tomorrow
+            return new Prayer("Fajr",prayerTimes.get(0),true); //true: tomorrow
         }
 
         String name = Utility.getPrayerName(pos,context);
@@ -180,4 +180,5 @@ public class PrayerAlarmReceiver extends WakefulBroadcastReceiver {
             //do nothing. We should always have permision in order to reach this screen.
         }
     }
+
 }

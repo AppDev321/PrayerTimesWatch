@@ -14,7 +14,7 @@ public class Prayer {
         this.tomorrow = false;
     }
 
-    public Prayer(String name, String time, boolean tomorrow){
+    public Prayer(String name, String time,boolean tomorrow){
         this.name = name;
         this.time = time;
         this.tomorrow = tomorrow;
