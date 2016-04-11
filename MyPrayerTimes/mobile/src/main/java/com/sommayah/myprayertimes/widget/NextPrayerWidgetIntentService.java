@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Intent;
+import android.graphics.Color;
 import android.widget.RemoteViews;
 
 import com.sommayah.myprayertimes.MainActivity;
@@ -62,8 +63,19 @@ public class NextPrayerWidgetIntentService extends IntentService {
                 }
                 // Add the data to the RemoteViews
                 views.setTextViewText(R.id.appwidget_date, Utility.getSmallHijriDate(getApplicationContext()));
-                views.setTextViewText(R.id.textViewPrayerName, Utility.getPrayerName(nextPrayer,getApplicationContext()));
+                views.setTextViewText(R.id.textViewPrayerName, Utility.getPrayerName(nextPrayer, getApplicationContext()));
                 views.setTextViewText(R.id.textViewPrayerTime, prayTimes.get(nextPrayer));
+
+                int color = Utility.getWidgetTextColor(getApplicationContext());
+                int transparencyPercent = Utility.getTransparencyPercent(getApplicationContext());
+                int transcolor = Utility.getWidgetTransparencyColor(getApplicationContext());
+                if(transcolor == android.R.color.transparent){
+                    views.setInt(R.id.widgetNextPrayer, "setBackgroundColor", getResources().getColor(transcolor));
+                }else{
+                    int colorvalue = Color.parseColor(Utility.getTransparencyNumber(transparencyPercent, transcolor));
+                    views.setInt(R.id.widgetNextPrayer, "setBackgroundColor", colorvalue);
+                }
+                views.setInt(R.id.textViewPrayerTime, "setTextColor", getResources().getColor(color));
 
                 // Create an Intent to launch MainActivity
                 Intent launchIntent = new Intent(this, MainActivity.class);
@@ -75,6 +87,8 @@ public class NextPrayerWidgetIntentService extends IntentService {
             }
         }
     }
+
+
 
 
 }

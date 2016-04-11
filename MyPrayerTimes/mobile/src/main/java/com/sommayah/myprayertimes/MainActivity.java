@@ -21,6 +21,8 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.sommayah.myprayertimes.broadcastReceivers.PrayerAlarmReceiver;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
@@ -273,11 +275,11 @@ public class MainActivity extends AppCompatActivity {
         if(Utility.isLocationLatLonAvailable(getApplicationContext())) {
             mTitleText.setText(Utility.getPreferredLocation(getApplicationContext()));
         }
-//        if (Utility.isAlarmEnabled(getApplicationContext())) {
-//            PrayerAlarmReceiver alarm = new PrayerAlarmReceiver();
-//            alarm.cancelAlarm(getApplicationContext());
-//            alarm.addPrayerAlarm(getApplicationContext());
-//        }
+        if (Utility.isAlarmEnabled(getApplicationContext())) {
+            PrayerAlarmReceiver alarm = new PrayerAlarmReceiver();
+            alarm.cancelAlarm(getApplicationContext());
+            alarm.addPrayerAlarm(getApplicationContext());
+        }
 
     }
 

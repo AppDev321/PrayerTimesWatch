@@ -88,7 +88,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity  {
                     }
                 }
 
-            } else {
+            }  else {
                 // For all other preferences, set the summary to the value's
                 // simple string representation.
                 preference.setSummary(stringValue);
@@ -180,7 +180,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity  {
     protected boolean isValidFragment(String fragmentName) {
         return PreferenceFragment.class.getName().equals(fragmentName)
                 || GeneralPreferenceFragment.class.getName().equals(fragmentName)
-                || DataSyncPreferenceFragment.class.getName().equals(fragmentName)
+                || WatchWidgetPreferenceFragment.class.getName().equals(fragmentName)
                 || NotificationPreferenceFragment.class.getName().equals(fragmentName)
                 || LocationPreferenceFragment.class.getName().equals(fragmentName);
     }
@@ -261,18 +261,19 @@ public class SettingsActivity extends AppCompatPreferenceActivity  {
      * activity is showing a two-pane settings UI.
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static class DataSyncPreferenceFragment extends PreferenceFragment {
+    public static class WatchWidgetPreferenceFragment extends PreferenceFragment {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.pref_data_sync);
+            addPreferencesFromResource(R.xml.pref_widget_watch);
             setHasOptionsMenu(true);
 
             // Bind the summaries of EditText/List/Dialog/Ringtone preferences
             // to their values. When their values change, their summaries are
             // updated to reflect the new value, per the Android Design
             // guidelines.
-            bindPreferenceSummaryToValue(findPreference("sync_frequency"));
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.widget_pref_color_key)));
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.widget_pref_bg_key)));
         }
 
         @Override
@@ -304,9 +305,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity  {
             // guidelines.
             bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_location_key)));
             bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_location_key_manual)));
-
-
-
         }
 
         @Override

@@ -100,6 +100,15 @@
     <string name="pref_notification_key">notification_key</string>
     <string name="pref_notification_enable_summary">Enable or disable notifications</string>
     <string name="pref_vibrate_summary">Set vibration on or off</string>
+    <string name="widget_pref_title">Widget Settings</string>
+    <string name="pref_widget_setting_key">widget_setting_key</string>
+    <string name="widget_pref_color_key">widget_color_key</string>
+    <string name="pref_title_widget_color">Widget text color</string>
+    <string name="pref_header_watch_widget">Watch and Widget settings</string>
+    <string name="pref_title_widget_bg_color">Widget Background Color</string>
+    <string name="widget_pref_bg_key">widget_bg_key</string>
+    <string name="pref_widget_transparency_key">widget_transprency_key</string>
+    <string name="pref_widget_transparency_title">Widget background color transparency</string>
 
     <string name="use_current_location">Use current location</string>
     <string name="compass_button_description">Compass button</string>
@@ -130,6 +139,7 @@
     <string name="dhulhija">Dhu-l Hija</string>
     <string name="appwidget_text">LOADING...</string>
     <string name="add_widget">Add widget</string>
+
 
 
 </resources>

@@ -1,5 +1,6 @@
 package com.sommayah.myprayertimes;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -13,6 +14,7 @@ import android.view.ViewGroup;
 
 import com.sommayah.myprayertimes.broadcastReceivers.PrayerAlarmReceiver;
 import com.sommayah.myprayertimes.dataModels.PrayTime;
+import com.sommayah.myprayertimes.services.PrayerNotificationService;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -147,6 +149,7 @@ public class MainActivityFragment extends Fragment{
 
     private void onChangedSettings(SharedPreferences prefs, String key){
 
+        //ss: so badly implemented has to change this if statement
         if (!key.equals(getString(R.string.pref_time_format_key))) { //in case of format we dont need to grab data again
             Date now = new Date();
             Calendar cal = Calendar.getInstance();
@@ -160,9 +163,18 @@ public class MainActivityFragment extends Fragment{
             mAdapter.notifyDataSetChanged();
         }
         //no need to listen to hijri date adjustment because we display the new one onresume
+        if(key.equals(getString(R.string.pref_widget_transparency_key))
+                || key.equals(getString(R.string.widget_pref_bg_key))
+                || key.equals(getString(R.string.widget_pref_color_key))){
+            updateWidgets();
+        }
 
     }
+    public void updateWidgets(){
+        Intent nextPrayerUpdatedIntent = new Intent(PrayerNotificationService.ACTION_NEXT_PRAYER_UPDATED).setPackage(getContext().getPackageName());
+        getContext().sendBroadcast(nextPrayerUpdatedIntent);
 
+    }
 
 
 

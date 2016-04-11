@@ -8,5 +8,6 @@
     <color name="secondary_text">#727272</color>
     <color name="icons">#FFFFFF</color>
     <color name="divider">#B6B6B6</color>
-    <color name="widget_background">#40388E3C</color>
+    <color name="widget_backgroundwhite25">#33FFFFFF</color>
+    <color name="widget_backgroundblack25">#33000000</color>
 </resources>

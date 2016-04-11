@@ -18,8 +18,8 @@
         android:title="@string/pref_header_notifications" />
 
     <header
-        android:fragment="com.sommayah.myprayertimes.SettingsActivity$DataSyncPreferenceFragment"
-        android:icon="@drawable/ic_sync_black_24dp"
-        android:title="@string/pref_header_data_sync" />
+        android:fragment="com.sommayah.myprayertimes.SettingsActivity$WatchWidgetPreferenceFragment"
+        android:icon="@drawable/ic_watch_24dp"
+        android:title="@string/pref_header_watch_widget" />
 
 </preference-headers>

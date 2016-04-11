@@ -549,4 +549,55 @@ public class Utility {
         return pos;
     }
 
+    public static int getWidgetTextColor(Context context) {
+        SharedPreferences prefs
+                = PreferenceManager.getDefaultSharedPreferences(context);
+        String color = prefs.getString(context.getString(R.string.widget_pref_color_key), "0");
+        if(color.equals("0")){
+            return android.R.color.white;
+        }
+        return android.R.color.black;
+    }
+
+    public static int getWidgetTransparencyColor(Context context){
+        SharedPreferences prefs
+                = PreferenceManager.getDefaultSharedPreferences(context);
+        String color = prefs.getString(context.getString(R.string.widget_pref_bg_key), "0");
+        if(color.equals("0")){
+            return android.R.color.transparent;
+        }else if(color.equals("1")){
+            return android.R.color.white;
+        }
+        return android.R.color.black;
+    }
+
+    public static int getTransparencyPercent(Context context){
+        SharedPreferences prefs
+                = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getInt(context.getString(R.string.pref_widget_transparency_key),25);
+    }
+
+    public static String getTransparencyNumber(int transparency,int color) {
+        String trans = "#00";
+        switch (transparency){
+            case 25:
+                trans= "#40";
+                break;
+            case 50:
+                trans = "#80";
+                break;
+            case 75:
+                trans = "#BF";
+                break;
+            case 100:
+                trans = "#FF";
+                break;
+            default:
+                break;
+        }
+        String colorString = (color == android.R.color.white) ? "FFFFFF" : "000000";
+        return trans + colorString;
+
+    }
+
 }

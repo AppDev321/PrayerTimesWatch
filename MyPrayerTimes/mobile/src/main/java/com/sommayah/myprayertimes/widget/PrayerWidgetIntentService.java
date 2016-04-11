@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Intent;
+import android.graphics.Color;
 import android.widget.RemoteViews;
 
 import com.sommayah.myprayertimes.MainActivity;
@@ -77,14 +78,23 @@ public class PrayerWidgetIntentService extends IntentService {
                     temp = getResources().getIdentifier(id[i], "id", getPackageName());
                     tempName = getResources().getIdentifier(namesId[i], "id", getPackageName());
                     views.setTextViewText(temp, prayTimes.get(i));
+                    int nextcolor = Utility.getWidgetTextColor(getApplicationContext());
                     if(i == nextPrayer){
-                        views.setInt(temp, "setTextColor", getResources().getColor(android.R.color.white));
-                        views.setInt(tempName, "setTextColor", getResources().getColor(android.R.color.white));
+                        views.setInt(temp, "setTextColor", getResources().getColor(nextcolor));
+                        views.setInt(tempName, "setTextColor", getResources().getColor(nextcolor));
                     }else{
                         views.setInt(temp, "setTextColor", getResources().getColor(android.R.color.secondary_text_dark));
                         views.setInt(tempName, "setTextColor", getResources().getColor(android.R.color.secondary_text_dark));
                     }
 
+                }
+                int transparencyPercent = Utility.getTransparencyPercent(getApplicationContext());
+                int transcolor = Utility.getWidgetTransparencyColor(getApplicationContext());
+                if(transcolor == android.R.color.transparent){
+                    views.setInt(R.id.widget, "setBackgroundColor", getResources().getColor(transcolor));
+                }else{
+                    int colorvalue = Color.parseColor(Utility.getTransparencyNumber(transparencyPercent, transcolor));
+                    views.setInt(R.id.widget, "setBackgroundColor", colorvalue);
                 }
 
                 // Create an Intent to launch MainActivity

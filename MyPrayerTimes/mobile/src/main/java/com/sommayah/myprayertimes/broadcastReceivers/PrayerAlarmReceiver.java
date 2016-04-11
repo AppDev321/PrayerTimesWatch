@@ -25,7 +25,6 @@ import java.util.TimeZone;
 
 public class PrayerAlarmReceiver extends WakefulBroadcastReceiver {
     public static final String ACTION_PRAYER_TIME_ALARM = "com.sommayah.myprayertimes.ACTION_PRAYER_TIME_ALARM";
-    public static final String ACTION_NEXT_PRAYER_UPDATED = "com.sommayah.myprayertimes.ACTION_NEXT_PRAYER_UPDATED";
     public static final String EXTRA_PRAYER_NAME = "prayer_name";
     public static final String EXTRA_PRAYER_TIME = "prayer_time";
     public static final int ALARM_ID = 1000;
