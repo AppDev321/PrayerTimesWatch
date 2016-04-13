@@ -1,15 +1,21 @@
 package com.sommayah.myprayertimes;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.text.format.Time;
 import android.util.Log;
 
+import com.sommayah.myprayertimes.data.PrayerContract;
 import com.sommayah.myprayertimes.dataModels.PrayTime;
+import com.sommayah.myprayertimes.services.PrayerNotificationService;
 
 import org.joda.time.Chronology;
 import org.joda.time.LocalDate;
@@ -25,8 +31,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
-
-
+import java.util.Vector;
 
 
 /**
@@ -369,7 +374,7 @@ public class Utility {
         SharedPreferences prefs
                 = PreferenceManager.getDefaultSharedPreferences(context);
         //-2 to +2 values
-        return Integer.valueOf(prefs.getString(context.getString(R.string.pref_hijri_date_adj), "2"));
+        return Integer.valueOf(prefs.getString(context.getString(R.string.pref_hijri_date_adj), "0"));
     }
 
     public static int getLanguage(Context context){
@@ -597,6 +602,50 @@ public class Utility {
         }
         String colorString = (color == android.R.color.white) ? "FFFFFF" : "000000";
         return trans + colorString;
+
+    }
+
+    public static void addPrayersToDB(Context context, ArrayList<String> prayers){
+        long prayerId;
+        Uri prayerUri = PrayerContract.PrayerEntry.CONTENT_URI;
+        Cursor cur = context.getContentResolver().query(prayerUri,
+                null,
+                null,
+                null, null);
+
+        if (cur.moveToFirst()) {
+            //delete and update
+            context.getContentResolver().delete(PrayerContract.PrayerEntry.CONTENT_URI,
+                    null,
+                    null);
+        }
+        if(cur.moveToFirst()){
+            Log.d("In adding to DB", "Error, not deleted");
+        }
+        // Insert the new weather information into the database
+        Vector<ContentValues> cVVector = new Vector<ContentValues>(prayers.size());
+
+        for(int i = 0; i<prayers.size(); i++) {
+            ContentValues prayerTime = new ContentValues();
+            prayerTime.put(PrayerContract.PrayerEntry.COLUMN_PRAYERNAME, getPrayerName(i, context));
+            prayerTime.put(PrayerContract.PrayerEntry.COLUMN_PRAYERTIME, prayers.get(i));
+            cVVector.add(prayerTime);
+        }
+        int inserted = 0;
+        // add to database
+        if ( cVVector.size() > 0 ) {
+            ContentValues[] cvArray = new ContentValues[cVVector.size()];
+            cVVector.toArray(cvArray);
+            context.getContentResolver().bulkInsert(PrayerContract.PrayerEntry.CONTENT_URI, cvArray);
+            updateWidgets(context);
+        }
+        Log.d("Adding Prayer", "Sync Complete. " + cVVector.size() + " Inserted");
+    }
+
+
+    public static void updateWidgets(Context context){
+        Intent nextPrayerUpdatedIntent = new Intent(PrayerNotificationService.ACTION_NEXT_PRAYER_UPDATED).setPackage(context.getPackageName());
+        context.sendBroadcast(nextPrayerUpdatedIntent);
 
     }
 

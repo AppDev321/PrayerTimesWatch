@@ -4,7 +4,6 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
-import android.text.format.Time;
 
 /**
  * Created by sommayahsoliman on 3/11/16.
@@ -21,16 +20,6 @@ public class PrayerContract {
     // Possible paths (appended to base content URI for possible URI's)
     public static final String PATH_PRAYER = "prayer";
 
-    // To make it easy to query for the exact date, we normalize all dates that go into
-    // the database to the start of the the Julian day at UTC.
-    public static long normalizeDate(long startDate) {
-        // normalize the start date to the beginning of the (UTC) day
-        Time time = new Time();
-        time.set(startDate);
-        int julianDay = Time.getJulianDay(startDate, time.gmtoff);
-        return time.setJulianDay(julianDay);
-    }
-
     public static final class PrayerEntry implements BaseColumns{
 
         public static final Uri CONTENT_URI =
@@ -42,25 +31,19 @@ public class PrayerContract {
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_PRAYER;
         public static final String TABLE_NAME = "prayer";
         //columns in our table
-        public static final String COLUMN_DATE = "date";
-        public static final String COLUMN_FAJR = "fajr";
-        public static final String COLUMN_SUNRISE = "sunrise";
-        public static final String COLUMN_DHUHR = "dhuhr";
-        public static final String COLUMN_ASR = "asr";
-        public static final String COLUMN_MAGHRIB = "maghrib";
-        public static final String COLUMN_ISHA = "isha";
-
+        public static final String COLUMN_PRAYERNAME = "name";
+        public static final String COLUMN_PRAYERTIME = "time";
 
         public static Uri buildPrayerUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
-        public static Uri buildPrayerWithDateUri(long date){
-            return CONTENT_URI.buildUpon().appendPath(Long.toString(normalizeDate(date))).build();
+        public static Uri buildPrayerWithNameUri(String name){
+            return CONTENT_URI.buildUpon().appendPath(name).build();
         }
 
-        public static long getDateFromUri(Uri uri) {
-            return Long.parseLong(uri.getPathSegments().get(1));
+        public static String getPrayerFromUri(Uri uri) {
+            return uri.getPathSegments().get(1);
         }
 
     }

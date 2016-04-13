@@ -135,8 +135,6 @@ public class MainActivity extends AppCompatActivity {
             mTitleText.setText(Utility.getManualLocation(getApplicationContext()));
         }
 
-
-
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             Log.d(TAG, "no network available2");
@@ -280,6 +278,13 @@ public class MainActivity extends AppCompatActivity {
             alarm.cancelAlarm(getApplicationContext());
             alarm.addPrayerAlarm(getApplicationContext());
         }
+//        // update the location in our recycler view using the fragment manager
+//        if (location != null) {
+//            MainActivityFragment mainFragment = (MainActivityFragment)getSupportFragmentManager().findFragmentById(R.id.fragment);
+//            if ( null != mainFragment ) {
+//                mainFragment.onLocationChanged();
+//            }
+//        }
 
     }
 

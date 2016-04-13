@@ -1,10 +1,14 @@
 package com.sommayah.myprayertimes;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -13,8 +17,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.sommayah.myprayertimes.broadcastReceivers.PrayerAlarmReceiver;
+import com.sommayah.myprayertimes.data.PrayerContract;
 import com.sommayah.myprayertimes.dataModels.PrayTime;
-import com.sommayah.myprayertimes.services.PrayerNotificationService;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -26,15 +30,27 @@ import butterknife.ButterKnife;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends Fragment{
+public class MainActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
     SharedPreferences.OnSharedPreferenceChangeListener listener;
     @Bind(R.id.recyclerview_prayer) RecyclerView mRecyclerView;
     private boolean mUseNextPrayerLayout;
-    private PrayerAdapter mPrayerAdapter;
     private PrayTime mPraytime;
     private PrayerAdapter mAdapter;
     private ArrayList<String> mPrayerTimes;
     private View mEmptyView;
+
+    private static final int PRAYER_LOADER = 0;
+    // Specify the columns we need.
+    private static final String[] PRAYER_COLUMNS = {
+            // In this case the id needs to be fully qualified with a table name, since
+            PrayerContract.PrayerEntry.COLUMN_PRAYERNAME,
+            PrayerContract.PrayerEntry.COLUMN_PRAYERTIME,
+    };
+
+    // These indices are tied to FORECAST_COLUMNS.  If FORECAST_COLUMNS changes, these
+    // must change.
+    static final int COL_PRAYER_NAME = 0;
+    static final int COL_PRAYER_TIME = 1;
 
     public MainActivityFragment() {
     }
@@ -69,10 +85,8 @@ public class MainActivityFragment extends Fragment{
         Date now = new Date();
         Calendar cal = Calendar.getInstance();
         cal.setTime(now);
-
-
-
         mPrayerTimes = Utility.getPrayTimes(cal,getContext());
+        Utility.addPrayersToDB(getContext(),mPrayerTimes);
 
         if(!Utility.isAlarmInitiated(getContext())){
             SharedPreferences sharedPreferences =
@@ -86,8 +100,8 @@ public class MainActivityFragment extends Fragment{
         }
 
 
-        //ss:temp adapter that don't user cursor
-        mAdapter = new PrayerAdapter(mPrayerTimes,getActivity(), mEmptyView);
+
+        mAdapter = new PrayerAdapter(getActivity(), mEmptyView);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
@@ -119,12 +133,22 @@ public class MainActivityFragment extends Fragment{
     public void onResume() {
         //so that the next prayer is updated
         //update ui
-        if (mAdapter != null) {
-            mAdapter.clear();
-            mAdapter.add(mPrayerTimes);
-            mAdapter.notifyDataSetChanged();
-        }
+//        if (mAdapter != null) {
+//            mAdapter.clear();
+//            mAdapter.add(mPrayerTimes);
+//            mAdapter.notifyDataSetChanged();
+//        }
         super.onResume();
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        getLoaderManager().initLoader(PRAYER_LOADER, null, this);
+        super.onActivityCreated(savedInstanceState);
+    }
+
+    void onLocationChanged() {
+        getLoaderManager().restartLoader(PRAYER_LOADER, null, this);
     }
 
     @Override
@@ -155,28 +179,48 @@ public class MainActivityFragment extends Fragment{
             Calendar cal = Calendar.getInstance();
             cal.setTime(now);
             mPrayerTimes = Utility.getPrayTimes(cal, getContext());
+            Utility.addPrayersToDB(getContext(), mPrayerTimes);
+
         }
         //update ui
         if (mAdapter != null) {
-            mAdapter.clear();
-            mAdapter.add(mPrayerTimes);
-            mAdapter.notifyDataSetChanged();
+            getContext().getContentResolver().notifyChange(PrayerContract.PrayerEntry.CONTENT_URI,null);
         }
         //no need to listen to hijri date adjustment because we display the new one onresume
         if(key.equals(getString(R.string.pref_widget_transparency_key))
                 || key.equals(getString(R.string.widget_pref_bg_key))
                 || key.equals(getString(R.string.widget_pref_color_key))){
-            updateWidgets();
+            Utility.updateWidgets(getContext());
         }
 
     }
-    public void updateWidgets(){
-        Intent nextPrayerUpdatedIntent = new Intent(PrayerNotificationService.ACTION_NEXT_PRAYER_UPDATED).setPackage(getContext().getPackageName());
-        getContext().sendBroadcast(nextPrayerUpdatedIntent);
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        Uri prayerUri = PrayerContract.PrayerEntry.CONTENT_URI;
+
+        return new CursorLoader(getActivity(),
+                prayerUri,
+                PRAYER_COLUMNS,
+                null,
+                null,
+                null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        if (data != null)
+            mAdapter.swapCursor(data);
+        updateEmptyView();
 
     }
 
+    private void updateEmptyView() {
+        //implement it later
+    }
 
-
-
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mAdapter.swapCursor(null);
+    }
 }
