@@ -19,7 +19,6 @@ import com.sommayah.myprayertimes.services.PrayerNotificationService;
 
 import org.joda.time.Chronology;
 import org.joda.time.LocalDate;
-import org.joda.time.LocalTime;
 import org.joda.time.chrono.ISOChronology;
 import org.joda.time.chrono.IslamicChronology;
 
@@ -535,7 +534,7 @@ public class Utility {
         return name;
     }
 
-    public static int getNextPos(ArrayList<String> prayerTimes){
+   /* public static int getNextPos(ArrayList<String> prayerTimes){
         int pos = 0;
         LocalTime now = LocalTime.now();
         Log.d("get current time", now.toString());
@@ -552,6 +551,12 @@ public class Utility {
             pos = 0; //just for now
         }
         return pos;
+    }*/
+
+    public static int getNextPos(Context context){
+        SharedPreferences prefs
+                = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getInt(context.getString(R.string.pref_next_prayer), 0);
     }
 
     public static int getWidgetTextColor(Context context) {

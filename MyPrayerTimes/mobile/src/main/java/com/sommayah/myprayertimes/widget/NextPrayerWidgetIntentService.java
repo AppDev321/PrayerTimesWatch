@@ -20,8 +20,6 @@ import org.joda.time.LocalTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-import java.util.ArrayList;
-
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
  * a service on a separate handler thread.
@@ -68,25 +66,25 @@ public class NextPrayerWidgetIntentService extends IntentService {
                     data.close();
                     return;
                 }
-                ArrayList<String> prayTimes = new ArrayList<>();
-                do{
-                    prayTimes.add(data.getString(COL_PRAYER_TIME));
-                }while (data.moveToNext());
-                int nextPrayer = Utility.getNextPos(prayTimes);
+                int nextPrayer = Utility.getNextPos(getApplicationContext());
+//                ArrayList<String> prayTimes = new ArrayList<>();
+//                do{
+//                    prayTimes.add(data.getString(COL_PRAYER_TIME));
+//                }while (data.moveToNext());
+                data.moveToPosition(nextPrayer);
+                String prayName = data.getString(COL_PRAYER_NAME);
+                String prayTime = data.getString(COL_PRAYER_TIME);
+
                 if (Utility.getPreferredTimeFormat(getApplicationContext()) == PrayTime.TIME12) { //12 hr or 24 formate{
-                    //update if 12 format
-                    for (int i = 0; i < prayTimes.size(); i++) {
-                        LocalTime time = new LocalTime(prayTimes.get(i));
+                        LocalTime time = new LocalTime(prayTime);
                         DateTimeFormatter fmt = DateTimeFormat.forPattern("h:mm aa");
                         String str = fmt.print(time);
-                        prayTimes.set(i, str);
-
-                    }
+                        prayTime = str;
                 }
                 // Add the data to the RemoteViews
                 views.setTextViewText(R.id.appwidget_date, Utility.getSmallHijriDate(getApplicationContext()));
-                views.setTextViewText(R.id.textViewPrayerName, Utility.getPrayerName(nextPrayer, getApplicationContext()));
-                views.setTextViewText(R.id.textViewPrayerTime, prayTimes.get(nextPrayer));
+                views.setTextViewText(R.id.textViewPrayerName, prayName);
+                views.setTextViewText(R.id.textViewPrayerTime, prayTime);
 
                 int color = Utility.getWidgetTextColor(getApplicationContext());
                 int transparencyPercent = Utility.getTransparencyPercent(getApplicationContext());

@@ -94,8 +94,6 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
         }
 
-
-
         mAdapter = new PrayerAdapter(getActivity(), mEmptyView);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());

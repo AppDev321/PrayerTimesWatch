@@ -139,7 +139,7 @@ public class PrayerAdapter extends RecyclerView.Adapter<PrayerAdapter.PrayerAdap
 
     @Override
     public int getItemViewType(int position) {
-        return (position == getNextPos() && mUseNextPrayerLayout) ? VIEW_TYPE_NEXT : VIEW_TYPE_ALL;
+        return (position == Utility.getNextPos(mContext) && mUseNextPrayerLayout) ? VIEW_TYPE_NEXT : VIEW_TYPE_ALL;
     }
 
     public int getNextPos(){
@@ -163,6 +163,8 @@ public class PrayerAdapter extends RecyclerView.Adapter<PrayerAdapter.PrayerAdap
             pos = 0; //just for now
         }
         return pos;
+
+
     }
 
     public class PrayerAdapterViewHolder extends RecyclerView.ViewHolder  {

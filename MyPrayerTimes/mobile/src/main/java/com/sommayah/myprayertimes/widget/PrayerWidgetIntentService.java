@@ -74,7 +74,7 @@ public class PrayerWidgetIntentService extends IntentService {
                 do{
                     prayTimes.add(data.getString(COL_PRAYER_TIME));
                 }while (data.moveToNext());
-                int nextPrayer = Utility.getNextPos(prayTimes);
+                int nextPrayer = Utility.getNextPos(getApplicationContext());
                 if (Utility.getPreferredTimeFormat(getApplicationContext()) == PrayTime.TIME12) { //12 hr or 24 formate{
                     //update if 12 format
                     for (int i = 0; i < prayTimes.size(); i++) {

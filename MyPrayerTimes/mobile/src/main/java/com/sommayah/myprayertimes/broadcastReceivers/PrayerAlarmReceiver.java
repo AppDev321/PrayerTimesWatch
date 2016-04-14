@@ -5,9 +5,11 @@ import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
 
@@ -122,11 +124,21 @@ public class PrayerAlarmReceiver extends WakefulBroadcastReceiver {
             tomorrow.setTimeInMillis(System.currentTimeMillis());
             tomorrow.add(Calendar.DAY_OF_YEAR, 1);
             prayerTimes = Utility.getPrayTimes(tomorrow,context);
+            saveNextPrayerPos(context,0);
             return new Prayer("Fajr",prayerTimes.get(0),true); //true: tomorrow
         }
 
         String name = Utility.getPrayerName(pos,context);
+        saveNextPrayerPos(context,pos);
         return new Prayer(name,prayerTimes.get(pos));
+    }
+
+    public void saveNextPrayerPos(Context context,int pos){
+        SharedPreferences sharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt(context.getString(R.string.pref_next_prayer), pos);
+        editor.commit();
     }
 
     public Calendar getCalendarFromPrayerTime(String prayTime, boolean tomorrow){
