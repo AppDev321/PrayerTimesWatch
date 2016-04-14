@@ -81,12 +81,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         // in content do not change the layout size of the RecyclerView
         mRecyclerView.setHasFixedSize(true);
 
-        //get prayer data:
-        Date now = new Date();
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(now);
-        mPrayerTimes = Utility.getPrayTimes(cal,getContext());
-        Utility.addPrayersToDB(getContext(),mPrayerTimes);
+
 
         if(!Utility.isAlarmInitiated(getContext())){
             SharedPreferences sharedPreferences =
@@ -174,7 +169,8 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     private void onChangedSettings(SharedPreferences prefs, String key){
 
         //ss: so badly implemented has to change this if statement
-        if (!key.equals(getString(R.string.pref_time_format_key))) { //in case of format we dont need to grab data again
+        if (!key.equals(getString(R.string.pref_time_format_key)) && !key.equals(getString(R.string.pref_location_latitude))
+        && !key.equals(getString(R.string.pref_location_longitude))) { //in case of format we dont need to grab data again
             Date now = new Date();
             Calendar cal = Calendar.getInstance();
             cal.setTime(now);
@@ -185,6 +181,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         //update ui
         if (mAdapter != null) {
             getContext().getContentResolver().notifyChange(PrayerContract.PrayerEntry.CONTENT_URI,null);
+            Utility.updateWidgets(getContext());
         }
         //no need to listen to hijri date adjustment because we display the new one onresume
         if(key.equals(getString(R.string.pref_widget_transparency_key))

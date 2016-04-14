@@ -5,12 +5,15 @@ import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Color;
+import android.net.Uri;
 import android.widget.RemoteViews;
 
 import com.sommayah.myprayertimes.MainActivity;
 import com.sommayah.myprayertimes.R;
 import com.sommayah.myprayertimes.Utility;
+import com.sommayah.myprayertimes.data.PrayerContract;
 import com.sommayah.myprayertimes.dataModels.PrayTime;
 
 import org.joda.time.LocalTime;
@@ -18,8 +21,6 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
@@ -29,6 +30,18 @@ import java.util.Date;
  * helper methods.
  */
 public class NextPrayerWidgetIntentService extends IntentService {
+
+    // Specify the columns we need.
+    private static final String[] PRAYER_COLUMNS = {
+            // In this case the id needs to be fully qualified with a table name, since
+            PrayerContract.PrayerEntry.COLUMN_PRAYERNAME,
+            PrayerContract.PrayerEntry.COLUMN_PRAYERTIME,
+    };
+
+    // These indices are tied to FORECAST_COLUMNS.  If FORECAST_COLUMNS changes, these
+    // must change.
+    static final int COL_PRAYER_NAME = 0;
+    static final int COL_PRAYER_TIME = 1;
 
     public NextPrayerWidgetIntentService() {
         super("NextPrayerWidgetIntentService");
@@ -45,11 +58,20 @@ public class NextPrayerWidgetIntentService extends IntentService {
             for (int appWidgetId : appWidgetIds) {
                 int layoutId = R.layout.next_prayer_widget;
                 RemoteViews views = new RemoteViews(getPackageName(), layoutId);
-                ArrayList<String> prayTimes;
-                Date now = new Date();
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(now);
-                prayTimes = Utility.getPrayTimes(cal, getApplicationContext());
+                Uri prayerUri = PrayerContract.PrayerEntry.CONTENT_URI;
+                Cursor data = getContentResolver().query(prayerUri, PRAYER_COLUMNS, null,
+                        null, null);
+                if (data == null) {
+                    return;
+                }
+                if (!data.moveToFirst()) {
+                    data.close();
+                    return;
+                }
+                ArrayList<String> prayTimes = new ArrayList<>();
+                do{
+                    prayTimes.add(data.getString(COL_PRAYER_TIME));
+                }while (data.moveToNext());
                 int nextPrayer = Utility.getNextPos(prayTimes);
                 if (Utility.getPreferredTimeFormat(getApplicationContext()) == PrayTime.TIME12) { //12 hr or 24 formate{
                     //update if 12 format

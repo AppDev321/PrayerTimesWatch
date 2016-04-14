@@ -22,6 +22,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.sommayah.myprayertimes.broadcastReceivers.PrayerAlarmReceiver;
+import com.sommayah.myprayertimes.data.PrayerContract;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -124,6 +129,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         mhijriDateText.setText(Utility.getHijriDate(getApplicationContext()));
+
         SharedPreferences prefs
                 = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         boolean isManualLocation = prefs.getBoolean(getApplicationContext().getString(R.string.pref_loc_manual_set), false);
@@ -275,6 +281,13 @@ public class MainActivity extends AppCompatActivity {
         }
         if (Utility.isAlarmEnabled(getApplicationContext())) {
             PrayerAlarmReceiver alarm = new PrayerAlarmReceiver();
+            Date now = new Date();
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(now);
+            ArrayList<String> prayerTimes = new ArrayList<>();
+            prayerTimes = Utility.getPrayTimes(cal, this);
+            Utility.addPrayersToDB(this, prayerTimes);
+            this.getContentResolver().notifyChange(PrayerContract.PrayerEntry.CONTENT_URI,null);
             alarm.cancelAlarm(getApplicationContext());
             alarm.addPrayerAlarm(getApplicationContext());
         }

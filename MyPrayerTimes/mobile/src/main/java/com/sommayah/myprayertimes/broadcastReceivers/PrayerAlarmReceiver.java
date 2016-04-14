@@ -11,7 +11,9 @@ import android.os.Build;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
 
+import com.sommayah.myprayertimes.R;
 import com.sommayah.myprayertimes.Utility;
+import com.sommayah.myprayertimes.data.PrayerContract;
 import com.sommayah.myprayertimes.dataModels.Prayer;
 import com.sommayah.myprayertimes.services.PrayerNotificationService;
 
@@ -62,6 +64,12 @@ public class PrayerAlarmReceiver extends WakefulBroadcastReceiver {
 
         Prayer next_prayer_time = getNextPrayer(context);
         Calendar cal = getCalendarFromPrayerTime(next_prayer_time.getTime(), next_prayer_time.getTomorrow());
+        if(next_prayer_time.getName().equals(context.getString(R.string.fajr))){ //fajr of next day, bring prayers of next day and update database
+            ArrayList<String> prayerTimes = new ArrayList<>();
+            prayerTimes = Utility.getPrayTimes(cal, context);
+            Utility.addPrayersToDB(context, prayerTimes);
+            context.getContentResolver().notifyChange(PrayerContract.PrayerEntry.CONTENT_URI,null);
+        }
         intent.putExtra(EXTRA_PRAYER_NAME,next_prayer_time.getName());
         intent.putExtra(EXTRA_PRAYER_TIME, cal.getTimeInMillis());
         alarmIntent = PendingIntent.getBroadcast(context, ALARM_ID, intent, PendingIntent.FLAG_CANCEL_CURRENT);

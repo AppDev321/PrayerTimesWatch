@@ -9,6 +9,12 @@ import android.location.LocationManager;
 import android.preference.PreferenceManager;
 
 import com.sommayah.myprayertimes.R;
+import com.sommayah.myprayertimes.Utility;
+import com.sommayah.myprayertimes.data.PrayerContract;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 public class PassiveLocationChangeReceiver extends BroadcastReceiver {
     public PassiveLocationChangeReceiver() {
@@ -46,6 +52,14 @@ public class PassiveLocationChangeReceiver extends BroadcastReceiver {
                 editor.putFloat(context.getResources().getString(R.string.pref_location_longitude),
                         (float) location.getLongitude());
                 editor.commit();
+                //get new prayer data
+                Date now = new Date();
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(now);
+                ArrayList<String> prayerTimes = new ArrayList<>();
+                prayerTimes = Utility.getPrayTimes(cal,context);
+                Utility.addPrayersToDB(context,prayerTimes);
+                context.getContentResolver().notifyChange(PrayerContract.PrayerEntry.CONTENT_URI,null);
                 alarm.cancelAlarm(context);
                 alarm.addPrayerAlarm(context);
             }
