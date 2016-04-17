@@ -124,13 +124,6 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
     @Override
     public void onResume() {
-        //so that the next prayer is updated
-        //update ui
-//        if (mAdapter != null) {
-//            mAdapter.clear();
-//            mAdapter.add(mPrayerTimes);
-//            mAdapter.notifyDataSetChanged();
-//        }
         super.onResume();
     }
 
@@ -167,7 +160,28 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     private void onChangedSettings(SharedPreferences prefs, String key){
 
         //ss: so badly implemented has to change this if statement
-        if (!key.equals(getString(R.string.pref_time_format_key)) && !key.equals(getString(R.string.pref_location_latitude))
+        if (key.equals(getString(R.string.pref_calculation_methods_key))
+                || key.equals(getString(R.string.pref_asr_calculation_key))
+                || key.equals(getString(R.string.pref_dst_value))
+                || key.equals(getString(R.string.pref_high_alt_switch))
+                || key.equals(getString(R.string.pref_time_format_key))
+                || key.equals(getString(R.string.pref_loc_manual_set))
+                || isKeyOffset(key)) {
+            if(!key.equals(getString(R.string.pref_time_format_key))){
+                Date now = new Date();
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(now);
+                mPrayerTimes = Utility.getPrayTimes(cal, getContext());
+                Utility.addPrayersToDB(getContext(), mPrayerTimes);
+            }
+            //update ui
+            if (mAdapter != null) {
+                getContext().getContentResolver().notifyChange(PrayerContract.PrayerEntry.CONTENT_URI,null);
+                Utility.updateWidgets(getContext());
+            }
+
+        }
+        /*if (!key.equals(getString(R.string.pref_time_format_key)) && !key.equals(getString(R.string.pref_location_latitude))
         && !key.equals(getString(R.string.pref_location_longitude))) { //in case of format we dont need to grab data again
             Date now = new Date();
             Calendar cal = Calendar.getInstance();
@@ -180,7 +194,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         if (mAdapter != null) {
             getContext().getContentResolver().notifyChange(PrayerContract.PrayerEntry.CONTENT_URI,null);
             Utility.updateWidgets(getContext());
-        }
+        }*/
         //no need to listen to hijri date adjustment because we display the new one onresume
         if(key.equals(getString(R.string.pref_widget_transparency_key))
                 || key.equals(getString(R.string.widget_pref_bg_key))
@@ -188,6 +202,18 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
             Utility.updateWidgets(getContext());
         }
 
+    }
+
+    private boolean isKeyOffset(String key) {
+            if(key.equals(getString(R.string.pref_prayer_offsets) + "0")
+                    || key.equals(getString(R.string.pref_prayer_offsets) + "1")
+                    || key.equals(getString(R.string.pref_prayer_offsets) + "2")
+                    || key.equals(getString(R.string.pref_prayer_offsets) + "3")
+                    || key.equals(getString(R.string.pref_prayer_offsets) + "4")
+                    ){
+                return true;
+            }else
+                return false;
     }
 
     @Override

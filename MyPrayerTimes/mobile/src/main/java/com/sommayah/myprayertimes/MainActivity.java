@@ -55,10 +55,7 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
                 Intent intent = new Intent(getApplicationContext(),CompassActivity.class);
-                //ss:add the angle of prayer later with the intent
                 startActivity(intent);
 
 
@@ -194,8 +191,10 @@ public class MainActivity extends AppCompatActivity {
         double longitude = location.getLongitude();
         double latitude = location.getLatitude();
         String address = Utility.getLocationAddress(getApplicationContext(),longitude,latitude);
-        locationInquires++;
-        Toast.makeText(getApplicationContext(), "location inquiries= " + locationInquires, Toast.LENGTH_SHORT).show();
+        if(!((float)longitude == Utility.getLocationLongitude(getApplicationContext())
+                && (float)latitude == Utility.getLocationLatitude(getApplicationContext()))){ //check if it is really new location
+            locationInquires++;
+            Toast.makeText(getApplicationContext(), "location inquiries= " + locationInquires, Toast.LENGTH_SHORT).show();
 //        String countryName = "";
 //        String cityName = "";
 //        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
@@ -260,44 +259,31 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        SharedPreferences sharedPreferences =
-                PreferenceManager.getDefaultSharedPreferences(this);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(getString(R.string.pref_location_key), address);
-
-        // Also store the latitude and longitude so that we can use these to get a precise
-        // result from our weather service. We cannot expect the weather service to
-        // understand addresses that Google formats.
-        editor.putFloat(getString(R.string.pref_location_latitude),
-                (float) latitude);
-        editor.putFloat(getString(R.string.pref_location_longitude),
-                (float) longitude);
-        editor.commit();
-       // Log.d("location long:", String.valueOf(location.getLongitude()));
-       // Log.d("location lat", String.valueOf(location.getLatitude()));
-       // Utility.testPrayertimes(getApplicationContext());
-        if(Utility.isLocationLatLonAvailable(getApplicationContext())) {
-            mTitleText.setText(Utility.getPreferredLocation(getApplicationContext()));
+            SharedPreferences sharedPreferences =
+                    PreferenceManager.getDefaultSharedPreferences(this);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString(getString(R.string.pref_location_key), address);
+            editor.putFloat(getString(R.string.pref_location_latitude),
+                    (float) latitude);
+            editor.putFloat(getString(R.string.pref_location_longitude),
+                    (float) longitude);
+            editor.commit();
+            if(Utility.isLocationLatLonAvailable(getApplicationContext())) {
+                mTitleText.setText(Utility.getPreferredLocation(getApplicationContext()));
+            }
+            if (Utility.isAlarmEnabled(getApplicationContext())) {
+                PrayerAlarmReceiver alarm = new PrayerAlarmReceiver();
+                Date now = new Date();
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(now);
+                ArrayList<String> prayerTimes = new ArrayList<>();
+                prayerTimes = Utility.getPrayTimes(cal, this);
+                Utility.addPrayersToDB(this, prayerTimes);
+                this.getContentResolver().notifyChange(PrayerContract.PrayerEntry.CONTENT_URI,null);
+                alarm.cancelAlarm(getApplicationContext());
+                alarm.addPrayerAlarm(getApplicationContext());
+            }
         }
-        if (Utility.isAlarmEnabled(getApplicationContext())) {
-            PrayerAlarmReceiver alarm = new PrayerAlarmReceiver();
-            Date now = new Date();
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(now);
-            ArrayList<String> prayerTimes = new ArrayList<>();
-            prayerTimes = Utility.getPrayTimes(cal, this);
-            Utility.addPrayersToDB(this, prayerTimes);
-            this.getContentResolver().notifyChange(PrayerContract.PrayerEntry.CONTENT_URI,null);
-            alarm.cancelAlarm(getApplicationContext());
-            alarm.addPrayerAlarm(getApplicationContext());
-        }
-//        // update the location in our recycler view using the fragment manager
-//        if (location != null) {
-//            MainActivityFragment mainFragment = (MainActivityFragment)getSupportFragmentManager().findFragmentById(R.id.fragment);
-//            if ( null != mainFragment ) {
-//                mainFragment.onLocationChanged();
-//            }
-//        }
 
     }
 

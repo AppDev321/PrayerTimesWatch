@@ -125,11 +125,13 @@ public class PrayerAlarmReceiver extends WakefulBroadcastReceiver {
             tomorrow.add(Calendar.DAY_OF_YEAR, 1);
             prayerTimes = Utility.getPrayTimes(tomorrow,context);
             saveNextPrayerPos(context,0);
+            context.getContentResolver().notifyChange(PrayerContract.PrayerEntry.CONTENT_URI,null); //to notifiy change of next prayer
             return new Prayer("Fajr",prayerTimes.get(0),true); //true: tomorrow
         }
 
         String name = Utility.getPrayerName(pos,context);
         saveNextPrayerPos(context,pos);
+        context.getContentResolver().notifyChange(PrayerContract.PrayerEntry.CONTENT_URI,null);
         return new Prayer(name,prayerTimes.get(pos));
     }
 

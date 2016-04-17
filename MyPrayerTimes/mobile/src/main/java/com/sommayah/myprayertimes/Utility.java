@@ -19,6 +19,7 @@ import com.sommayah.myprayertimes.services.PrayerNotificationService;
 
 import org.joda.time.Chronology;
 import org.joda.time.LocalDate;
+import org.joda.time.LocalTime;
 import org.joda.time.chrono.ISOChronology;
 import org.joda.time.chrono.IslamicChronology;
 
@@ -270,7 +271,7 @@ public class Utility {
         offsets[0] = prayeroffsets[0];
         offsets[2] = prayeroffsets[1];
         offsets[3] = prayeroffsets[2];
-        offsets[5] = prayeroffsets[3];
+        offsets[4] = prayeroffsets[3];
         offsets[6] = prayeroffsets[4]; //skipped sunrise and sunset no need for change
         return  offsets;
     }
@@ -534,7 +535,7 @@ public class Utility {
         return name;
     }
 
-   /* public static int getNextPos(ArrayList<String> prayerTimes){
+    public static int getNextPos(ArrayList<String> prayerTimes){
         int pos = 0;
         LocalTime now = LocalTime.now();
         Log.d("get current time", now.toString());
@@ -551,7 +552,7 @@ public class Utility {
             pos = 0; //just for now
         }
         return pos;
-    }*/
+    }
 
     public static int getNextPos(Context context){
         SharedPreferences prefs
