@@ -30,9 +30,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:paddingLeft="16dp"
+                android:paddingStart="16dp"
                 android:paddingTop="8dp"
-                android:paddingRight="16dp"
+                android:paddingEnd="16dp"
                 android:text="LOADING YOUR LOCATION, PLEASE WAIT"
                 android:ellipsize="end"
                 android:maxLines="4" />
@@ -44,8 +44,8 @@
                 android:id="@+id/dateTextView"
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_weight="1"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
                 android:ellipsize="end"/>
         </LinearLayout>
 
