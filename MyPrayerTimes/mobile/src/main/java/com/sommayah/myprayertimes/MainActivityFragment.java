@@ -15,6 +15,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.sommayah.myprayertimes.broadcastReceivers.PrayerAlarmReceiver;
 import com.sommayah.myprayertimes.data.PrayerContract;
@@ -33,11 +34,11 @@ import butterknife.ButterKnife;
 public class MainActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
     SharedPreferences.OnSharedPreferenceChangeListener listener;
     @Bind(R.id.recyclerview_prayer) RecyclerView mRecyclerView;
+    @Bind(R.id.recyclerview_prayer_empty) View mEmptyView;
     private boolean mUseNextPrayerLayout;
     private PrayTime mPraytime;
     private PrayerAdapter mAdapter;
     private ArrayList<String> mPrayerTimes;
-    private View mEmptyView;
 
     private static final int PRAYER_LOADER = 0;
     // Specify the columns we need.
@@ -75,7 +76,6 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
         // Set the layout manager
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mEmptyView = rootView.findViewById(R.id.recyclerview_prayer_empty);
 
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
@@ -202,6 +202,10 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
             Utility.updateWidgets(getContext());
         }
 
+        if (key.equals(getString(R.string.pref_location_status_key))) {
+            updateEmptyView();
+        }
+
     }
 
     private boolean isKeyOffset(String key) {
@@ -237,7 +241,30 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     }
 
     private void updateEmptyView() {
-        //implement it later
+        if ( mAdapter.getItemCount() == 0 ) {
+            TextView tv = (TextView) mEmptyView;
+            if ( null != tv ) {
+                // if cursor is empty, why? do we have an invalid location
+                int message = R.string.empty_prayer_list;
+                @Utility.LocationStatus int location = Utility.getLocationStatus(getActivity());
+                switch (location) {
+                    case Utility.LOCATION_STATUS_NO_NETWORK:
+                        message = R.string.no_network_available;
+                        break;
+                    case Utility.LOCATION_STATUS_PERMISSION_DENIED:
+                        message = R.string.permission_denied;
+                        break;
+                    case Utility.LOCATION_STATUS_INVALID:
+                        message = R.string.invalid_location;
+                        break;
+                    default:
+                        if (!Utility.isNetworkAvailable(getActivity())) {
+                            message = R.string.empty_prayer_list;
+                        }
+                }
+                tv.setText(message);
+            }
+        }
     }
 
     @Override

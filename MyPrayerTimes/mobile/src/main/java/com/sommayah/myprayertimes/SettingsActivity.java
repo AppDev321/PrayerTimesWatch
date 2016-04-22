@@ -304,7 +304,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity  {
             // updated to reflect the new value, per the Android Design
             // guidelines.
             bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_location_key)));
-            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_location_key_manual)));
+          //  bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_location_key_manual)));
         }
 
         @Override
@@ -367,6 +367,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity  {
 
                 //    Utility.resetLocationStatus(this);
                 //    SunshineSyncAdapter.syncImmediately(this);
+            }else{
+
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);

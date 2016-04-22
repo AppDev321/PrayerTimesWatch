@@ -51,7 +51,14 @@ public class LocationEditTextPreference extends EditTextPreference {
         } finally {
             a.recycle();
         }
-        setSummary(Utility.getPreferredLocation(context));
+        String summary = Utility.getManualLocation(context);
+        if(summary.equals("")){
+            summary = context.getString(R.string.location_not_valid);
+        }
+        if(summary.equals(context.getString(R.string.pref_location_default))){
+            summary = "";
+        }
+        setSummary(summary);
 
     }
 

@@ -8,8 +8,11 @@ import android.database.Cursor;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.support.annotation.IntDef;
 import android.text.format.Time;
 import android.util.Log;
 
@@ -24,6 +27,8 @@ import org.joda.time.chrono.ISOChronology;
 import org.joda.time.chrono.IslamicChronology;
 
 import java.io.IOException;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -45,6 +50,17 @@ public class Utility {
     public static final float LONGMECCA = 39.8167F;
 
     public static PrayTime mPrayTime;
+
+
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({LOCATION_STATUS_OK, LOCATION_STATUS_NO_NETWORK, LOCATION_STATUS_PERMISSION_DENIED,  LOCATION_STATUS_UNKNOWN, LOCATION_STATUS_INVALID})
+    public @interface LocationStatus {}
+
+    public static final int LOCATION_STATUS_OK = 0;
+    public static final int LOCATION_STATUS_NO_NETWORK = 1;
+    public static final int LOCATION_STATUS_PERMISSION_DENIED = 2;
+    public static final int LOCATION_STATUS_UNKNOWN = 3;
+    public static final int LOCATION_STATUS_INVALID = 4;
 
 
 
@@ -126,6 +142,41 @@ public class Utility {
     public static boolean isVibrateEnabled(Context context){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         return prefs.getBoolean(context.getString(R.string.pref_vibrate_key),true);
+    }
+
+    /**
+     * Sets the location status into shared preference.
+     * @param c Context to get the PreferenceManager from.
+     * @param locationStatus The IntDef value to set
+     */
+    static public void setLocationStatus(Context c, @LocationStatus int locationStatus){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
+        SharedPreferences.Editor spe = sp.edit();
+        spe.putInt(c.getString(R.string.pref_location_status_key), locationStatus);
+        spe.apply();
+    }
+
+    /**
+     *
+     * @param c Context used to get the SharedPreferences
+     * @return the location status integer type
+     */
+    @SuppressWarnings("ResourceType")
+    static public @LocationStatus
+    int getLocationStatus(Context c){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
+        return sp.getInt(c.getString(R.string.pref_location_status_key), LOCATION_STATUS_UNKNOWN);
+    }
+
+    /**
+     * Resets the location status.  (Sets it to LOCATION_STATUS_UNKNOWN)
+     * @param c Context used to get the SharedPreferences
+     */
+    static public void resetLocationStatus(Context c){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
+        SharedPreferences.Editor spe = sp.edit();
+        spe.putInt(c.getString(R.string.pref_location_status_key),LOCATION_STATUS_UNKNOWN);
+        spe.apply();
     }
 
     public static String getLocationAddress(Context context, double longitude, double latitude){
@@ -236,6 +287,9 @@ public class Utility {
         LocalDate todayHijri = new LocalDate(todayIso.toDateTimeAtStartOfDay(),
                 hijri);
         int adjustment = adjustHijriDate(context);
+        if(Utility.getNextPos(context) == 0){ // if next prayer is fajr(before sunrise) which means tomorrow show tomorrow's date
+            adjustment++;
+        }
         todayHijri = todayHijri.plusDays(adjustment);
         int day =  todayHijri.getDayOfMonth();
         int month = todayHijri.getMonthOfYear();
@@ -251,6 +305,9 @@ public class Utility {
         LocalDate todayHijri = new LocalDate(todayIso.toDateTimeAtStartOfDay(),
                 hijri);
         int adjustment = adjustHijriDate(context);
+        if(Utility.getNextPos(context) == 0){ // if next prayer is fajr(before sunrise) which means tomorrow show tomorrow's date
+            adjustment++;
+        }
         todayHijri = todayHijri.plusDays(adjustment);
         int day =  todayHijri.getDayOfMonth();
         int month = todayHijri.getMonthOfYear();
@@ -625,8 +682,14 @@ public class Utility {
                     null,
                     null);
         }
+
+
         if(cur.moveToFirst()){
             Log.d("In adding to DB", "Error, not deleted");
+        }
+        //check if location is not valid don't add wrong values to db
+        if(getLocationLatitude(context) == DEFAULT_LATLONG && getLocationLongitude(context) == DEFAULT_LATLONG){
+            return;
         }
         // Insert the new weather information into the database
         Vector<ContentValues> cVVector = new Vector<ContentValues>(prayers.size());
@@ -646,6 +709,7 @@ public class Utility {
             updateWidgets(context);
         }
         Log.d("Adding Prayer", "Sync Complete. " + cVVector.size() + " Inserted");
+        setLocationStatus(context,LOCATION_STATUS_OK);
     }
 
 
@@ -653,6 +717,21 @@ public class Utility {
         Intent nextPrayerUpdatedIntent = new Intent(PrayerNotificationService.ACTION_NEXT_PRAYER_UPDATED).setPackage(context.getPackageName());
         context.sendBroadcast(nextPrayerUpdatedIntent);
 
+    }
+
+    /**
+     * Returns true if the network is available or about to become available.
+     *
+     * @param c Context used to get the ConnectivityManager
+     * @return true if the network is available
+     */
+    static public boolean isNetworkAvailable(Context c) {
+        ConnectivityManager cm =
+                (ConnectivityManager)c.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        return activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
     }
 
 }

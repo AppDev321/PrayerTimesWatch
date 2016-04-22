@@ -19,7 +19,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.sommayah.myprayertimes.broadcastReceivers.PrayerAlarmReceiver;
 import com.sommayah.myprayertimes.data.PrayerContract;
@@ -70,11 +69,13 @@ public class MainActivity extends AppCompatActivity {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             Log.d(TAG, "no network available");
+            Utility.setLocationStatus(getApplicationContext(),Utility.LOCATION_STATUS_UNKNOWN);
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION) &&
                     (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_COARSE_LOCATION))) {
                 // If the user has previously denied permission , and do not check marked " never show this warning
                 // We can show an alert explaining to the user because permission is important.
                 Log.d(TAG, "permissions are denied");
+                Utility.setLocationStatus(getApplicationContext(),Utility.LOCATION_STATUS_PERMISSION_DENIED);
             } else {
 
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
@@ -82,10 +83,10 @@ public class MainActivity extends AppCompatActivity {
             }
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
+//               public void onRequestPermissionsResult(int requestCode, String[] permissions,
+//                                                      int[] grantResults)
+//             to handle the case where the user grants the permission. See the documentation
+//             for ActivityCompat#requestPermissions for more details.
 
         } else {
             Location lastKnownLocation = mLocationManager.getLastKnownLocation(locationProvider);
@@ -99,8 +100,11 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 //location null no previous location
                 Log.d(TAG, "last known location null");
+                Utility.setLocationStatus(getApplicationContext(),Utility.LOCATION_STATUS_UNKNOWN);
             }
         }
+
+
 
         // Define a listener that responds to location updates
         mLocationListener = new LocationListener() {
@@ -112,13 +116,17 @@ public class MainActivity extends AppCompatActivity {
             }
 
             public void onStatusChanged(String provider, int status, Bundle extras) {
+                Log.d(TAG,"on status changed");
             }
 
             public void onProviderEnabled(String provider) {
+                Log.d(TAG,"on provider enabled");
             }
 
             public void onProviderDisabled(String provider) {
+                Log.d(TAG,"on provider disabled");
             }
+
         };
     }
 
@@ -140,7 +148,9 @@ public class MainActivity extends AppCompatActivity {
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
-            Log.d(TAG, "no network available2");
+            Log.d(TAG, "no permission");
+            Utility.setLocationStatus(getApplicationContext(),Utility.LOCATION_STATUS_PERMISSION_DENIED);
+
 
         }else {
             mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME, MIN_DIST, mLocationListener);
@@ -193,8 +203,8 @@ public class MainActivity extends AppCompatActivity {
         String address = Utility.getLocationAddress(getApplicationContext(),longitude,latitude);
         if(!((float)longitude == Utility.getLocationLongitude(getApplicationContext())
                 && (float)latitude == Utility.getLocationLatitude(getApplicationContext()))){ //check if it is really new location
-            locationInquires++;
-            Toast.makeText(getApplicationContext(), "location inquiries= " + locationInquires, Toast.LENGTH_SHORT).show();
+           // locationInquires++;
+           // Toast.makeText(getApplicationContext(), "location inquiries= " + locationInquires, Toast.LENGTH_SHORT).show();
 //        String countryName = "";
 //        String cityName = "";
 //        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
