@@ -688,8 +688,10 @@ public class Utility {
             Log.d("In adding to DB", "Error, not deleted");
         }
         //check if location is not valid don't add wrong values to db
-        if(getLocationLatitude(context) == DEFAULT_LATLONG && getLocationLongitude(context) == DEFAULT_LATLONG){
-            return;
+        if(!isManualLocation(context)) {
+            if (getLocationLatitude(context) == DEFAULT_LATLONG && getLocationLongitude(context) == DEFAULT_LATLONG) {
+                return;
+            }
         }
         // Insert the new weather information into the database
         Vector<ContentValues> cVVector = new Vector<ContentValues>(prayers.size());

@@ -55,9 +55,7 @@ public class LocationEditTextPreference extends EditTextPreference {
         if(summary.equals("")){
             summary = context.getString(R.string.location_not_valid);
         }
-        if(summary.equals(context.getString(R.string.pref_location_default))){
-            summary = "";
-        }
+
         setSummary(summary);
 
     }

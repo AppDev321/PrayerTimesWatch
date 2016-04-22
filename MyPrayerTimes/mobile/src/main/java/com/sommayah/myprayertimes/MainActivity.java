@@ -151,9 +151,9 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "no permission");
             Utility.setLocationStatus(getApplicationContext(),Utility.LOCATION_STATUS_PERMISSION_DENIED);
 
-
         }else {
             mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME, MIN_DIST, mLocationListener);
+            Utility.setLocationStatus(getApplicationContext(),Utility.LOCATION_STATUS_UNKNOWN);
         }
 
 

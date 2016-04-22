@@ -32,11 +32,8 @@ public class CurrentLocationDialog extends DialogPreference {
         }else{
             setDialogMessage(context.getString(R.string.automatic_location_disabled));
         }
-       String summary = Utility.getPreferredLocation(context);
-        if(summary.equals(context.getString(R.string.pref_location_default))){
-            summary ="";
-        }
-        setSummary(summary);
+
+        setSummary(Utility.getPreferredLocation(context));
 
     }
 

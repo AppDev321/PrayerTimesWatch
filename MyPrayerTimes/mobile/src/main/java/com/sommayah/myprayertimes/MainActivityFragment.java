@@ -165,8 +165,10 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                 || key.equals(getString(R.string.pref_dst_value))
                 || key.equals(getString(R.string.pref_high_alt_switch))
                 || key.equals(getString(R.string.pref_time_format_key))
-                || key.equals(getString(R.string.pref_loc_manual_set))
-                || isKeyOffset(key)) {
+                || key.equals(getString(R.string.pref_loc_manual_set)) //incase we use the saved location
+                || key.equals(getString(R.string.pref_location_key_manual))
+                || isKeyOffset(key)
+                || key.equals(getString(R.string.pref_location_status_key))) {
             if(!key.equals(getString(R.string.pref_time_format_key))){
                 Date now = new Date();
                 Calendar cal = Calendar.getInstance();

@@ -367,8 +367,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity  {
 
                 //    Utility.resetLocationStatus(this);
                 //    SunshineSyncAdapter.syncImmediately(this);
-            }else{
-
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
