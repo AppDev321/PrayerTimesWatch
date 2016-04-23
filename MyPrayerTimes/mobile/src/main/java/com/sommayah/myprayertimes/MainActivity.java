@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         //ss: check here if location is null
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
-            Log.d(TAG, "no network available");
+            Log.d(TAG, "no permission granted yet");
             Utility.setLocationStatus(getApplicationContext(),Utility.LOCATION_STATUS_UNKNOWN);
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION) &&
                     (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_COARSE_LOCATION))) {
@@ -153,7 +153,6 @@ public class MainActivity extends AppCompatActivity {
 
         }else {
             mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME, MIN_DIST, mLocationListener);
-            Utility.setLocationStatus(getApplicationContext(),Utility.LOCATION_STATUS_UNKNOWN);
         }
 
 

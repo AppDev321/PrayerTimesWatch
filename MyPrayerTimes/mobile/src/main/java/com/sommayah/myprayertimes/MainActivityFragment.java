@@ -167,8 +167,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                 || key.equals(getString(R.string.pref_time_format_key))
                 || key.equals(getString(R.string.pref_loc_manual_set)) //incase we use the saved location
                 || key.equals(getString(R.string.pref_location_key_manual))
-                || isKeyOffset(key)
-                || key.equals(getString(R.string.pref_location_status_key))) {
+                || isKeyOffset(key)) {
             if(!key.equals(getString(R.string.pref_time_format_key))){
                 Date now = new Date();
                 Calendar cal = Calendar.getInstance();
@@ -176,11 +175,15 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                 mPrayerTimes = Utility.getPrayTimes(cal, getContext());
                 Utility.addPrayersToDB(getContext(), mPrayerTimes);
             }
+            if(key.equals(getString(R.string.pref_location_status_key))){
+                updateEmptyView();
+            }
             //update ui
             if (mAdapter != null) {
                 getContext().getContentResolver().notifyChange(PrayerContract.PrayerEntry.CONTENT_URI,null);
                 Utility.updateWidgets(getContext());
             }
+
 
         }
         /*if (!key.equals(getString(R.string.pref_time_format_key)) && !key.equals(getString(R.string.pref_location_latitude))
@@ -250,9 +253,6 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                 int message = R.string.empty_prayer_list;
                 @Utility.LocationStatus int location = Utility.getLocationStatus(getActivity());
                 switch (location) {
-                    case Utility.LOCATION_STATUS_NO_NETWORK:
-                        message = R.string.no_network_available;
-                        break;
                     case Utility.LOCATION_STATUS_PERMISSION_DENIED:
                         message = R.string.permission_denied;
                         break;
@@ -260,9 +260,8 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                         message = R.string.invalid_location;
                         break;
                     default:
-                        if (!Utility.isNetworkAvailable(getActivity())) {
-                            message = R.string.empty_prayer_list;
-                        }
+                        message = R.string.empty_prayer_list;
+
                 }
                 tv.setText(message);
             }

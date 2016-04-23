@@ -53,14 +53,13 @@ public class Utility {
 
 
     @Retention(RetentionPolicy.SOURCE)
-    @IntDef({LOCATION_STATUS_OK, LOCATION_STATUS_NO_NETWORK, LOCATION_STATUS_PERMISSION_DENIED,  LOCATION_STATUS_UNKNOWN, LOCATION_STATUS_INVALID})
+    @IntDef({LOCATION_STATUS_OK, LOCATION_STATUS_PERMISSION_DENIED,  LOCATION_STATUS_UNKNOWN, LOCATION_STATUS_INVALID})
     public @interface LocationStatus {}
 
     public static final int LOCATION_STATUS_OK = 0;
-    public static final int LOCATION_STATUS_NO_NETWORK = 1;
-    public static final int LOCATION_STATUS_PERMISSION_DENIED = 2;
-    public static final int LOCATION_STATUS_UNKNOWN = 3;
-    public static final int LOCATION_STATUS_INVALID = 4;
+    public static final int LOCATION_STATUS_PERMISSION_DENIED = 1;
+    public static final int LOCATION_STATUS_UNKNOWN = 2;
+    public static final int LOCATION_STATUS_INVALID = 3;
 
 
 
@@ -97,10 +96,8 @@ public class Utility {
                 = PreferenceManager.getDefaultSharedPreferences(context);
         boolean isManualLocation = prefs.getBoolean(context.getString(R.string.pref_loc_manual_set), false);
         if(isManualLocation){
-            float lat = prefs.getFloat(context.getString(R.string.pref_location_latitude_manual), DEFAULT_LATLONG);
-            if(lat != DEFAULT_LATLONG){
-                return lat;
-            }
+            return prefs.getFloat(context.getString(R.string.pref_location_latitude_manual), DEFAULT_LATLONG);
+
         }
         return prefs.getFloat(context.getString(R.string.pref_location_latitude),
                 DEFAULT_LATLONG);
@@ -111,10 +108,8 @@ public class Utility {
                 = PreferenceManager.getDefaultSharedPreferences(context);
         boolean isManualLocation = prefs.getBoolean(context.getString(R.string.pref_loc_manual_set), false);
         if(isManualLocation){
-            float longitude = prefs.getFloat(context.getString(R.string.pref_location_longitude_manual), DEFAULT_LATLONG);
-            if(longitude != DEFAULT_LATLONG){
-                return longitude;
-            }
+            return prefs.getFloat(context.getString(R.string.pref_location_longitude_manual), DEFAULT_LATLONG);
+
 
         }
         return prefs.getFloat(context.getString(R.string.pref_location_longitude),
@@ -688,11 +683,12 @@ public class Utility {
             Log.d("In adding to DB", "Error, not deleted");
         }
         //check if location is not valid don't add wrong values to db
-        if(!isManualLocation(context)) {
-            if (getLocationLatitude(context) == DEFAULT_LATLONG && getLocationLongitude(context) == DEFAULT_LATLONG) {
-                return;
-            }
+
+        if (getLocationLatitude(context) == DEFAULT_LATLONG && getLocationLongitude(context) == DEFAULT_LATLONG) {
+            Utility.setLocationStatus(context,Utility.LOCATION_STATUS_INVALID);
+            return;
         }
+
         // Insert the new weather information into the database
         Vector<ContentValues> cVVector = new Vector<ContentValues>(prayers.size());
 

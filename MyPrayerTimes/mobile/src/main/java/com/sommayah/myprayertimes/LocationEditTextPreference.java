@@ -129,9 +129,11 @@ public class LocationEditTextPreference extends EditTextPreference {
                     double lng = addressList.get(0).getLongitude();
                     addManualLocation(lat,lng);
                     setSummary(address);
+                    Utility.setLocationStatus(getContext(),Utility.LOCATION_STATUS_OK);
                     return true;
                 }else{
                     setSummary(getContext().getString(R.string.location_not_valid));
+                    addManualLocation(Utility.DEFAULT_LATLONG,Utility.DEFAULT_LATLONG);
                     return false;
                 }
             } catch (Exception e) {
