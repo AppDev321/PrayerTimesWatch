@@ -172,8 +172,10 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                 Date now = new Date();
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(now);
-                mPrayerTimes = Utility.getPrayTimes(cal, getContext());
-                Utility.addPrayersToDB(getContext(), mPrayerTimes);
+               /* mPrayerTimes = Utility.getPrayTimes(cal, getContext());
+                Utility.addPrayersToDB(getContext(), mPrayerTimes);*/
+                new LoadPrayersAsyncTask(getContext(),cal).execute();
+
             }
             if(key.equals(getString(R.string.pref_location_status_key))){
                 updateEmptyView();

@@ -8,11 +8,9 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.preference.PreferenceManager;
 
+import com.sommayah.myprayertimes.LoadPrayersAsyncTask;
 import com.sommayah.myprayertimes.R;
-import com.sommayah.myprayertimes.Utility;
-import com.sommayah.myprayertimes.data.PrayerContract;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -56,10 +54,11 @@ public class PassiveLocationChangeReceiver extends BroadcastReceiver {
                 Date now = new Date();
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(now);
-                ArrayList<String> prayerTimes = new ArrayList<>();
+                /*ArrayList<String> prayerTimes = new ArrayList<>();
                 prayerTimes = Utility.getPrayTimes(cal,context);
                 Utility.addPrayersToDB(context,prayerTimes);
-                context.getContentResolver().notifyChange(PrayerContract.PrayerEntry.CONTENT_URI,null);
+                context.getContentResolver().notifyChange(PrayerContract.PrayerEntry.CONTENT_URI,null);*/
+                new LoadPrayersAsyncTask(context,cal).execute();
                 alarm.cancelAlarm(context);
                 alarm.addPrayerAlarm(context);
             }
