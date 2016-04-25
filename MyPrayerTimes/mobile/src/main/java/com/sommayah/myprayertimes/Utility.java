@@ -53,13 +53,14 @@ public class Utility {
 
 
     @Retention(RetentionPolicy.SOURCE)
-    @IntDef({LOCATION_STATUS_OK, LOCATION_STATUS_PERMISSION_DENIED,  LOCATION_STATUS_UNKNOWN, LOCATION_STATUS_INVALID})
+    @IntDef({LOCATION_STATUS_OK, LOCATION_STATUS_PERMISSION_DENIED,  LOCATION_STATUS_UNKNOWN, LOCATION_STATUS_INVALID, LOCATION_STATUS_DISABLED})
     public @interface LocationStatus {}
 
     public static final int LOCATION_STATUS_OK = 0;
     public static final int LOCATION_STATUS_PERMISSION_DENIED = 1;
     public static final int LOCATION_STATUS_UNKNOWN = 2;
     public static final int LOCATION_STATUS_INVALID = 3;
+    public static final int LOCATION_STATUS_DISABLED = 4;
 
 
 

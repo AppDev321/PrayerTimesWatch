@@ -5,6 +5,7 @@
     <string name="no_network_available">No prayer information due to network disabled, please enable network</string>
     <string name="invalid_location">No prayer information because the location you entered is invalid</string>
     <string name="permission_denied">No prayer information because you denied location access, please enable</string>
+    <string name="disabled_location">No prayer information because your location settings is disabled. Either enable it from your phone settings or from the application settings: Choose location settings and then press on the target image beside "Use current location".</string>
     <string name="pref_location_longitude">location-long</string>
     <string name="pref_location_latitude">location-lat</string>
     <string name="pref_location_key">location</string>
@@ -103,6 +104,11 @@
     <string name="offset_prayers_title">Edit prayer times in minutes</string>
     <string name="adjust_prayer_times">manual change to prayer times</string>
     <string name="zero">0</string>
+    <string name="cancel">No</string>
+    <string name="enable">Yes</string>
+    <string name="gps_network_not_enabled">We cannot retrieve your location because your locations setting is disabled, do you want to enable it?</string>
+    <string name="location_not_found">Location not found</string>
+    <string name="loading_location">LOADING YOUR LOCATION, PLEASE WAIT</string>
 
     <!--translatable strings-->
     <string name="fajr">Fajr</string>

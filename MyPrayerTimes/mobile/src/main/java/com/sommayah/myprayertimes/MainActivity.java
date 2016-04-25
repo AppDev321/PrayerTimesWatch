@@ -2,6 +2,7 @@ package com.sommayah.myprayertimes;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -10,6 +11,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -19,6 +21,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.support.v7.app.AlertDialog;
 
 import com.sommayah.myprayertimes.broadcastReceivers.PrayerAlarmReceiver;
 
@@ -74,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
                 // We can show an alert explaining to the user because permission is important.
                 Log.d(TAG, "permissions are denied");
                 Utility.setLocationStatus(getApplicationContext(),Utility.LOCATION_STATUS_PERMISSION_DENIED);
+                mTitleText.setText(getString(R.string.location_not_found));
             } else {
 
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
@@ -109,6 +113,7 @@ public class MainActivity extends AppCompatActivity {
             public void onLocationChanged(Location location) {
                 // Called when a new location is found by the network location provider.
                 if(!Utility.isManualLocation(getApplicationContext())){
+                    mTitleText.setText(getString(R.string.loading_location));
                     makeUseOfNewLocation(location);
                 }
             }
@@ -148,8 +153,13 @@ public class MainActivity extends AppCompatActivity {
             // TODO: Consider calling
             Log.d(TAG, "no permission");
             Utility.setLocationStatus(getApplicationContext(),Utility.LOCATION_STATUS_PERMISSION_DENIED);
+            mTitleText.setText(getString(R.string.location_not_found));
 
         }else {
+            if(isManualLocation == false){
+                //check if location setting is on if we don't have good location, if not open settings to enable
+                checkLocationSettings();
+            }
             mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME, MIN_DIST, mLocationListener);
         }
 
@@ -200,72 +210,6 @@ public class MainActivity extends AppCompatActivity {
         String address = Utility.getLocationAddress(getApplicationContext(),longitude,latitude);
         if(!((float)longitude == Utility.getLocationLongitude(getApplicationContext())
                 && (float)latitude == Utility.getLocationLatitude(getApplicationContext()))){ //check if it is really new location
-           // locationInquires++;
-           // Toast.makeText(getApplicationContext(), "location inquiries= " + locationInquires, Toast.LENGTH_SHORT).show();
-//        String countryName = "";
-//        String cityName = "";
-//        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-//        List<Address> addresses = null;
-//        try {
-//            addresses = geocoder.getFromLocation(
-//                    latitude,
-//                    longitude,
-//                    // In this sample, get just a single address.
-//                    5);
-//        } catch (IOException ioException) {
-//            // Catch network or other I/O problems.
-//            Log.e(TAG, getString(R.string.service_not_available), ioException);
-//        } catch (IllegalArgumentException illegalArgumentException) {
-//            // Catch invalid latitude or longitude values.
-//            Log.e(TAG, getString(R.string.invalid_lat_long_used) + ". " +
-//                    "Latitude = " + latitude +
-//                    ", Longitude = " +
-//                    longitude, illegalArgumentException);
-//        }
-//
-//        // Handle case where no address was found.
-//        if (addresses == null || addresses.size()  == 0) {
-//            Log.d(TAG, getString(R.string.no_addresses_found));
-//            // If the provided place doesn't have an address, we'll form a display-friendly
-//            // string from the latlng values.
-//            address = String.format("(%.2f, %.2f)",latitude, longitude);
-//        } else {
-//            for (Address addr : addresses) {
-////                String result = addr.getAdminArea() != null ? addr.getAdminArea() : "?";
-////                result += " | ";
-////                result += addr.getSubAdminArea() != null ? addr.getSubAdminArea() : "?";
-////                result += " | ";
-////                result += addr.getLocality() != null ? addr.getLocality() : "?";
-////                result += " | ";
-////                result += addr.getSubLocality() != null ? addr.getSubLocality() : "?";
-////                result += " | ";
-////                result += addr.getThoroughfare() != null ? addr.getThoroughfare() : "?";
-////                result += " | ";
-////                result += addr.getSubThoroughfare() != null ? addr.getSubThoroughfare() : "?";
-////                Log.i(TAG, result);
-//                countryName = addr.getCountryName();
-//                if(cityName == null || cityName.equals("")) {
-//                    cityName = addr.getLocality();
-//                }if(cityName == null || cityName.equals("")){
-//                    cityName = addr.getSubAdminArea();
-//                }if(cityName == null || cityName.equals("")){
-//                    cityName = addr.getAdminArea();
-//                }
-//                Log.i(TAG, "country: "+ countryName +" ,city: "+ cityName);
-//                address = cityName +", " + countryName;
-//                if(cityName != null  && countryName != null) //we got one good address
-//                    break;
-//            }
-//
-//            Log.i(TAG, getString(R.string.address_found));
-//            //cityName = addresses.get(0).getAddressLine(0);
-//            //String stateName = addresses.get(0).getAddressLine(1);
-//            //countryName = addresses.get(0).getAddressLine(2);
-//            Log.d(TAG, addresses.get(0).toString());
-//        }
-
-
-
             SharedPreferences sharedPreferences =
                     PreferenceManager.getDefaultSharedPreferences(this);
             SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -293,6 +237,49 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+    }
+
+    public void checkLocationSettings(){
+        if(Utility.getPreferredLocation(getApplicationContext()).equals("")) {
+            boolean gps_enabled = false;
+            boolean network_enabled = false;
+
+            try {
+                gps_enabled = mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+            } catch (Exception ex) {
+            }
+
+            try {
+                network_enabled = mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+            } catch (Exception ex) {
+            }
+
+            if (!gps_enabled && !network_enabled) {
+                // notify user
+                AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+                dialog.setMessage(getResources().getString(R.string.gps_network_not_enabled));
+                dialog.setPositiveButton(getResources().getString(R.string.enable), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+                        Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        startActivity(myIntent);
+                        //get gps
+                    }
+
+                });
+                dialog.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+                        // TODO Auto-generated method stub
+                        Utility.setLocationStatus(getApplicationContext(),Utility.LOCATION_STATUS_DISABLED);
+                        mTitleText.setText(getString(R.string.location_not_found));
+
+                    }
+                });
+                dialog.show();
+            }
+        }
     }
 
 }
