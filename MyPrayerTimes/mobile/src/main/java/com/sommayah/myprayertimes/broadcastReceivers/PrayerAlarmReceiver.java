@@ -109,7 +109,6 @@ public class PrayerAlarmReceiver extends WakefulBroadcastReceiver {
         Calendar now = Calendar.getInstance(TimeZone.getDefault());
         now.setTimeInMillis(System.currentTimeMillis());
         ArrayList<String> prayerTimes = Utility.getPrayTimes(now,context);
-       // prayerTimes.remove(1); //this is sunrise we don't need an alarm for that, or can make it as a feature?
         int pos = 0;
         LocalTime nowLocal = LocalTime.now();
         Log.d("get current time", nowLocal.toString());

@@ -35,6 +35,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     SharedPreferences.OnSharedPreferenceChangeListener listener;
     @Bind(R.id.recyclerview_prayer) RecyclerView mRecyclerView;
     @Bind(R.id.recyclerview_prayer_empty) View mEmptyView;
+
     private boolean mUseNextPrayerLayout;
     private PrayTime mPraytime;
     private PrayerAdapter mAdapter;

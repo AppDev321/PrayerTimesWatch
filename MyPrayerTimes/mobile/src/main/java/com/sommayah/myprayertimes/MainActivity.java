@@ -20,6 +20,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.support.v7.app.AlertDialog;
 
@@ -44,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
     @Bind(R.id.dateTextView) TextView mhijriDateText;
     @Bind(R.id.toolbar) Toolbar toolbar;
     @Bind(R.id.fab) FloatingActionButton fab;
+    @Bind(R.id.imageView)ImageView backgroundImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,6 +139,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         mhijriDateText.setText(Utility.getHijriDate(getApplicationContext()));
+        int temp = getResources().getIdentifier("backgroundmosque"+Utility.getNextPos(this), "drawable", getPackageName());
+        backgroundImage.setImageResource(temp);
 
         SharedPreferences prefs
                 = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());

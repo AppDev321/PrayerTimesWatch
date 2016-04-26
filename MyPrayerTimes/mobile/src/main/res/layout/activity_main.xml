@@ -12,42 +12,73 @@
         android:layout_height="wrap_content"
         android:theme="@style/AppTheme.AppBarOverlay">
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
+        <android.support.design.widget.CollapsingToolbarLayout
+            android:id="@+id/collapsing_toolbar_layout"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
+            android:layout_height="match_parent"
+            app:collapsedTitleTextAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Title.Inverse"
+            app:expandedTitleTextAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Title.Inverse"
+            app:titleEnabled="false"
+            app:expandedTitleMarginStart="16dp"
+            app:contentScrim="?attr/colorPrimary"
+            app:layout_scrollFlags="enterAlways">
 
-        <LinearLayout
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:background="@color/colorPrimary"
-            android:orientation="vertical">
-            <TextView
-                android:id="@+id/title"
-                style="@style/TextAppearance.AppCompat.Subhead"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:paddingStart="16dp"
-                android:paddingTop="8dp"
-                android:paddingEnd="16dp"
-                android:text="@string/loading_location"
-                android:ellipsize="end"
-                android:maxLines="4" />
+            android:layout_height="120dp">
 
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:background="@drawable/bggreen2"
+                android:orientation="vertical">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="36dp">
+                </LinearLayout>
+                <TextView
+                    android:id="@+id/title"
+                    style="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:paddingStart="16dp"
+                    android:paddingTop="8dp"
+                    android:paddingEnd="16dp"
+                    android:text="@string/loading_location"
+                    android:ellipsize="end"
+                    android:maxLines="4" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Date"
+                    android:id="@+id/dateTextView"
+                    style="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_weight="1"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:ellipsize="end"/>
+            </LinearLayout>
+
+            <ImageView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Date"
-                android:id="@+id/dateTextView"
-                style="@style/TextAppearance.AppCompat.Subhead"
-                android:layout_weight="1"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:ellipsize="end"/>
-        </LinearLayout>
+                android:src="@drawable/backgroundmosque"
+                android:tint="@android:color/white"
+                android:id="@+id/imageView" />
+
+        </FrameLayout>
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                app:contentInsetStart="16dp"
+                app:layout_collapseMode="pin" />
+
+        </android.support.design.widget.CollapsingToolbarLayout>
 
     </android.support.design.widget.AppBarLayout>
 
@@ -63,6 +94,6 @@
         android:tint="@android:color/white"
         android:contentDescription="@string/compass_button_description"
         />
-        <!--android:src="@android:drawable/ic_menu_compass" />-->
+    <!--android:src="@android:drawable/ic_menu_compass" />-->
 
 </android.support.design.widget.CoordinatorLayout>
