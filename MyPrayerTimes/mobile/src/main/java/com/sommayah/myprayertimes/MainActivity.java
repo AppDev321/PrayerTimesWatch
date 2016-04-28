@@ -115,7 +115,6 @@ public class MainActivity extends AppCompatActivity {
             public void onLocationChanged(Location location) {
                 // Called when a new location is found by the network location provider.
                 if(!Utility.isManualLocation(getApplicationContext())){
-                    mTitleText.setText(getString(R.string.loading_location));
                     makeUseOfNewLocation(location);
                 }
             }

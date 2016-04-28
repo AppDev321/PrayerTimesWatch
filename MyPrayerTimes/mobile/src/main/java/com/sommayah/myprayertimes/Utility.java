@@ -282,8 +282,12 @@ public class Utility {
         LocalDate todayIso = new LocalDate();
         LocalDate todayHijri = new LocalDate(todayIso.toDateTimeAtStartOfDay(),
                 hijri);
+        Calendar c = Calendar.getInstance();
+        int hours = c.get(Calendar.HOUR_OF_DAY);
+        int minutes = c.get(Calendar.MINUTE);
+        int seconds = c.get(Calendar.SECOND); //get current time and check if it is before midnight time greater than 1800
         int adjustment = adjustHijriDate(context);
-        if(Utility.getNextPos(context) == 0){ // if next prayer is fajr(before sunrise) which means tomorrow show tomorrow's date
+        if(Utility.getNextPos(context) == 0 && hours*3600 + minutes*60 + seconds > 1800){ // if next prayer is fajr(before sunrise) which means tomorrow show tomorrow's date
             adjustment++;
         }
         todayHijri = todayHijri.plusDays(adjustment);
@@ -300,8 +304,12 @@ public class Utility {
         LocalDate todayIso = new LocalDate();
         LocalDate todayHijri = new LocalDate(todayIso.toDateTimeAtStartOfDay(),
                 hijri);
+        Calendar c = Calendar.getInstance();
+        int hours = c.get(Calendar.HOUR_OF_DAY);
+        int minutes = c.get(Calendar.MINUTE);
+        int seconds = c.get(Calendar.SECOND); //get current time and check if it is before midnight time greater than 1800
         int adjustment = adjustHijriDate(context);
-        if(Utility.getNextPos(context) == 0){ // if next prayer is fajr(before sunrise) which means tomorrow show tomorrow's date
+        if(Utility.getNextPos(context) == 0 && hours*3600 + minutes*60 + seconds > 1800){ // if next prayer is fajr(before sunrise) which means tomorrow show tomorrow's date
             adjustment++;
         }
         todayHijri = todayHijri.plusDays(adjustment);
