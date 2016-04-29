@@ -126,14 +126,24 @@ public class PrayerAlarmReceiver extends WakefulBroadcastReceiver {
             tomorrow.add(Calendar.DAY_OF_YEAR, 1);
             prayerTimes = Utility.getPrayTimes(tomorrow,context);
             saveNextPrayerPos(context,0);
+            saveNextPrayerTime(context,prayerTimes.get(0));
             context.getContentResolver().notifyChange(PrayerContract.PrayerEntry.CONTENT_URI,null); //to notifiy change of next prayer
             return new Prayer("Fajr",prayerTimes.get(0),true); //true: tomorrow
         }
 
         String name = Utility.getPrayerName(pos,context);
         saveNextPrayerPos(context,pos);
+        saveNextPrayerTime(context,prayerTimes.get(pos));
         context.getContentResolver().notifyChange(PrayerContract.PrayerEntry.CONTENT_URI,null);
         return new Prayer(name,prayerTimes.get(pos));
+    }
+
+    private void saveNextPrayerTime(Context context, String s) {
+        SharedPreferences sharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(context.getString(R.string.pref_next_prayer_time), s);
+        editor.commit();
     }
 
     public void saveNextPrayerPos(Context context,int pos){

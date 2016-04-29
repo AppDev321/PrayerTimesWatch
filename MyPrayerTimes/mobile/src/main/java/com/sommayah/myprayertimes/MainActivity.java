@@ -6,9 +6,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
@@ -35,7 +37,6 @@ import butterknife.ButterKnife;
 public class MainActivity extends AppCompatActivity {
 
     public static final String TAG = MainActivity.class.getSimpleName();
-    public static int locationInquires;
 
     public static final int MIN_TIME =1000 * 60 * 120; //two hours
     public static final int MIN_DIST = 20000; //set to 20 kilometers
@@ -53,7 +54,15 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
-        locationInquires = 0;
+        //check if rtl flip image
+        Configuration config = getResources().getConfiguration();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            if (config.getLayoutDirection() == View.LAYOUT_DIRECTION_RTL) {
+                //in Right To Left layout
+                backgroundImage.setScaleX(-1);
+            }
+        }
+
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -138,9 +147,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         mhijriDateText.setText(Utility.getHijriDate(getApplicationContext()));
-        int temp = getResources().getIdentifier("backgroundmosque"+Utility.getNextPos(this), "drawable", getPackageName());
-        backgroundImage.setImageResource(temp);
-
         SharedPreferences prefs
                 = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         boolean isManualLocation = prefs.getBoolean(getApplicationContext().getString(R.string.pref_loc_manual_set), false);
@@ -165,7 +171,8 @@ public class MainActivity extends AppCompatActivity {
             }
             mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME, MIN_DIST, mLocationListener);
         }
-
+        int temp = getResources().getIdentifier("backgroundmosque"+Utility.getNextPos(this), "drawable", getPackageName());
+        backgroundImage.setImageResource(temp);
 
     }
 
@@ -208,6 +215,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void makeUseOfNewLocation(Location location) {
+        int temp = getResources().getIdentifier("backgroundmosque"+Utility.getNextPos(this), "drawable", getPackageName());
+        backgroundImage.setImageResource(temp);
         double longitude = location.getLongitude();
         double latitude = location.getLatitude();
         String address = Utility.getLocationAddress(getApplicationContext(),longitude,latitude);

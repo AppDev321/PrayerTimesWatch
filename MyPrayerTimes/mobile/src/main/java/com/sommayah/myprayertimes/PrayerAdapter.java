@@ -16,8 +16,6 @@ import org.joda.time.Minutes;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-import java.util.ArrayList;
-
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
@@ -34,27 +32,12 @@ public class PrayerAdapter extends RecyclerView.Adapter<PrayerAdapter.PrayerAdap
     private Cursor mCursor;
     final private Context mContext;
     final private View mEmptyView;
-    ArrayList<String> prayerTimes;
-    ArrayList<String> friendlyPrayerTimes;
-
 
     public PrayerAdapter(Context context, View emptyView){
         mContext = context;
         mEmptyView = emptyView;
 
     }
-
-    public PrayerAdapter(ArrayList<String> array,Context context, View emptyView) {
-        mContext = context;
-        mEmptyView = emptyView;
-        prayerTimes = new ArrayList<>();
-        friendlyPrayerTimes = new ArrayList<>();
-        //times = new double[array.size()];
-        for(int i=0 ; i<array.size();i++){
-            prayerTimes.add(array.get(i));
-        }
-    }
-
 
     @Override
     public PrayerAdapterViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -85,7 +68,7 @@ public class PrayerAdapter extends RecyclerView.Adapter<PrayerAdapter.PrayerAdap
         holder.mPrayerName.setText(name);
         String timeString = mCursor.getString(MainActivityFragment.COL_PRAYER_TIME);
         LocalTime time = new LocalTime(timeString);
-        DateTimeFormatter fmt = DateTimeFormat.forPattern("hh:mm aa");
+        DateTimeFormatter fmt = DateTimeFormat.forPattern("h:mm aa");
         if(Utility.getPreferredTimeFormat(mContext) == PrayTime.TIME12) { //12 hr or 24 formate
             String str = fmt.print(time);
             holder.mPrayerTime.setText(str);
@@ -108,8 +91,8 @@ public class PrayerAdapter extends RecyclerView.Adapter<PrayerAdapter.PrayerAdap
         if(minutes >59){
             hours = minutes/60;
             minutes = minutes%60;
-            remainingTime = String.valueOf(hours)+ " hours, and " + String.valueOf(minutes)
-                    + " minutes remaining.";
+            remainingTime = String.valueOf(hours)+ " hours and " + String.valueOf(minutes)
+                    + " minutes remaining";
             return remainingTime;
         }else if(minutes == 0){
             return "Time for Prayer.";
@@ -122,18 +105,6 @@ public class PrayerAdapter extends RecyclerView.Adapter<PrayerAdapter.PrayerAdap
     public int getItemCount() {
         if ( null == mCursor ) return 0;
         return mCursor.getCount();
-    }
-
-    void clear(){
-        prayerTimes.clear();
-    }
-
-    void add(ArrayList<String> times){
-
-        for(String time: times){
-            prayerTimes.add(time);
-        }
-
     }
 
 
@@ -175,8 +146,6 @@ public class PrayerAdapter extends RecyclerView.Adapter<PrayerAdapter.PrayerAdap
 
         public PrayerAdapterViewHolder(View view) {
             super(view);
-//            mPrayerName = (TextView) view.findViewById(R.id.prayer_name);
-//            mPrayerTime = (TextView) view.findViewById(R.id.prayer_time);
             ButterKnife.bind(this,view);
             mTimeRemaining = (TextView)view.findViewById(R.id.prayer_time_remaining);
 

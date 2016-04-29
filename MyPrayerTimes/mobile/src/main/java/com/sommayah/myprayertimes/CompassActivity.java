@@ -25,6 +25,8 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
     @Bind(R.id.imageViewArrow) ImageView imageArrow;
     // TextView that will tell the user what degree is he heading
     @Bind(R.id.tvHeading) TextView tvHeading;
+    //TextView that will tell the user the qibla degree
+    @Bind(R.id.textViewQibla) TextView textQibla;
     // record the compass picture angle turned
     private float currentDegree = 0f;
     private float qiblaDegree = 0f;
@@ -49,6 +51,7 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
         super.onResume();
         // for the system's orientation sensor registered listeners
         qiblaDegree = Utility.getQiblaDirection(getApplicationContext());
+        textQibla.setText(getString(R.string.qibla_direction)+ ": " + String.format(getString(R.string.format_qibla_dir),qiblaDegree));
         mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION),
                 SensorManager.SENSOR_DELAY_GAME);
     }
@@ -64,7 +67,7 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
     public void onSensorChanged(SensorEvent event) {
         // get the angle around the z-axis rotated
         float degree = Math.round(event.values[0]);
-        tvHeading.setText("Heading: " + Float.toString(degree) + " degrees");
+        tvHeading.setText("Current Heading: " + String.format(getString(R.string.format_heading),degree));
         // create a rotation animation (reverse turn degree degrees)
         RotateAnimation ra = new RotateAnimation(
                 currentDegree,

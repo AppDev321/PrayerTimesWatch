@@ -48,6 +48,7 @@ public class Utility {
     public static float DEFAULT_LATLONG = 0F;
     public static final float LATMECCA = 21.4167F;
     public static final float LONGMECCA = 39.8167F;
+    
 
     public static PrayTime mPrayTime;
 
@@ -254,9 +255,6 @@ public class Utility {
 
     }
 
-
-
-
     /**
      * Helper method to display today's date in a friendly display to user
 
@@ -282,13 +280,10 @@ public class Utility {
         LocalDate todayIso = new LocalDate();
         LocalDate todayHijri = new LocalDate(todayIso.toDateTimeAtStartOfDay(),
                 hijri);
-        Calendar c = Calendar.getInstance();
-        int hours = c.get(Calendar.HOUR_OF_DAY);
-        int minutes = c.get(Calendar.MINUTE);
-        int seconds = c.get(Calendar.SECOND); //get current time and check if it is before midnight time greater than 1800
         int adjustment = adjustHijriDate(context);
-        if(Utility.getNextPos(context) == 0 && hours*3600 + minutes*60 + seconds > 1800){ // if next prayer is fajr(before sunrise) which means tomorrow show tomorrow's date
-            adjustment++;
+        if(Utility.getNextPos(context) == 0){ // if next prayer is fajr(before sunrise) which means tomorrow show tomorrow's date
+            if (isBetweenMidnightAndFajr(context))
+                adjustment++;
         }
         todayHijri = todayHijri.plusDays(adjustment);
         int day =  todayHijri.getDayOfMonth();
@@ -298,19 +293,18 @@ public class Utility {
         return hijriDate;
 
     }
+
+
     public static String getSmallHijriDate(Context context){
         Chronology iso = ISOChronology.getInstanceUTC();
         Chronology hijri = IslamicChronology.getInstanceUTC();
         LocalDate todayIso = new LocalDate();
         LocalDate todayHijri = new LocalDate(todayIso.toDateTimeAtStartOfDay(),
                 hijri);
-        Calendar c = Calendar.getInstance();
-        int hours = c.get(Calendar.HOUR_OF_DAY);
-        int minutes = c.get(Calendar.MINUTE);
-        int seconds = c.get(Calendar.SECOND); //get current time and check if it is before midnight time greater than 1800
         int adjustment = adjustHijriDate(context);
-        if(Utility.getNextPos(context) == 0 && hours*3600 + minutes*60 + seconds > 1800){ // if next prayer is fajr(before sunrise) which means tomorrow show tomorrow's date
-            adjustment++;
+        if(Utility.getNextPos(context) == 0){ // if next prayer is fajr(before sunrise) which means tomorrow show tomorrow's date
+            if (isBetweenMidnightAndFajr(context))
+                adjustment++;
         }
         todayHijri = todayHijri.plusDays(adjustment);
         int day =  todayHijri.getDayOfMonth();
@@ -320,6 +314,16 @@ public class Utility {
         return hijriDate;
 
     }
+
+    private static boolean isBetweenMidnightAndFajr(Context context){
+        LocalTime now = LocalTime.now();
+        LocalTime fajr = new LocalTime(getNextPrayerTime(context)); //here we know next prayer is fajr
+        //if now is later than fajr it means we are still before midnight and adjust hijri date
+        //if now is before that now and fajr are at the same day no need to adjust hijri date
+        return now.isAfter(fajr);
+    }
+
+
 
     public static int[] getOffsetArray(Context context){
         int[] offsets = {0, 0, 0, 0, 0, 0, 0};
@@ -619,6 +623,12 @@ public class Utility {
         SharedPreferences prefs
                 = PreferenceManager.getDefaultSharedPreferences(context);
         return prefs.getInt(context.getString(R.string.pref_next_prayer), 0);
+    }
+
+    public static String getNextPrayerTime(Context context){
+        SharedPreferences prefs
+                = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getString(context.getString(R.string.pref_next_prayer), "");
     }
 
     public static int getWidgetTextColor(Context context) {

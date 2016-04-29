@@ -79,7 +79,7 @@ public class PrayerWidgetIntentService extends IntentService {
                     //update if 12 format
                     for (int i = 0; i < prayTimes.size(); i++) {
                         LocalTime time = new LocalTime(prayTimes.get(i));
-                        DateTimeFormatter fmt = DateTimeFormat.forPattern("hh:mm");
+                        DateTimeFormatter fmt = DateTimeFormat.forPattern("h:mm");
                         String str = fmt.print(time);
                         prayTimes.set(i, str);
 
