@@ -239,10 +239,6 @@ public class MainActivity extends AppCompatActivity {
                 Date now = new Date();
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(now);
-                /*ArrayList<String> prayerTimes = new ArrayList<>();
-                prayerTimes = Utility.getPrayTimes(cal, this);
-                Utility.addPrayersToDB(this, prayerTimes);
-                this.getContentResolver().notifyChange(PrayerContract.PrayerEntry.CONTENT_URI,null);*/
                 new LoadPrayersAsyncTask(this,cal).execute();
                 alarm.cancelAlarm(getApplicationContext());
                 alarm.addPrayerAlarm(getApplicationContext());

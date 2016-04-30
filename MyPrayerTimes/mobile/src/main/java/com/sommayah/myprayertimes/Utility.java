@@ -48,7 +48,7 @@ public class Utility {
     public static float DEFAULT_LATLONG = 0F;
     public static final float LATMECCA = 21.4167F;
     public static final float LONGMECCA = 39.8167F;
-    
+
 
     public static PrayTime mPrayTime;
 
@@ -628,7 +628,7 @@ public class Utility {
     public static String getNextPrayerTime(Context context){
         SharedPreferences prefs
                 = PreferenceManager.getDefaultSharedPreferences(context);
-        return prefs.getString(context.getString(R.string.pref_next_prayer), "");
+        return prefs.getString(context.getString(R.string.pref_next_prayer_time), "");
     }
 
     public static int getWidgetTextColor(Context context) {
