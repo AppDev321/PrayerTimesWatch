@@ -2,5 +2,8 @@
 <resources>
     <color name="background">#000000</color>
     <color name="background2">#000088</color>
+    <color name="colorPrimary">#4CAF50</color>
+    <color name="colorPrimaryDark">#388E3C</color>
+    <color name="colorAccent">#FFC107</color>
     <color name="digital_text">#ffffff</color>
 </resources>

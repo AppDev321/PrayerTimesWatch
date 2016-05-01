@@ -23,8 +23,10 @@ import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.Shader;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
@@ -123,10 +125,8 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
 
             mBackgroundPaint = new Paint();
             mBackgroundPaint.setColor(resources.getColor(R.color.background));
-
             mTextPaint = new Paint();
             mTextPaint = createTextPaint(resources.getColor(R.color.digital_text));
-
             mTime = new Time();
         }
 
@@ -207,6 +207,7 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
             invalidate();
         }
 
+
         @Override
         public void onAmbientModeChanged(boolean inAmbientMode) {
             super.onAmbientModeChanged(inAmbientMode);
@@ -242,6 +243,13 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
                     mTapCount++;
                     mBackgroundPaint.setColor(resources.getColor(mTapCount % 2 == 0 ?
                             R.color.background : R.color.background2));
+//                    Shader shader = new LinearGradient(0, 0, 0, 100,
+//                            getResources().getColor(R.color.colorPrimaryDark),
+//                            getResources().getColor(R.color.colorPrimary)
+//                            , Shader.TileMode.MIRROR);
+//                    if(mTapCount % 2 != 0){
+//                        mBackgroundPaint.setShader(shader);
+//                    }
                     break;
             }
             invalidate();
@@ -253,6 +261,11 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
             if (isInAmbientMode()) {
                 canvas.drawColor(Color.BLACK);
             } else {
+                Shader shader = new LinearGradient(0, 0, 0, bounds.height(),
+                        getResources().getColor(R.color.colorPrimaryDark),
+                        getResources().getColor(R.color.colorPrimary)
+                        , Shader.TileMode.MIRROR);
+                mBackgroundPaint.setShader(shader);
                 canvas.drawRect(0, 0, bounds.width(), bounds.height(), mBackgroundPaint);
             }
 
