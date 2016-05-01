@@ -9,10 +9,18 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.os.Build;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.DataEventBuffer;
+import com.google.android.gms.wearable.MessageApi;
+import com.google.android.gms.wearable.MessageEvent;
+import com.google.android.gms.wearable.Wearable;
 import com.sommayah.myprayertimes.LoadPrayersAsyncTask;
 import com.sommayah.myprayertimes.R;
 import com.sommayah.myprayertimes.Utility;
@@ -28,7 +36,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
-public class PrayerAlarmReceiver extends WakefulBroadcastReceiver {
+public class PrayerAlarmReceiver extends WakefulBroadcastReceiver implements  GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener, DataApi.DataListener, MessageApi.MessageListener {
+    public final String LOG_TAG = PrayerAlarmReceiver.class.getSimpleName();
+    public GoogleApiClient mGoogleApiClient;
+    private boolean mResolvingError = false;
     public static final String ACTION_PRAYER_TIME_ALARM = "com.sommayah.myprayertimes.ACTION_PRAYER_TIME_ALARM";
     public static final String EXTRA_PRAYER_NAME = "prayer_name";
     public static final String EXTRA_PRAYER_TIME = "prayer_time";
@@ -40,11 +52,11 @@ public class PrayerAlarmReceiver extends WakefulBroadcastReceiver {
     // The pending intent that is triggered when the alarm fires.
     private PendingIntent alarmIntent;
     public PrayerAlarmReceiver() {
+
     }
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        // TODO: This method is called when the BroadcastReceiver is receiving
         // Start the service, keeping the device awake while it is launching.
         String prayerName =  intent.getStringExtra(EXTRA_PRAYER_NAME);
         long alarmTime = intent.getLongExtra(EXTRA_PRAYER_TIME, -1);
@@ -61,6 +73,14 @@ public class PrayerAlarmReceiver extends WakefulBroadcastReceiver {
     }
 
     public void addPrayerAlarm(Context context){
+        mGoogleApiClient = new GoogleApiClient.Builder(context)
+                .addApi(Wearable.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
+        if (!mResolvingError) {
+            mGoogleApiClient.connect();
+        }
         alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context,PrayerAlarmReceiver.class);
         //get the next prayer
@@ -68,14 +88,12 @@ public class PrayerAlarmReceiver extends WakefulBroadcastReceiver {
         Prayer next_prayer_time = getNextPrayer(context);
         Calendar cal = getCalendarFromPrayerTime(next_prayer_time.getTime(), next_prayer_time.getTomorrow());
         if(next_prayer_time.getName().equals(context.getString(R.string.fajr))){ //fajr of next day, bring prayers of next day and update database
-            /*ArrayList<String> prayerTimes = new ArrayList<>();
-            prayerTimes = Utility.getPrayTimes(cal, context);
-            Utility.addPrayersToDB(context, prayerTimes);
-            context.getContentResolver().notifyChange(PrayerContract.PrayerEntry.CONTENT_URI,null);*/
             new LoadPrayersAsyncTask(context,cal).execute();
         }
         intent.putExtra(EXTRA_PRAYER_NAME,next_prayer_time.getName());
         intent.putExtra(EXTRA_PRAYER_TIME, cal.getTimeInMillis());
+        if (mGoogleApiClient.isConnected())
+            Utility.sendPrayerInfoToWatch(next_prayer_time.getName(), next_prayer_time.getName(), Utility.getSmallHijriDate(context), mGoogleApiClient);
         alarmIntent = PendingIntent.getBroadcast(context, ALARM_ID, intent, PendingIntent.FLAG_CANCEL_CURRENT);
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
             //lollipop_mr1 is 22, this is only 23 and above
@@ -211,6 +229,51 @@ public class PrayerAlarmReceiver extends WakefulBroadcastReceiver {
             Log.w("SetAlarmReceiver", se.getMessage(), se);
             //do nothing. We should always have permision in order to reach this screen.
         }
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        mResolvingError = false;
+        Wearable.DataApi.addListener(mGoogleApiClient, this);
+        Wearable.MessageApi.addListener(mGoogleApiClient, this);
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult result) {
+
+        if (mResolvingError) {
+            // Already attempting to resolve an error.
+            return;
+        } else if (result.hasResolution()) {
+//            try {
+//                mResolvingError = true;
+//                result.startResolutionForResult(this, REQUEST_RESOLVE_ERROR);
+//            } catch (IntentSender.SendIntentException e) {
+//                // There was an error with the resolution intent. Try again.
+//                mGoogleApiClient.connect();
+//            }
+        } else {
+            Log.e("in SyncAdapter", "Connection to Google API client has failed");
+            mResolvingError = false;
+            Wearable.DataApi.removeListener(mGoogleApiClient, this);
+            Wearable.MessageApi.removeListener(mGoogleApiClient, this);
+        }
+    }
+
+    @Override
+    public void onDataChanged(DataEventBuffer dataEventBuffer) {
+
+    }
+
+    @Override
+    public void onMessageReceived(MessageEvent messageEvent) {
+
     }
 
 }

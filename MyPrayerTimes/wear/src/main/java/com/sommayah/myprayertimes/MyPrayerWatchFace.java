@@ -28,16 +28,32 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Shader;
 import android.graphics.Typeface;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceStyle;
 import android.text.format.Time;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.WindowInsets;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.DataEvent;
+import com.google.android.gms.wearable.DataEventBuffer;
+import com.google.android.gms.wearable.DataMapItem;
+import com.google.android.gms.wearable.Node;
+import com.google.android.gms.wearable.NodeApi;
+import com.google.android.gms.wearable.Wearable;
+
 import java.lang.ref.WeakReference;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
@@ -46,6 +62,12 @@ import java.util.concurrent.TimeUnit;
  * low-bit ambient mode, the text is drawn without anti-aliasing in ambient mode.
  */
 public class MyPrayerWatchFace extends CanvasWatchFaceService {
+    public static final String PRAYER_PATH = "/prayer";
+    public static final String PRAYER_NAME_KEY = "prayername";
+    public static final String PRAYER_TIME_KEY = "prayertime";
+    private static final String HIJRI_DATE_KEY = "hijridate";
+    public static final String ACTION_RECEIVE = "com.sommayah.myprayertimes.watchface.DATA";
+    public static final String TAG = "MyPrayerWatchFace";
     private static final Typeface NORMAL_TYPEFACE =
             Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL);
 
@@ -85,13 +107,20 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
         }
     }
 
-    private class Engine extends CanvasWatchFaceService.Engine {
+    private class Engine extends CanvasWatchFaceService.Engine implements DataApi.DataListener,
+            GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
         final Handler mUpdateTimeHandler = new EngineHandler(this);
         boolean mRegisteredTimeZoneReceiver = false;
         Paint mBackgroundPaint;
         Paint mTextPaint;
+        Paint mNamePaint;
+        Paint mTimePaint;
+        Paint mDatePaint;
+        Paint mLinePaint;
         boolean mAmbient;
+        float mLineHeight;
         Time mTime;
+        GoogleApiClient mGoogleApiClient;
         final BroadcastReceiver mTimeZoneReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -103,6 +132,10 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
 
         float mXOffset;
         float mYOffset;
+
+        String prayer_name = "";
+        String prayer_time = "";
+        String prayer_date = "";
 
         /**
          * Whether the display supports fewer bits for each color in ambient mode. When true, we
@@ -127,7 +160,22 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
             mBackgroundPaint.setColor(resources.getColor(R.color.background));
             mTextPaint = new Paint();
             mTextPaint = createTextPaint(resources.getColor(R.color.digital_text));
+            mNamePaint = new Paint();
+            mNamePaint = createTextPaint(resources.getColor(R.color.digital_text));
+            mTimePaint = new Paint();
+            mTimePaint = createTextPaint(resources.getColor(R.color.digital_text));
+            mDatePaint = new Paint();
+            mDatePaint = createTextPaint(resources.getColor(R.color.digital_text));
             mTime = new Time();
+            mLinePaint = new Paint();
+            mLinePaint.setColor(resources.getColor(R.color.line_color));
+            mLinePaint.setTextAlign(Paint.Align.CENTER);
+            mLineHeight = resources.getDimension(R.dimen.digital_line_height);
+            mGoogleApiClient = new GoogleApiClient.Builder(MyPrayerWatchFace.this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(Wearable.API)
+                    .build();
         }
 
         @Override
@@ -191,8 +239,18 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
                     ? R.dimen.digital_x_offset_round : R.dimen.digital_x_offset);
             float textSize = resources.getDimension(isRound
                     ? R.dimen.digital_text_size_round : R.dimen.digital_text_size);
+            float dateTextSize = resources.getDimension(isRound
+                    ? R.dimen.digital_date_size_round : R.dimen.digital_date_size);
+            float nameTextSize = resources.getDimension(isRound
+                    ? R.dimen.digital_name_size_round : R.dimen.digital_name_size);
+            float timeSize = resources.getDimension(isRound
+                    ? R.dimen.digital_time_size_round : R.dimen.digital_time_size);
 
             mTextPaint.setTextSize(textSize);
+            mDatePaint.setTextSize(dateTextSize);
+            mNamePaint.setTextSize(nameTextSize);
+            mTimePaint.setTextSize(timeSize);
+
         }
 
         @Override
@@ -215,6 +273,9 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
                 mAmbient = inAmbientMode;
                 if (mLowBitAmbient) {
                     mTextPaint.setAntiAlias(!inAmbientMode);
+                    mNamePaint.setAntiAlias(!inAmbientMode);
+                    mDatePaint.setAntiAlias(!inAmbientMode);
+                    mTimePaint.setAntiAlias(!inAmbientMode);
                 }
                 invalidate();
             }
@@ -243,13 +304,6 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
                     mTapCount++;
                     mBackgroundPaint.setColor(resources.getColor(mTapCount % 2 == 0 ?
                             R.color.background : R.color.background2));
-//                    Shader shader = new LinearGradient(0, 0, 0, 100,
-//                            getResources().getColor(R.color.colorPrimaryDark),
-//                            getResources().getColor(R.color.colorPrimary)
-//                            , Shader.TileMode.MIRROR);
-//                    if(mTapCount % 2 != 0){
-//                        mBackgroundPaint.setShader(shader);
-//                    }
                     break;
             }
             invalidate();
@@ -275,6 +329,21 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
                     ? String.format("%d:%02d", mTime.hour, mTime.minute)
                     : String.format("%d:%02d:%02d", mTime.hour, mTime.minute, mTime.second);
             canvas.drawText(text, mXOffset, mYOffset, mTextPaint);
+
+            canvas.drawText(prayer_date,
+                    mXOffset, mYOffset + mLineHeight, mDatePaint);
+
+            if (getPeekCardPosition().isEmpty()) {
+                if (!prayer_name.equals("") && !prayer_time.equals("")) {
+                    // Date
+                    canvas.drawLine(bounds.width() * 3 / 8, mYOffset + 2 * mLineHeight,
+                            bounds.width() * 5 / 8, mYOffset + 2 * mLineHeight, mLinePaint);
+                    canvas.drawText(prayer_name, bounds.width() * 4 / 8, mYOffset + 3 * mLineHeight, mNamePaint);
+                    canvas.drawText(prayer_time, bounds.width() * 6 / 8, mYOffset + 3 * mLineHeight, mTimePaint);
+                }
+
+
+            }
         }
 
         /**
@@ -308,5 +377,123 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
                 mUpdateTimeHandler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, delayMs);
             }
         }
+
+        @Override  // GoogleApiClient.ConnectionCallbacks
+        public void onConnected(Bundle connectionHint) {
+            // if (Log.isLoggable(TAG, Log.DEBUG)) {
+            //    Log.d(TAG, "onConnected: " + connectionHint);
+            // }
+            Log.d(TAG, "onConnected: ");
+            Wearable.DataApi.addListener(mGoogleApiClient, Engine.this);
+            updateUiOnStartup();
+        }
+
+        private void updateUiOnStartup() {
+            new GetDataTask().execute();
+        }
+
+
+        @Override  // GoogleApiClient.ConnectionCallbacks
+        public void onConnectionSuspended(int cause) {
+            if (Log.isLoggable(TAG, Log.DEBUG)) {
+                Log.d(TAG, "onConnectionSuspended: " + cause);
+            }
+        }
+
+        @Override  // GoogleApiClient.OnConnectionFailedListener
+        public void onConnectionFailed(ConnectionResult result) {
+            if (Log.isLoggable(TAG, Log.DEBUG)) {
+                Log.d(TAG, "onConnectionFailed: " + result);
+            }
+        }
+
+        @Override
+        public void onDataChanged(DataEventBuffer dataEvents) {
+            Log.d(TAG, "onDataChanged(): " + dataEvents);
+
+            for (DataEvent event : dataEvents) {
+                if (event.getType() == DataEvent.TYPE_CHANGED) {
+                    String path = event.getDataItem().getUri().getPath();
+                    if (PRAYER_PATH.equals(path)) {
+                        DataMapItem dataMapItem = DataMapItem.fromDataItem(event.getDataItem());
+                        prayer_name = dataMapItem.getDataMap()
+                                .getString(PRAYER_NAME_KEY);
+                        Log.d(TAG,prayer_name);
+                        prayer_time = dataMapItem.getDataMap()
+                                .getString(PRAYER_TIME_KEY);
+                        prayer_date = dataMapItem.getDataMap()
+                                .getString(HIJRI_DATE_KEY);
+                    } else {
+                        Log.d(TAG, "Unrecognized path: " + path);
+                    }
+
+                } else if (event.getType() == DataEvent.TYPE_DELETED) {
+                    Log.d("DataItem Deleted", event.getDataItem().toString());
+                } else {
+                    Log.d("Unknown data event type", "Type = " + event.getType());
+                }
+            }
+        }
+
+        private Collection<String> getNodes() {
+            HashSet<String> results = new HashSet<>();
+            NodeApi.GetConnectedNodesResult nodes =
+                    Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await();
+
+            for (Node node : nodes.getNodes()) {
+                results.add(node.getId());
+            }
+
+            return results;
+        }
+
+        private String getRemoteNodeId() {
+            HashSet<String> results = new HashSet<String>();
+            NodeApi.GetConnectedNodesResult nodesResult =
+                    Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await();
+            List<Node> nodes = nodesResult.getNodes();
+            if (nodes.size() > 0) {
+                return nodes.get(0).getId();
+            }
+            return null;
+        }
+
+        private class GetDataTask extends AsyncTask<Void, Void, Void> {
+
+            @Override
+            protected Void doInBackground(Void... args) {
+                String node = getRemoteNodeId();
+                if (node != null) {
+                    Uri uri = new Uri.Builder()
+                            .scheme("wear")
+                            .path(PRAYER_PATH)
+                            .authority(node)
+                            .build();
+
+                    DataApi.DataItemResult result = Wearable.DataApi.getDataItem(mGoogleApiClient, uri).await();
+
+                    String path = uri.getPath();
+                    if (PRAYER_PATH.equals(path)) {
+                        DataMapItem dataItem = DataMapItem.fromDataItem(result.getDataItem());
+                        prayer_name = dataItem.getDataMap()
+                                .getString(PRAYER_NAME_KEY);
+                        prayer_time = dataItem.getDataMap()
+                                .getString(PRAYER_TIME_KEY);
+                        prayer_date = dataItem.getDataMap()
+                                .getString(HIJRI_DATE_KEY);
+                    } else {
+                        Log.d(TAG, "Unrecognized path: " + path);
+                    }
+
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+            }
+        }
+
     }
 }

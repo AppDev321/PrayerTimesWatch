@@ -16,6 +16,12 @@ import android.support.annotation.IntDef;
 import android.text.format.Time;
 import android.util.Log;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.PutDataMapRequest;
+import com.google.android.gms.wearable.PutDataRequest;
+import com.google.android.gms.wearable.Wearable;
 import com.sommayah.myprayertimes.data.PrayerContract;
 import com.sommayah.myprayertimes.dataModels.PrayTime;
 import com.sommayah.myprayertimes.services.PrayerNotificationService;
@@ -48,6 +54,11 @@ public class Utility {
     public static float DEFAULT_LATLONG = 0F;
     public static final float LATMECCA = 21.4167F;
     public static final float LONGMECCA = 39.8167F;
+
+    public static final String PRAYER_PATH = "/prayer";
+    public static final String PRAYER_NAME_KEY = "prayername";
+    public static final String PRAYER_TIME_KEY = "prayertime";
+    private static final String HIJRI_DATE_KEY = "hijridate";
 
 
     public static PrayTime mPrayTime;
@@ -749,6 +760,26 @@ public class Utility {
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         return activeNetwork != null &&
                 activeNetwork.isConnectedOrConnecting();
+    }
+
+    public static void sendPrayerInfoToWatch(String prayer_name,String prayer_time,String hijri_date, GoogleApiClient client) {
+        PutDataMapRequest dataMap = PutDataMapRequest.create(Utility.PRAYER_PATH);
+        dataMap.getDataMap().putString(Utility.PRAYER_NAME_KEY, prayer_name);
+        dataMap.getDataMap().putString(Utility.PRAYER_TIME_KEY, prayer_time);
+        dataMap.getDataMap().putString(Utility.HIJRI_DATE_KEY, hijri_date);
+        dataMap.getDataMap().putLong("time", new Date().getTime());
+        PutDataRequest request = dataMap.asPutDataRequest();
+        request.setUrgent();
+
+        Wearable.DataApi.putDataItem(client, request)
+                .setResultCallback(new ResultCallback<DataApi.DataItemResult>() {
+                    @Override
+                    public void onResult(DataApi.DataItemResult dataItemResult) {
+                        Log.d("Sending Prayer", "Sending prayer info was successful: " + dataItemResult.getStatus()
+                                .isSuccess());
+                    }
+                });
+
     }
 
 }

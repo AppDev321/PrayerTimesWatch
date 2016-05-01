@@ -16,6 +16,7 @@ import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -24,7 +25,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.support.v7.app.AlertDialog;
 
 import com.sommayah.myprayertimes.broadcastReceivers.PrayerAlarmReceiver;
 
@@ -219,7 +219,7 @@ public class MainActivity extends AppCompatActivity {
         backgroundImage.setImageResource(temp);
         double longitude = location.getLongitude();
         double latitude = location.getLatitude();
-        String address = Utility.getLocationAddress(getApplicationContext(),longitude,latitude);
+        String address = Utility.getLocationAddress(getApplicationContext(), longitude, latitude);
         if(!((float)longitude == Utility.getLocationLongitude(getApplicationContext())
                 && (float)latitude == Utility.getLocationLatitude(getApplicationContext()))){ //check if it is really new location
             SharedPreferences sharedPreferences =
@@ -280,7 +280,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface paramDialogInterface, int paramInt) {
                         // TODO Auto-generated method stub
-                        Utility.setLocationStatus(getApplicationContext(),Utility.LOCATION_STATUS_DISABLED);
+                        Utility.setLocationStatus(getApplicationContext(), Utility.LOCATION_STATUS_DISABLED);
                         mTitleText.setText(getString(R.string.location_not_found));
 
                     }
@@ -289,5 +289,4 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
 }
