@@ -49,8 +49,10 @@ public class PrayerAlarmReceiver extends WakefulBroadcastReceiver implements  Go
     public static final int FIVE_MIN = 5000 *60;
     // The app's AlarmManager, which provides access to the system alarm services.
     private AlarmManager alarmManager;
+    private Prayer next_prayer_time;
     // The pending intent that is triggered when the alarm fires.
     private PendingIntent alarmIntent;
+    private String mdate = " ";
     public PrayerAlarmReceiver() {
 
     }
@@ -72,6 +74,8 @@ public class PrayerAlarmReceiver extends WakefulBroadcastReceiver implements  Go
         }
     }
 
+
+
     public void addPrayerAlarm(Context context){
         mGoogleApiClient = new GoogleApiClient.Builder(context)
                 .addApi(Wearable.API)
@@ -84,16 +88,16 @@ public class PrayerAlarmReceiver extends WakefulBroadcastReceiver implements  Go
         alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context,PrayerAlarmReceiver.class);
         //get the next prayer
-
-        Prayer next_prayer_time = getNextPrayer(context);
+        next_prayer_time = getNextPrayer(context);
         Calendar cal = getCalendarFromPrayerTime(next_prayer_time.getTime(), next_prayer_time.getTomorrow());
         if(next_prayer_time.getName().equals(context.getString(R.string.fajr))){ //fajr of next day, bring prayers of next day and update database
             new LoadPrayersAsyncTask(context,cal).execute();
         }
         intent.putExtra(EXTRA_PRAYER_NAME,next_prayer_time.getName());
         intent.putExtra(EXTRA_PRAYER_TIME, cal.getTimeInMillis());
+        mdate = Utility.getSmallHijriDate(context);
         if (mGoogleApiClient.isConnected())
-            Utility.sendPrayerInfoToWatch(next_prayer_time.getName(), next_prayer_time.getName(), Utility.getSmallHijriDate(context), mGoogleApiClient);
+            Utility.sendPrayerInfoToWatch(next_prayer_time.getName(), next_prayer_time.getTime(), mdate, mGoogleApiClient);
         alarmIntent = PendingIntent.getBroadcast(context, ALARM_ID, intent, PendingIntent.FLAG_CANCEL_CURRENT);
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
             //lollipop_mr1 is 22, this is only 23 and above
@@ -236,6 +240,7 @@ public class PrayerAlarmReceiver extends WakefulBroadcastReceiver implements  Go
         mResolvingError = false;
         Wearable.DataApi.addListener(mGoogleApiClient, this);
         Wearable.MessageApi.addListener(mGoogleApiClient, this);
+        Utility.sendPrayerInfoToWatch(next_prayer_time.getName(), next_prayer_time.getTime(), mdate, mGoogleApiClient);
 
     }
 

@@ -50,6 +50,10 @@ import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 
+import org.joda.time.LocalTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
 import java.lang.ref.WeakReference;
 import java.util.Collection;
 import java.util.HashSet;
@@ -165,7 +169,7 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
             mTimePaint = new Paint();
             mTimePaint = createTextPaint(resources.getColor(R.color.digital_text));
             mDatePaint = new Paint();
-            mDatePaint = createTextPaint(resources.getColor(R.color.digital_text));
+            mDatePaint = createTextPaint(resources.getColor(R.color.colorAccent));
             mTime = new Time();
             mLinePaint = new Paint();
             mLinePaint.setColor(resources.getColor(R.color.line_color));
@@ -197,12 +201,17 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
             super.onVisibilityChanged(visible);
 
             if (visible) {
+                mGoogleApiClient.connect();
                 registerReceiver();
 
                 // Update time zone in case it changed while we weren't visible.
                 mTime.clear(TimeZone.getDefault().getID());
                 mTime.setToNow();
             } else {
+                if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
+                    Wearable.DataApi.removeListener(mGoogleApiClient, this);
+                    mGoogleApiClient.disconnect();
+                }
                 unregisterReceiver();
             }
 
@@ -248,8 +257,11 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
 
             mTextPaint.setTextSize(textSize);
             mDatePaint.setTextSize(dateTextSize);
+            mDatePaint.setTextAlign(Paint.Align.CENTER);
             mNamePaint.setTextSize(nameTextSize);
+            mNamePaint.setTextAlign(Paint.Align.CENTER);
             mTimePaint.setTextSize(timeSize);
+            mNamePaint.setTextAlign(Paint.Align.CENTER);
 
         }
 
@@ -329,17 +341,13 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
                     ? String.format("%d:%02d", mTime.hour, mTime.minute)
                     : String.format("%d:%02d:%02d", mTime.hour, mTime.minute, mTime.second);
             canvas.drawText(text, mXOffset, mYOffset, mTextPaint);
-
-            canvas.drawText(prayer_date,
-                    mXOffset, mYOffset + mLineHeight, mDatePaint);
-
+            if(!prayer_name.equals("")) {
+                canvas.drawText(prayer_date + "   " + prayer_name,
+                        bounds.width() / 4, mYOffset + mLineHeight, mDatePaint);
+            }
             if (getPeekCardPosition().isEmpty()) {
-                if (!prayer_name.equals("") && !prayer_time.equals("")) {
-                    // Date
-                    canvas.drawLine(bounds.width() * 3 / 8, mYOffset + 2 * mLineHeight,
-                            bounds.width() * 5 / 8, mYOffset + 2 * mLineHeight, mLinePaint);
-                    canvas.drawText(prayer_name, bounds.width() * 4 / 8, mYOffset + 3 * mLineHeight, mNamePaint);
-                    canvas.drawText(prayer_time, bounds.width() * 6 / 8, mYOffset + 3 * mLineHeight, mTimePaint);
+                if (!prayer_time.equals("")) {
+                    canvas.drawText(prayer_time, bounds.width() * 1 / 2, mYOffset + 1.25f * mLineHeight, mTimePaint);
                 }
 
 
@@ -418,9 +426,10 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
                         DataMapItem dataMapItem = DataMapItem.fromDataItem(event.getDataItem());
                         prayer_name = dataMapItem.getDataMap()
                                 .getString(PRAYER_NAME_KEY);
-                        Log.d(TAG,prayer_name);
-                        prayer_time = dataMapItem.getDataMap()
-                                .getString(PRAYER_TIME_KEY);
+                        LocalTime time = new LocalTime(dataMapItem.getDataMap()
+                                .getString(PRAYER_TIME_KEY));
+                        DateTimeFormatter fmt = DateTimeFormat.forPattern("h:mm aa");
+                        prayer_time =fmt.print(time);
                         prayer_date = dataMapItem.getDataMap()
                                 .getString(HIJRI_DATE_KEY);
                     } else {
@@ -462,6 +471,7 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
 
             @Override
             protected Void doInBackground(Void... args) {
+                Log.d(TAG,"in background task");
                 String node = getRemoteNodeId();
                 if (node != null) {
                     Uri uri = new Uri.Builder()
@@ -477,8 +487,10 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
                         DataMapItem dataItem = DataMapItem.fromDataItem(result.getDataItem());
                         prayer_name = dataItem.getDataMap()
                                 .getString(PRAYER_NAME_KEY);
-                        prayer_time = dataItem.getDataMap()
-                                .getString(PRAYER_TIME_KEY);
+                        LocalTime time = new LocalTime(dataItem.getDataMap()
+                                .getString(PRAYER_TIME_KEY));
+                        DateTimeFormatter fmt = DateTimeFormat.forPattern("h:mm aa");
+                        prayer_time =fmt.print(time);
                         prayer_date = dataItem.getDataMap()
                                 .getString(HIJRI_DATE_KEY);
                     } else {
