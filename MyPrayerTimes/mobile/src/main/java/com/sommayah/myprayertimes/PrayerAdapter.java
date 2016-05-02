@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.sommayah.myprayertimes.dataModels.PrayTime;
 
@@ -55,11 +56,29 @@ public class PrayerAdapter extends RecyclerView.Adapter<PrayerAdapter.PrayerAdap
             }
             View view = LayoutInflater.from(parent.getContext()).inflate(layoutId, parent, false);
             view.setFocusable(true);
-            return new PrayerAdapterViewHolder(view);
+            final PrayerAdapterViewHolder vh = new PrayerAdapterViewHolder(view);
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mCursor.moveToPosition(vh.getAdapterPosition());
+                    String name = mCursor.getString(MainActivityFragment.COL_PRAYER_NAME);
+                    String timeString = mCursor.getString(MainActivityFragment.COL_PRAYER_TIME);
+                    LocalTime time = new LocalTime(timeString);
+                    DateTimeFormatter fmt = DateTimeFormat.forPattern("h:mm aa");
+                    if(Utility.getPreferredTimeFormat(mContext) == PrayTime.TIME12) { //12 hr or 24 formate
+                        String str = fmt.print(time);
+                        timeString = str;
+                    }
+                    Toast.makeText(mContext,name + " is at " + timeString , Toast.LENGTH_SHORT).show();
+
+                }
+            });
+            return vh;
         } else {
             throw new RuntimeException("Not bound to RecyclerView");
         }
     }
+
 
     @Override
     public void onBindViewHolder(PrayerAdapterViewHolder holder, int position) {

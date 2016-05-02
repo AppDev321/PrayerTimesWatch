@@ -327,11 +327,15 @@ public class Utility {
     }
 
     private static boolean isBetweenMidnightAndFajr(Context context){
+        boolean between = false;
         LocalTime now = LocalTime.now();
-        LocalTime fajr = new LocalTime(getNextPrayerTime(context)); //here we know next prayer is fajr
-        //if now is later than fajr it means we are still before midnight and adjust hijri date
-        //if now is before that now and fajr are at the same day no need to adjust hijri date
-        return now.isAfter(fajr);
+        if(!getNextPrayerTime(context).equals("")) { //at setup we still don't know the next prayer
+            LocalTime fajr = new LocalTime(getNextPrayerTime(context)); //here we know next prayer is fajr
+            //if now is later than fajr it means we are still before midnight and adjust hijri date
+            //if now is before that now and fajr are at the same day no need to adjust hijri date
+            between = now.isAfter(fajr);
+        }
+        return between;
     }
 
 
