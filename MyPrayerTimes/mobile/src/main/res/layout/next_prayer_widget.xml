@@ -27,7 +27,6 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:background="@android:color/transparent"
-                android:contentDescription="@string/appwidget_text"
                 android:text="@string/appwidget_text"
                 android:textColor="@color/colorAccent"
                 android:textAlignment="center"
