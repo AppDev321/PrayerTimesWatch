@@ -45,6 +45,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.DataEventBuffer;
+import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
@@ -137,6 +138,11 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
         float mXOffset;
         float mYOffset;
 
+        int mInteractiveBackgroundColor =
+                DigitalWatchFaceUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_BACKGROUND;
+        int mInteractiveHourDigitsColor =
+                DigitalWatchFaceUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_HOUR_DIGITS; //use hour color for all time color
+
         String prayer_name = "";
         String prayer_time = "";
         String prayer_date = "";
@@ -161,13 +167,16 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
             mYOffset = resources.getDimension(R.dimen.digital_y_offset);
 
             mBackgroundPaint = new Paint();
-            mBackgroundPaint.setColor(resources.getColor(R.color.background));
+            mBackgroundPaint.setColor(mInteractiveBackgroundColor);
             mTextPaint = new Paint();
-            mTextPaint = createTextPaint(resources.getColor(R.color.digital_text));
+            mTextPaint = createTextPaint(mInteractiveHourDigitsColor);
+           // mTextPaint = createTextPaint(resources.getColor(R.color.digital_text));
             mNamePaint = new Paint();
-            mNamePaint = createTextPaint(resources.getColor(R.color.digital_text));
+            //mNamePaint = createTextPaint(resources.getColor(R.color.digital_text));
+            mNamePaint = createTextPaint(mInteractiveHourDigitsColor);
             mTimePaint = new Paint();
-            mTimePaint = createTextPaint(resources.getColor(R.color.digital_text));
+            //mTimePaint = createTextPaint(resources.getColor(R.color.digital_text));
+            mTimePaint = createTextPaint(mInteractiveHourDigitsColor);
             mDatePaint = new Paint();
             mDatePaint = createTextPaint(resources.getColor(R.color.colorAccent));
             mTime = new Time();
@@ -258,6 +267,7 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
             mTextPaint.setTextSize(textSize);
             mDatePaint.setTextSize(dateTextSize);
             mDatePaint.setTextAlign(Paint.Align.CENTER);
+            mDatePaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
             mNamePaint.setTextSize(nameTextSize);
             mNamePaint.setTextAlign(Paint.Align.CENTER);
             mTimePaint.setTextSize(timeSize);
@@ -281,6 +291,15 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
         @Override
         public void onAmbientModeChanged(boolean inAmbientMode) {
             super.onAmbientModeChanged(inAmbientMode);
+            adjustPaintColorToCurrentMode(mBackgroundPaint, mInteractiveBackgroundColor,
+                    DigitalWatchFaceUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_BACKGROUND);
+            adjustPaintColorToCurrentMode(mTextPaint, mInteractiveHourDigitsColor,
+                    DigitalWatchFaceUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_HOUR_DIGITS);
+            //currently the prayer times are same color is the current time
+            adjustPaintColorToCurrentMode(mNamePaint, mInteractiveHourDigitsColor,
+                    DigitalWatchFaceUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_HOUR_DIGITS);
+            adjustPaintColorToCurrentMode(mTimePaint, mInteractiveHourDigitsColor,
+                    DigitalWatchFaceUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_HOUR_DIGITS);
             if (mAmbient != inAmbientMode) {
                 mAmbient = inAmbientMode;
                 if (mLowBitAmbient) {
@@ -296,6 +315,13 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
             // whether we're in ambient mode), so we may need to start or stop the timer.
             updateTimer();
         }
+
+        private void adjustPaintColorToCurrentMode(Paint paint, int interactiveColor,
+                                                   int ambientColor) {
+            paint.setColor(isInAmbientMode() ? ambientColor : interactiveColor);
+        }
+
+
 
         /**
          * Captures tap event (and tap type) and toggles the background color if the user finishes
@@ -314,8 +340,8 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
                 case TAP_TYPE_TAP:
                     // The user has completed the tap gesture.
                     mTapCount++;
-                    mBackgroundPaint.setColor(resources.getColor(mTapCount % 2 == 0 ?
-                            R.color.background : R.color.background2));
+//                    mBackgroundPaint.setColor(resources.getColor(mTapCount % 2 == 0 ?
+//                            R.color.background : R.color.colorPrimaryDark));
                     break;
             }
             invalidate();
@@ -331,7 +357,7 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
                         getResources().getColor(R.color.colorPrimaryDark),
                         getResources().getColor(R.color.colorPrimary)
                         , Shader.TileMode.MIRROR);
-                mBackgroundPaint.setShader(shader);
+               // mBackgroundPaint.setShader(shader);
                 canvas.drawRect(0, 0, bounds.width(), bounds.height(), mBackgroundPaint);
             }
 
@@ -341,11 +367,16 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
                     ? String.format("%d:%02d", mTime.hour, mTime.minute)
                     : String.format("%d:%02d:%02d", mTime.hour, mTime.minute, mTime.second);
             canvas.drawText(text, mXOffset, mYOffset, mTextPaint);
-            if(!prayer_name.equals("")) {
-                canvas.drawText(prayer_date + "   " + prayer_name,
-                        bounds.width() / 4, mYOffset + mLineHeight, mDatePaint);
-            }
             if (getPeekCardPosition().isEmpty()) {
+                if (!prayer_date.equals("")) {
+                    canvas.drawText(prayer_date,
+                            bounds.width() / 3, mYOffset + mLineHeight *0.7f, mDatePaint);
+                }
+                if (!prayer_time.equals("")) {
+                    canvas.drawText(prayer_name,
+                            bounds.width() / 3, mYOffset + mLineHeight * 1.3f, mNamePaint);
+                }
+
                 if (!prayer_time.equals("")) {
                     canvas.drawText(prayer_time, bounds.width() * 1 / 2, mYOffset + 1.25f * mLineHeight, mTimePaint);
                 }
@@ -386,6 +417,94 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
             }
         }
 
+        private void updateConfigDataItemAndUiOnStartup() {
+            DigitalWatchFaceUtil.fetchConfigDataMap(mGoogleApiClient,
+                    new DigitalWatchFaceUtil.FetchConfigDataMapCallback() {
+                        @Override
+                        public void onConfigDataMapFetched(DataMap startupConfig) {
+                            // If the DataItem hasn't been created yet or some keys are missing,
+                            // use the default values.
+                            setDefaultValuesForMissingConfigKeys(startupConfig);
+                            DigitalWatchFaceUtil.putConfigDataItem(mGoogleApiClient, startupConfig);
+
+                            updateUiForConfigDataMap(startupConfig);
+                        }
+                    }
+            );
+        }
+
+
+        private void setDefaultValuesForMissingConfigKeys(DataMap config) {
+            addIntKeyIfMissing(config, DigitalWatchFaceUtil.KEY_BACKGROUND_COLOR,
+                    DigitalWatchFaceUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_BACKGROUND);
+            addIntKeyIfMissing(config, DigitalWatchFaceUtil.KEY_HOURS_COLOR,
+                    DigitalWatchFaceUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_HOUR_DIGITS);
+        }
+
+        private void addIntKeyIfMissing(DataMap config, String key, int color) {
+            if (!config.containsKey(key)) {
+                config.putInt(key, color);
+            }
+        }
+
+        private void updateUiForConfigDataMap(final DataMap config) {
+            boolean uiUpdated = false;
+            for (String configKey : config.keySet()) {
+                if (!config.containsKey(configKey)) {
+                    continue;
+                }
+                int color = config.getInt(configKey);
+                if (Log.isLoggable(TAG, Log.DEBUG)) {
+                    Log.d(TAG, "Found watch face config key: " + configKey + " -> "
+                            + Integer.toHexString(color));
+                }
+                if (updateUiForKey(configKey, color)) {
+                    uiUpdated = true;
+                }
+            }
+            if (uiUpdated) {
+                invalidate();
+            }
+        }
+        private void updatePaintIfInteractive(Paint paint, int interactiveColor) {
+            if (!isInAmbientMode() && paint != null) {
+                paint.setColor(interactiveColor);
+            }
+        }
+
+        private void setInteractiveBackgroundColor(int color) {
+            mInteractiveBackgroundColor = color;
+            if(color == Color.WHITE){ //change the text to the other color(green) so that it shows
+                setInteractiveHourDigitsColor(getColor(R.color.colorPrimaryDark));
+            }
+            updatePaintIfInteractive(mBackgroundPaint, color);
+        }
+
+        private void setInteractiveHourDigitsColor(int color) {
+            mInteractiveHourDigitsColor = color;
+            updatePaintIfInteractive(mTextPaint, color);
+            updatePaintIfInteractive(mNamePaint, color);
+            updatePaintIfInteractive(mTimePaint, color);
+        }
+
+        /**
+         * Updates the color of a UI item according to the given {@code configKey}. Does nothing if
+         * {@code configKey} isn't recognized.
+         *
+         * @return whether UI has been updated
+         */
+        private boolean updateUiForKey(String configKey, int color) {
+            if (configKey.equals(DigitalWatchFaceUtil.KEY_BACKGROUND_COLOR)) {
+                setInteractiveBackgroundColor(color);
+            } else if (configKey.equals(DigitalWatchFaceUtil.KEY_HOURS_COLOR)) {
+                setInteractiveHourDigitsColor(color);
+            } else {
+                Log.w(TAG, "Ignoring unknown config key: " + configKey);
+                return false;
+            }
+            return true;
+        }
+
         @Override  // GoogleApiClient.ConnectionCallbacks
         public void onConnected(Bundle connectionHint) {
             // if (Log.isLoggable(TAG, Log.DEBUG)) {
@@ -393,6 +512,7 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
             // }
             Log.d(TAG, "onConnected: ");
             Wearable.DataApi.addListener(mGoogleApiClient, Engine.this);
+            updateConfigDataItemAndUiOnStartup();
             updateUiOnStartup();
         }
 
@@ -432,7 +552,15 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
                         prayer_time =fmt.print(time);
                         prayer_date = dataMapItem.getDataMap()
                                 .getString(HIJRI_DATE_KEY);
-                    } else {
+                    } else if(DigitalWatchFaceUtil.PATH_WITH_FEATURE.equals(path)){
+                        DataMapItem dataMapItem = DataMapItem.fromDataItem(event.getDataItem());
+                        DataMap config = dataMapItem.getDataMap();
+                        if (Log.isLoggable(TAG, Log.DEBUG)) {
+                            Log.d(TAG, "Config DataItem updated:" + config);
+                        }
+                        updateUiForConfigDataMap(config);
+                    }
+                    else {
                         Log.d(TAG, "Unrecognized path: " + path);
                     }
 
