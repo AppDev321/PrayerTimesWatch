@@ -98,28 +98,6 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         mAdapter = new PrayerAdapter(getActivity(), mEmptyView);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-
-//        // The PrayerAdapter will take data from a source and
-//        // use it to populate the RecyclerView it's attached to.
-//        mPrayerAdapter = new PrayerAdapter(getActivity(), new PrayerAdapter.PrayerAdapterOnClickHandler() {
-//            @Override
-//            public void onClick(int prayerPos, PrayerAdapter.PrayerAdapterViewHolder vh) {
-//                //leave it empty now till i impelement the click action
-//            }
-//        }, emptyView);
-//
-//        // specify an adapter (see also next example)
-//        mRecyclerView.setAdapter(mPrayerAdapter);
-////        if (savedInstanceState != null) {
-////            mPrayerAdapterAdapter.onRestoreInstanceState(savedInstanceState);
-////        }
-
-
-
-        //ss:havent set the boolean value yet
-       // mPrayerAdapter.setUseNextPrayerLayout(mUseNextPrayerLayout);
-
-
         return rootView;
     }
 
@@ -213,6 +191,12 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
         if (key.equals(getString(R.string.pref_location_status_key))) {
             updateEmptyView();
+        }
+
+        if(key.equals(getString(R.string.watch_pref_bg_key))
+                ||key.equals(getString(R.string.pref_twentyfour_switch_key))
+                ||key.equals(getString(R.string.pref_show_hijri_switch_key))){
+            //start service that sends these data to watch
         }
 
     }

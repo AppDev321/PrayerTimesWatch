@@ -95,7 +95,11 @@
 
         <service
             android:name=".widget.NextPrayerWidgetIntentService"
-            android:exported="false"></service>
+            android:exported="false" />
+        <service
+            android:name=".services.UpdateWatchService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>

@@ -274,6 +274,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity  {
             // guidelines.
             bindPreferenceSummaryToValue(findPreference(getString(R.string.widget_pref_color_key)));
             bindPreferenceSummaryToValue(findPreference(getString(R.string.widget_pref_bg_key)));
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.watch_pref_bg_key)));
         }
 
         @Override
@@ -285,6 +286,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity  {
             }
             return super.onOptionsItemSelected(item);
         }
+
     }
 
     /**
@@ -372,7 +374,4 @@ public class SettingsActivity extends AppCompatPreferenceActivity  {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
-
-
-
 }

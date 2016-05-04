@@ -33,5 +33,29 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory
+        android:key="@string/pref_watch_setting_key"
+        android:title="@string/watch_pref_title">
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="@string/pref_show_hijri_switch_key"
+            android:summary="@string/pref_description_hijri_switch"
+            android:title="@string/pref_title_show_hijri" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="@string/pref_twentyfour_switch_key"
+            android:summary="@string/pref_twentyfour_switch"
+            android:title="@string/pref_title_twentyfour" />
+        <ListPreference
+            android:defaultValue="0"
+            android:entries="@array/pref_watch_bg_colors"
+            android:entryValues="@array/pref_watch_bg_colors_values"
+            android:key="@string/watch_pref_bg_key"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"
+            android:title="@string/pref_title_watch_bg_color" />
+
+    </PreferenceCategory>
+
 
 </PreferenceScreen>

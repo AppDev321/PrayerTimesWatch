@@ -102,6 +102,16 @@
     <string name="pref_next_prayer">next_prayer</string>
     <string name="pref_location_status_key">loc_status_key</string>
     <string name="pref_next_prayer_time">next_prayer_time</string>
+    <string name="pref_watch_setting_key">watch_settings_key</string>
+    <string name="watch_pref_title">Watch Settings</string>
+    <string name="pref_show_hijri_switch_key">show_hijri_key</string>
+    <string name="pref_description_hijri_switch">Show or hide Hijri date on watch</string>
+    <string name="pref_title_show_hijri">Show Hijri Date</string>
+    <string name="pref_twentyfour_switch_key">twentyfour_key</string>
+    <string name="pref_twentyfour_switch">1:00 PM or 13:00</string>
+    <string name="pref_title_twentyfour">24 hour method</string>
+    <string name="watch_pref_bg_key">watch_pref_bg_key</string>
+    <string name="pref_title_watch_bg_color">Watch Background Color</string>
 
     <string name="use_current_location">Use current location</string>
     <string name="compass_button_description">Compass</string>
