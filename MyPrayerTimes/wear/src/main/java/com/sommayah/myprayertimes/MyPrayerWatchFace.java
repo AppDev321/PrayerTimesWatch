@@ -363,18 +363,20 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
 
             // Draw H:MM in ambient mode or H:MM:SS in interactive mode.
             mTime.setToNow();
+            if(!isInAmbientMode()) {
+                if (!prayer_date.equals("")) {
+                    canvas.drawText(prayer_date,
+                            bounds.width() / 3 , mYOffset + 0.6f*  mLineHeight, mDatePaint);
+                }
+            }
             String text = mAmbient
                     ? String.format("%d:%02d", mTime.hour, mTime.minute)
                     : String.format("%d:%02d:%02d", mTime.hour, mTime.minute, mTime.second);
             canvas.drawText(text, mXOffset, mYOffset, mTextPaint);
             if (getPeekCardPosition().isEmpty()) {
-                if (!prayer_date.equals("")) {
-                    canvas.drawText(prayer_date,
-                            bounds.width() / 3, mYOffset + mLineHeight *0.7f, mDatePaint);
-                }
                 if (!prayer_time.equals("")) {
                     canvas.drawText(prayer_name,
-                            bounds.width() / 3, mYOffset + mLineHeight * 1.3f, mNamePaint);
+                            bounds.width() / 3, mYOffset + mLineHeight * 1.25f, mNamePaint);
                 }
 
                 if (!prayer_time.equals("")) {

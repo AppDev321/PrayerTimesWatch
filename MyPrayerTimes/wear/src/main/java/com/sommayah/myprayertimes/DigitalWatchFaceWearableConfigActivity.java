@@ -276,11 +276,13 @@ public class DigitalWatchFaceWearableConfigActivity extends Activity implements
         }
 
         private void setColor(String colorName) {
-            if(colorName == "#388E3C"){
+            mColor.setCircleColor(Color.parseColor(colorName));
+            if(colorName.equals(getResources().getString(R.string.color_green))){
                 colorName = "Green";
+            }else if(colorName.equals(getResources().getString(R.string.color_blue))){
+                colorName = "Blue";
             }
             mLabel.setText(colorName);
-            mColor.setCircleColor(Color.parseColor(colorName));
         }
 
         private int getColor() {
