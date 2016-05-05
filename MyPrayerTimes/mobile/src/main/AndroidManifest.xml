@@ -32,15 +32,17 @@
             android:label="@string/title_activity_settings">
             <intent-filter>
                 <action android:name="com.example.android.wearable.watchface.CONFIG_DIGITAL" />
+
                 <category android:name="com.google.android.wearable.watchface.category.COMPANION_CONFIGURATION" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-            </activity>
+        </activity>
         <activity
             android:name=".DigitalWatchFaceCompanionConfigActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="com.example.android.wearable.watchface.CONFIG_DIGITAL" />
+
                 <category android:name="com.google.android.wearable.watchface.category.COMPANION_CONFIGURATION" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
@@ -110,11 +112,14 @@
 
         <service
             android:name=".widget.NextPrayerWidgetIntentService"
-            android:exported="false"></service>
+            android:exported="false" />
         <service
             android:name=".services.UpdateWatchService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
+        <service
+            android:name=".services.UpdateWatchIntentService"
+            android:exported="false"></service>
     </application>
 
 </manifest>
