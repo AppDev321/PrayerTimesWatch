@@ -60,6 +60,11 @@ public class Utility {
     public static final String PRAYER_TIME_KEY = "prayertime";
     private static final String HIJRI_DATE_KEY = "hijridate";
 
+    public static final String PREF_PATH = "/pref";
+    public static final String HIJRI_KEY = "hijridate";
+    public static final String TWENTYFOUR_KEY = "timeformat";
+    public static final String WATCH_BG_COLOR = "bgcolor";
+
 
     public static PrayTime mPrayTime;
 
@@ -783,7 +788,24 @@ public class Utility {
                                 .isSuccess());
                     }
                 });
-
     }
 
+    public static void sendPreferenceInfoToWatch(Boolean hijriDate, Boolean twentyfour, int color, GoogleApiClient client){
+        PutDataMapRequest dataMap = PutDataMapRequest.create(Utility.PREF_PATH);
+        dataMap.getDataMap().putBoolean(Utility.HIJRI_KEY, hijriDate);
+        dataMap.getDataMap().putBoolean(Utility.TWENTYFOUR_KEY, twentyfour);
+        dataMap.getDataMap().putInt(Utility.WATCH_BG_COLOR, color);
+        dataMap.getDataMap().putLong("time", new Date().getTime());
+        PutDataRequest request = dataMap.asPutDataRequest();
+        request.setUrgent();
+
+        Wearable.DataApi.putDataItem(client, request)
+                .setResultCallback(new ResultCallback<DataApi.DataItemResult>() {
+                    @Override
+                    public void onResult(DataApi.DataItemResult dataItemResult) {
+                        Log.d("Sending Prayer", "Sending prayer info was successful: " + dataItemResult.getStatus()
+                                .isSuccess());
+                    }
+                });
+    }
 }

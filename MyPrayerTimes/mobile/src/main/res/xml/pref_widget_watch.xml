@@ -46,6 +46,15 @@
             android:key="@string/pref_twentyfour_switch_key"
             android:summary="@string/pref_twentyfour_switch"
             android:title="@string/pref_title_twentyfour" />
+        <!--<Preference
+            android:key="@string/watch_pref_bg_key"
+            android:title="@string/pref_title_watch_bg_color"
+            android:summary="@string/watch_pref_bg_color">
+            <intent
+                android:action="com.example.android.wearable.watchface.CONFIG_DIGITAL" />
+        </Preference>-->
+
+
         <ListPreference
             android:defaultValue="0"
             android:entries="@array/pref_watch_bg_colors"

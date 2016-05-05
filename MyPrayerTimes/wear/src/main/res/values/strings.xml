@@ -17,8 +17,4 @@
         <item>@string/color_blue</item>
     </string-array>
 
-    <string-array name="color_names">
-        <item>Green</item>
-        <item>White</item>
-    </string-array>
 </resources>

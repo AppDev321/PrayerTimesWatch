@@ -71,6 +71,10 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
     public static final String PRAYER_NAME_KEY = "prayername";
     public static final String PRAYER_TIME_KEY = "prayertime";
     private static final String HIJRI_DATE_KEY = "hijridate";
+    public static final String PREF_PATH = "/pref";
+    public static final String HIJRI_KEY = "hijridate";
+    public static final String TWENTYFOUR_KEY = "timeformat";
+    public static final String WATCH_BG_COLOR = "bgcolor";
     public static final String ACTION_RECEIVE = "com.sommayah.myprayertimes.watchface.DATA";
     public static final String TAG = "MyPrayerWatchFace";
     private static final Typeface NORMAL_TYPEFACE =
@@ -146,6 +150,8 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
         String prayer_name = "";
         String prayer_time = "";
         String prayer_date = "";
+        boolean showHijri = true;
+        boolean format24 = false;
 
         /**
          * Whether the display supports fewer bits for each color in ambient mode. When true, we
@@ -364,7 +370,7 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
             // Draw H:MM in ambient mode or H:MM:SS in interactive mode.
             mTime.setToNow();
             if(!isInAmbientMode()) {
-                if (!prayer_date.equals("")) {
+                if (!prayer_date.equals("") && showHijri == true) {
                     canvas.drawText(prayer_date,
                             bounds.width() / 3 , mYOffset + 0.6f*  mLineHeight, mDatePaint);
                 }
@@ -374,13 +380,19 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
                     : String.format("%d:%02d:%02d", mTime.hour, mTime.minute, mTime.second);
             canvas.drawText(text, mXOffset, mYOffset, mTextPaint);
             if (getPeekCardPosition().isEmpty()) {
-                if (!prayer_time.equals("")) {
+                if (!prayer_name.equals("")) {
                     canvas.drawText(prayer_name,
                             bounds.width() / 3, mYOffset + mLineHeight * 1.25f, mNamePaint);
                 }
 
                 if (!prayer_time.equals("")) {
-                    canvas.drawText(prayer_time, bounds.width() * 1 / 2, mYOffset + 1.25f * mLineHeight, mTimePaint);
+                    String showtime = prayer_time;
+                    if(format24 == false){
+                        LocalTime time = new LocalTime(prayer_time);
+                        DateTimeFormatter fmt = DateTimeFormat.forPattern("h:mm aa");
+                        showtime =fmt.print(time);
+                    }
+                    canvas.drawText(showtime, bounds.width() * 1 / 2, mYOffset + 1.25f * mLineHeight, mTimePaint);
                 }
 
 
@@ -548,12 +560,10 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
                         DataMapItem dataMapItem = DataMapItem.fromDataItem(event.getDataItem());
                         prayer_name = dataMapItem.getDataMap()
                                 .getString(PRAYER_NAME_KEY);
-                        LocalTime time = new LocalTime(dataMapItem.getDataMap()
-                                .getString(PRAYER_TIME_KEY));
-                        DateTimeFormatter fmt = DateTimeFormat.forPattern("h:mm aa");
-                        prayer_time =fmt.print(time);
                         prayer_date = dataMapItem.getDataMap()
                                 .getString(HIJRI_DATE_KEY);
+                        prayer_time = dataMapItem.getDataMap()
+                                .getString(PRAYER_TIME_KEY);
                     } else if(DigitalWatchFaceUtil.PATH_WITH_FEATURE.equals(path)){
                         DataMapItem dataMapItem = DataMapItem.fromDataItem(event.getDataItem());
                         DataMap config = dataMapItem.getDataMap();
@@ -561,6 +571,12 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
                             Log.d(TAG, "Config DataItem updated:" + config);
                         }
                         updateUiForConfigDataMap(config);
+                    }else if(PREF_PATH.equals(path)){
+                        DataMapItem dataMapItem = DataMapItem.fromDataItem(event.getDataItem());
+                        showHijri = dataMapItem.getDataMap()
+                                .getBoolean(HIJRI_KEY);
+                        format24 = dataMapItem.getDataMap()
+                                .getBoolean(TWENTYFOUR_KEY);
                     }
                     else {
                         Log.d(TAG, "Unrecognized path: " + path);
@@ -617,13 +633,24 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
                         DataMapItem dataItem = DataMapItem.fromDataItem(result.getDataItem());
                         prayer_name = dataItem.getDataMap()
                                 .getString(PRAYER_NAME_KEY);
-                        LocalTime time = new LocalTime(dataItem.getDataMap()
-                                .getString(PRAYER_TIME_KEY));
-                        DateTimeFormatter fmt = DateTimeFormat.forPattern("h:mm aa");
-                        prayer_time =fmt.print(time);
                         prayer_date = dataItem.getDataMap()
                                 .getString(HIJRI_DATE_KEY);
-                    } else {
+                        prayer_time = dataItem.getDataMap()
+                                .getString(PRAYER_TIME_KEY);
+                    } else if(DigitalWatchFaceUtil.PATH_WITH_FEATURE.equals(path)){
+                        DataMapItem dataMapItem = DataMapItem.fromDataItem(result.getDataItem());
+                        DataMap config = dataMapItem.getDataMap();
+                        if (Log.isLoggable(TAG, Log.DEBUG)) {
+                            Log.d(TAG, "Config DataItem updated:" + config);
+                        }
+                        updateUiForConfigDataMap(config);
+                    }else if(PREF_PATH.equals(path)){
+                        DataMapItem dataMapItem = DataMapItem.fromDataItem(result.getDataItem());
+                        showHijri = dataMapItem.getDataMap()
+                                .getBoolean(HIJRI_KEY);
+                        format24 = dataMapItem.getDataMap()
+                                .getBoolean(TWENTYFOUR_KEY);
+                    }else {
                         Log.d(TAG, "Unrecognized path: " + path);
                     }
 

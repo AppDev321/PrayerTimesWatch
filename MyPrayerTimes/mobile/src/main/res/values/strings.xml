@@ -112,6 +112,7 @@
     <string name="pref_title_twentyfour">24 hour method</string>
     <string name="watch_pref_bg_key">watch_pref_bg_key</string>
     <string name="pref_title_watch_bg_color">Watch Background Color</string>
+    <string name="watch_pref_bg_color">Change watch background color</string>
 
     <string name="use_current_location">Use current location</string>
     <string name="compass_button_description">Compass</string>
@@ -126,6 +127,10 @@
     <string name="qibla_direction">Qibla Direction</string>
     <string name="format_qibla_dir"><xliff:g id="degree">%1.0f</xliff:g>\u00B0</string>
     <string name="format_heading"><xliff:g id="hdegree">%1.0f</xliff:g>\u00B0</string>
+    <string name="title_no_device_connected">No wearable device is currently connected.</string>
+    <string name="ok_no_device_connected">OK</string>
+    <string name="digital_config_background">Background</string>
+    <string name="digital_config_text">Digital watch face configuration</string>
 
     <!--translatable strings-->
     <string name="fajr">Fajr</string>

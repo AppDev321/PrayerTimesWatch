@@ -2,13 +2,17 @@ package com.sommayah.myprayertimes;
 
 
 import android.annotation.TargetApi;
+import android.app.AlertDialog;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.ListPreference;
@@ -17,18 +21,32 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
+import android.support.wearable.companion.WatchFaceCompanion;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.DataMap;
+import com.google.android.gms.wearable.MessageApi;
+import com.google.android.gms.wearable.Node;
+import com.google.android.gms.wearable.NodeApi;
+import com.google.android.gms.wearable.Wearable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -261,7 +279,14 @@ public class SettingsActivity extends AppCompatPreferenceActivity  {
      * activity is showing a two-pane settings UI.
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static class WatchWidgetPreferenceFragment extends PreferenceFragment {
+    public static class WatchWidgetPreferenceFragment extends PreferenceFragment implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
+            ResultCallback<DataApi.DataItemResult>, SharedPreferences.OnSharedPreferenceChangeListener {
+        private static final String KEY_BACKGROUND_COLOR = "BACKGROUND_COLOR";
+        private static final String PATH_WITH_FEATURE = "/watch_face_config/Digital";
+        private final String TAG = "WatchWidgetPreference";
+
+        private GoogleApiClient mGoogleApiClient;
+        private String mPeerId;
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
@@ -272,9 +297,45 @@ public class SettingsActivity extends AppCompatPreferenceActivity  {
             // to their values. When their values change, their summaries are
             // updated to reflect the new value, per the Android Design
             // guidelines.
+            mPeerId = getActivity().getIntent().getStringExtra(WatchFaceCompanion.EXTRA_PEER_ID);
             bindPreferenceSummaryToValue(findPreference(getString(R.string.widget_pref_color_key)));
             bindPreferenceSummaryToValue(findPreference(getString(R.string.widget_pref_bg_key)));
             bindPreferenceSummaryToValue(findPreference(getString(R.string.watch_pref_bg_key)));
+            mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(Wearable.API)
+                    .build();
+            ComponentName name = getActivity().getIntent().getParcelableExtra(
+                    WatchFaceCompanion.EXTRA_WATCH_FACE_COMPONENT);
+            Log.d(TAG,"component name: "+ name);
+
+        }
+
+        @Override
+        public void onStart() {
+            super.onStart();
+            mGoogleApiClient.connect();
+        }
+
+        @Override
+        public void onStop() {
+            if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
+                mGoogleApiClient.disconnect();
+            }
+            super.onStop();
+        }
+
+        @Override
+        public void onResume() {
+            super.onResume();
+            getPreferenceManager().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+        }
+
+        @Override
+        public void onPause() {
+            getPreferenceManager().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
+            super.onPause();
         }
 
         @Override
@@ -287,6 +348,115 @@ public class SettingsActivity extends AppCompatPreferenceActivity  {
             return super.onOptionsItemSelected(item);
         }
 
+        @Override
+        public void onConnected(@Nullable Bundle bundle) {
+            if (Log.isLoggable(TAG, Log.DEBUG)) {
+                Log.d(TAG, "onConnected: " + bundle);
+            }
+
+            /*if (mPeerId != null) {
+                Uri.Builder builder = new Uri.Builder();
+                Uri uri = builder.scheme("wear").path(PATH_WITH_FEATURE).authority(mPeerId).build();
+                Wearable.DataApi.getDataItem(mGoogleApiClient, uri).setResultCallback(this);
+            } else {
+                displayNoConnectedDeviceDialog();
+            }*/
+        }
+
+        @Override
+        public void onConnectionSuspended(int i) {
+            if (Log.isLoggable(TAG, Log.DEBUG)) {
+                Log.d(TAG, "onConnectionSuspended: " + i);
+            }
+        }
+
+        @Override
+        public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+            if (Log.isLoggable(TAG, Log.DEBUG)) {
+                Log.d(TAG, "onConnectionFailed: " + connectionResult);
+            }
+        }
+
+
+
+        @Override
+        public void onResult(@NonNull DataApi.DataItemResult dataItemResult) {
+
+        }
+
+        private void displayNoConnectedDeviceDialog() {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            String messageText = getResources().getString(R.string.title_no_device_connected);
+            String okText = getResources().getString(R.string.ok_no_device_connected);
+            builder.setMessage(messageText)
+                    .setCancelable(false)
+                    .setPositiveButton(okText, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) { }
+                    });
+            AlertDialog alert = builder.create();
+            alert.show();
+        }
+        private void sendConfigUpdateMessage(final String configKey, final int color) {
+            new AsyncTask<Void, Void, List<Node>>(){
+
+                @Override
+                protected List<Node> doInBackground(Void... params) {
+                    return getNodes();
+                }
+
+                @Override
+                protected void onPostExecute(List<Node> nodeList) {
+                    for(Node node : nodeList) {
+                        DataMap config = new DataMap();
+                        config.putInt(configKey, color);
+                        byte[] rawData = config.toByteArray();
+                        PendingResult<MessageApi.SendMessageResult> result = Wearable.MessageApi.sendMessage(mGoogleApiClient, mPeerId, PATH_WITH_FEATURE, rawData);
+
+                        if (Log.isLoggable(TAG, Log.DEBUG)) {
+                            Log.d(TAG, "Sent watch face config message: " + configKey + " -> "
+                                    + Integer.toHexString(color));
+                        }
+
+                        result.setResultCallback(new ResultCallback<MessageApi.SendMessageResult>() {
+                            @Override
+                            public void onResult(MessageApi.SendMessageResult sendMessageResult) {
+                                Log.v(TAG, "Phone: " + sendMessageResult.getStatus().getStatusMessage());
+                            }
+                        });
+                    }
+                }
+            }.execute();
+
+        }
+
+        private List<Node> getNodes() {
+            List<Node> nodes = new ArrayList<Node>();
+            NodeApi.GetConnectedNodesResult rawNodes =
+                    Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await();
+            for (Node node : rawNodes.getNodes()) {
+                nodes.add(node);
+            }
+            return nodes;
+        }
+
+        @Override
+        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+            SharedPreferences prefs
+                    = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            if(key.equals(getString(R.string.watch_pref_bg_key))
+                    ||key.equals(getString(R.string.pref_twentyfour_switch_key))
+                    ||key.equals(getString(R.string.pref_show_hijri_switch_key))){
+                String[] colorNames = getResources().getStringArray(R.array.color_array);
+                int i = Integer.valueOf(prefs.getString(getString(R.string.watch_pref_bg_key),"0"));
+                Boolean hijri = prefs.getBoolean(getString(R.string.pref_show_hijri_switch_key),true);
+                Boolean twentyfour = prefs.getBoolean(getString(R.string.pref_twentyfour_switch_key), false);
+                if (i >= 0 && i < 4)
+                    if (mGoogleApiClient.isConnected()) {
+                        // sendConfigUpdateMessage(KEY_BACKGROUND_COLOR, Color.parseColor(colorNames[i]));
+                        Utility.sendPreferenceInfoToWatch(hijri,twentyfour,i,mGoogleApiClient);
+                    }
+            }
+        }
     }
 
     /**
@@ -374,4 +544,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity  {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
+
+
 }

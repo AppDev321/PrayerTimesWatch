@@ -44,6 +44,10 @@ public class UpdateWatchService extends Service implements GoogleApiClient.Conne
     public void onConnectionSuspended(int i) {
     }
 
+    private void sendPreferencesDataToWatch(){
+
+    }
+
     @Override // OnConnectionFailedListener
     public void onConnectionFailed(ConnectionResult connectionResult) {
         Log.e(TAG, "Failed to connect to the Google API client");

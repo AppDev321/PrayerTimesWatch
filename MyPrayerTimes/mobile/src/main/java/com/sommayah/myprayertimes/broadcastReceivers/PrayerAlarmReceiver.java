@@ -96,8 +96,6 @@ public class PrayerAlarmReceiver extends WakefulBroadcastReceiver implements  Go
         intent.putExtra(EXTRA_PRAYER_NAME,next_prayer_time.getName());
         intent.putExtra(EXTRA_PRAYER_TIME, cal.getTimeInMillis());
         mdate = Utility.getSmallHijriDate(context);
-        if (mGoogleApiClient.isConnected())
-            Utility.sendPrayerInfoToWatch(next_prayer_time.getName(), next_prayer_time.getTime(), mdate, mGoogleApiClient);
         alarmIntent = PendingIntent.getBroadcast(context, ALARM_ID, intent, PendingIntent.FLAG_CANCEL_CURRENT);
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
             //lollipop_mr1 is 22, this is only 23 and above
@@ -123,6 +121,9 @@ public class PrayerAlarmReceiver extends WakefulBroadcastReceiver implements  Go
         pm.setComponentEnabledSetting(receiver,
                 PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
                 PackageManager.DONT_KILL_APP);
+        if (mGoogleApiClient.isConnected()) {
+            Utility.sendPrayerInfoToWatch(next_prayer_time.getName(), next_prayer_time.getTime(), mdate, mGoogleApiClient);
+        }
 
     }
 
