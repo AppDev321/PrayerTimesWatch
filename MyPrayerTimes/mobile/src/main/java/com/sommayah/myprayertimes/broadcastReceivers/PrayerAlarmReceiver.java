@@ -13,11 +13,11 @@ import android.preference.PreferenceManager;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
 
-import com.sommayah.myprayertimes.LoadPrayersAsyncTask;
 import com.sommayah.myprayertimes.R;
 import com.sommayah.myprayertimes.Utility;
 import com.sommayah.myprayertimes.data.PrayerContract;
 import com.sommayah.myprayertimes.dataModels.Prayer;
+import com.sommayah.myprayertimes.services.LoadPrayerToDBIntentService;
 import com.sommayah.myprayertimes.services.PrayerNotificationService;
 import com.sommayah.myprayertimes.services.UpdateWatchIntentService;
 
@@ -34,6 +34,7 @@ public class PrayerAlarmReceiver extends WakefulBroadcastReceiver{
     public static final String ACTION_PRAYER_TIME_ALARM = "com.sommayah.myprayertimes.ACTION_PRAYER_TIME_ALARM";
     public static final String EXTRA_PRAYER_NAME = "prayer_name";
     public static final String EXTRA_PRAYER_TIME = "prayer_time";
+    public static final String EXTRA_PRAYER_ARRAY = "prayer_array";
     public static final int ALARM_ID = 1000;
     public static final int PASSIVE_LOCATION_ID = 2000;
     public static final int FIVE_MIN = 5000 *60;
@@ -71,9 +72,6 @@ public class PrayerAlarmReceiver extends WakefulBroadcastReceiver{
         //get the next prayer
         next_prayer_time = getNextPrayer(context);
         Calendar cal = getCalendarFromPrayerTime(next_prayer_time.getTime(), next_prayer_time.getTomorrow());
-        if(next_prayer_time.getName().equals(context.getString(R.string.fajr))){ //fajr of next day, bring prayers of next day and update database
-            new LoadPrayersAsyncTask(context,cal).execute();
-        }
         intent.putExtra(EXTRA_PRAYER_NAME,next_prayer_time.getName());
         intent.putExtra(EXTRA_PRAYER_TIME, cal.getTimeInMillis());
         alarmIntent = PendingIntent.getBroadcast(context, ALARM_ID, intent, PendingIntent.FLAG_CANCEL_CURRENT);
@@ -112,11 +110,10 @@ public class PrayerAlarmReceiver extends WakefulBroadcastReceiver{
     private Prayer getNextPrayer(Context context) {
         Calendar now = Calendar.getInstance(TimeZone.getDefault());
         now.setTimeInMillis(System.currentTimeMillis());
-        ArrayList<String> prayerTimes = Utility.getPrayTimes(now,context);
         int pos = 0;
         LocalTime nowLocal = LocalTime.now();
-        Log.d("get current time", nowLocal.toString());
         LocalTime limit;
+        ArrayList<String> prayerTimes = Utility.getPrayTimes(now,context);
         for(int i=0; i<prayerTimes.size(); i++){
             limit = new LocalTime(prayerTimes.get(i));
             Boolean isLate = nowLocal.isAfter(limit);
@@ -131,6 +128,9 @@ public class PrayerAlarmReceiver extends WakefulBroadcastReceiver{
             prayerTimes = Utility.getPrayTimes(tomorrow,context);
             saveNextPrayerPos(context,0);
             saveNextPrayerTime(context,prayerTimes.get(0));
+            Intent loadPrayers = new Intent(context, LoadPrayerToDBIntentService.class);
+            loadPrayers.putExtra(EXTRA_PRAYER_ARRAY,prayerTimes);
+            startWakefulService(context,loadPrayers);
             context.getContentResolver().notifyChange(PrayerContract.PrayerEntry.CONTENT_URI,null); //to notifiy change of next prayer
             return new Prayer("Fajr",prayerTimes.get(0),true); //true: tomorrow
         }
