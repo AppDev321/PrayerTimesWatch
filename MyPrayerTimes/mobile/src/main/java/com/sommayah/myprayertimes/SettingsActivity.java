@@ -40,9 +40,7 @@ import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.wearable.DataApi;
-import com.google.android.gms.wearable.DataItem;
 import com.google.android.gms.wearable.DataMap;
-import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
@@ -383,7 +381,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity  {
 
         @Override
         public void onResult(@NonNull DataApi.DataItemResult dataItemResult) {
-            if (dataItemResult.getStatus().isSuccess() && dataItemResult.getDataItem() != null) {
+           /* if (dataItemResult.getStatus().isSuccess() && dataItemResult.getDataItem() != null) {
                 DataItem configDataItem = dataItemResult.getDataItem();
                 DataMapItem dataMapItem = DataMapItem.fromDataItem(configDataItem);
                 DataMap config = dataMapItem.getDataMap();
@@ -392,7 +390,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity  {
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putString(getString(R.string.watch_pref_bg_key), config.getString(Utility.WATCH_BG_COLOR));
                 editor.commit();
-            }
+            }*/
         }
 
         private void displayNoConnectedDeviceDialog() {

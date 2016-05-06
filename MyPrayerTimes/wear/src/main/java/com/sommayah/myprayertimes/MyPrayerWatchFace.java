@@ -371,18 +371,14 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
             mTime.setToNow();
             mTime.format("%k:%M:%S");
             int hour = mTime.hour;
-            String ampm = "AM";
             if(format24 == false){
-                if(hour>= 12){
-                    ampm = "PM";
-                }
                 hour = mTime.hour%12;
                 if(hour == 0) hour = 12;
             }
 
             String text = mAmbient
-                    ? (format24)?String.format("%d:%02d", hour, mTime.minute):String.format("%d:%02d %s", hour, mTime.minute,ampm)
-                    : String.format("%d:%02d:%02d", hour, mTime.minute, mTime.second);
+                    ? String.format("%d:%02d", hour, mTime.minute)
+                    :String.format("%02d:%02d:%02d", hour, mTime.minute, mTime.second);
             canvas.drawText(text, mXOffset, mYOffset, mTextPaint);
             if(!isInAmbientMode()) {
                 if (!prayer_date.equals("") && showHijri == true) {
