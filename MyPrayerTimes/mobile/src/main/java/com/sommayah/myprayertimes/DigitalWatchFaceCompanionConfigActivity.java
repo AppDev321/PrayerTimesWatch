@@ -197,7 +197,6 @@ public class DigitalWatchFaceCompanionConfigActivity extends Activity
             config.putInt(configKey, color);
             byte[] rawData = config.toByteArray();
             Wearable.MessageApi.sendMessage(mGoogleApiClient, mPeerId, PATH_WITH_FEATURE, rawData);
-
             if (Log.isLoggable(TAG, Log.DEBUG)) {
                 Log.d(TAG, "Sent watch face config message: " + configKey + " -> "
                         + Integer.toHexString(color));

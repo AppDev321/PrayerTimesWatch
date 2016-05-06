@@ -65,6 +65,8 @@ public class Utility {
     public static final String TWENTYFOUR_KEY = "timeformat";
     public static final String WATCH_BG_COLOR = "bgcolor";
 
+    private static final String KEY_BACKGROUND_COLOR = "BACKGROUND_COLOR";
+
 
     public static PrayTime mPrayTime;
 
@@ -794,7 +796,6 @@ public class Utility {
         PutDataMapRequest dataMap = PutDataMapRequest.create(Utility.PREF_PATH);
         dataMap.getDataMap().putBoolean(Utility.HIJRI_KEY, hijriDate);
         dataMap.getDataMap().putBoolean(Utility.TWENTYFOUR_KEY, twentyfour);
-        dataMap.getDataMap().putInt(Utility.WATCH_BG_COLOR, color);
         dataMap.getDataMap().putLong("time", new Date().getTime());
         PutDataRequest request = dataMap.asPutDataRequest();
         request.setUrgent();

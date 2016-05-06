@@ -369,16 +369,27 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
 
             // Draw H:MM in ambient mode or H:MM:SS in interactive mode.
             mTime.setToNow();
+            mTime.format("%k:%M:%S");
+            int hour = mTime.hour;
+            String ampm = "AM";
+            if(format24 == false){
+                if(hour>= 12){
+                    ampm = "PM";
+                }
+                hour = mTime.hour%12;
+                if(hour == 0) hour = 12;
+            }
+
+            String text = mAmbient
+                    ? (format24)?String.format("%d:%02d", hour, mTime.minute):String.format("%d:%02d %s", hour, mTime.minute,ampm)
+                    : String.format("%d:%02d:%02d", hour, mTime.minute, mTime.second);
+            canvas.drawText(text, mXOffset, mYOffset, mTextPaint);
             if(!isInAmbientMode()) {
                 if (!prayer_date.equals("") && showHijri == true) {
                     canvas.drawText(prayer_date,
                             bounds.width() / 3 , mYOffset + 0.6f*  mLineHeight, mDatePaint);
                 }
             }
-            String text = mAmbient
-                    ? String.format("%d:%02d", mTime.hour, mTime.minute)
-                    : String.format("%d:%02d:%02d", mTime.hour, mTime.minute, mTime.second);
-            canvas.drawText(text, mXOffset, mYOffset, mTextPaint);
             if (getPeekCardPosition().isEmpty()) {
                 if (!prayer_name.equals("")) {
                     canvas.drawText(prayer_name,
@@ -577,6 +588,10 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
                                 .getBoolean(HIJRI_KEY);
                         format24 = dataMapItem.getDataMap()
                                 .getBoolean(TWENTYFOUR_KEY);
+//                        byte[] rawData = dataMapItem.getDataMap()
+//                                .getByteArray(WATCH_BG_COLOR);
+//                        DataMap configKeysToOverwrite = DataMap.fromByteArray(rawData);
+//                        DigitalWatchFaceUtil.overwriteKeysInConfigDataMap(mGoogleApiClient, configKeysToOverwrite);
                     }
                     else {
                         Log.d(TAG, "Unrecognized path: " + path);

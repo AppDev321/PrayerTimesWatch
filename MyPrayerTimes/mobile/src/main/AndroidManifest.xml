@@ -30,12 +30,6 @@
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings">
-            <intent-filter>
-                <action android:name="com.example.android.wearable.watchface.CONFIG_DIGITAL" />
-
-                <category android:name="com.google.android.wearable.watchface.category.COMPANION_CONFIGURATION" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".DigitalWatchFaceCompanionConfigActivity"
