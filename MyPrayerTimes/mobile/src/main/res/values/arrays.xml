@@ -110,12 +110,21 @@
     <string name="color_white">White</string>
     <string name="color_black">Black</string>
     <string name="color_blue">#000088</string>
+    <string name="color_bluename">Blue</string>
+    <string name="color_greenname">Green</string>
 
     <string-array name="color_array">
         <item>@string/color_green</item>
         <item>@string/color_white</item>
         <item>@string/color_black</item>
         <item>@string/color_blue</item>
+    </string-array>
+
+    <string-array name="color_arrayreadable">
+        <item>@string/color_greenname</item>
+        <item>@string/color_white</item>
+        <item>@string/color_black</item>
+        <item>@string/color_bluename</item>
     </string-array>
 
 </resources>

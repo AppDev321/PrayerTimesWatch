@@ -168,9 +168,14 @@ public class DigitalWatchFaceCompanionConfigActivity extends Activity
             color = defaultColor;
         }
         Spinner spinner = (Spinner) findViewById(spinnerId);
-        String[] colorNames = getResources().getStringArray(R.array.color_array);
+        String[] colorNames = getResources().getStringArray(R.array.color_arrayreadable);
         for (int i = 0; i < colorNames.length; i++) {
-            if (Color.parseColor(colorNames[i]) == color) {
+            String colorNumber = colorNames[i];
+            if(colorNames[i] == getString(R.string.color_greenname))
+                colorNumber = getString(R.string.color_green);
+            if(colorNames[i] == getString(R.string.color_bluename))
+                colorNumber = getString(R.string.color_blue); //here we want to show to the user a good color name but parse the correct color
+            if (Color.parseColor(colorNumber) == color) {
                 spinner.setSelection(i);
                 break;
             }
@@ -182,8 +187,14 @@ public class DigitalWatchFaceCompanionConfigActivity extends Activity
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long id) {
-                final String colorName = (String) adapterView.getItemAtPosition(pos);
-                sendConfigUpdateMessage(configKey, Color.parseColor(colorName));
+                final String colorName = (String) adapterView.getItemAtPosition(pos); //change the color name to the correct color number
+                if(colorName.equals(getString(R.string.color_greenname))){
+                    sendConfigUpdateMessage(configKey, Color.parseColor(getString(R.string.color_green)));
+                }else if(colorName.equals(getString(R.string.color_bluename))){
+                    sendConfigUpdateMessage(configKey, Color.parseColor(getString(R.string.color_blue)));
+                }else {
+                    sendConfigUpdateMessage(configKey, Color.parseColor(colorName));
+                }
             }
 
             @Override
