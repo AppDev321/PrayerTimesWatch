@@ -70,8 +70,8 @@
                 android:textColorHighlight="@android:color/black"
                 android:textAlignment="center"
                 android:text="remaining time 2 hours"
-                android:maxLines="1"
-                android:singleLine="true"
+                android:maxLines="2"
+                android:singleLine="false"
                 android:ellipsize="end" />
         </LinearLayout>
     </LinearLayout>

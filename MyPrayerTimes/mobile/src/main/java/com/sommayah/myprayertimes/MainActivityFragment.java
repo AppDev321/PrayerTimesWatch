@@ -1,6 +1,7 @@
 package com.sommayah.myprayertimes;
 
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -76,8 +78,12 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         View rootView =  inflater.inflate(R.layout.fragment_main, container, false);
         ButterKnife.bind(this,rootView);
 
-        // Set the layout manager
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        if(getContext().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            mRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(),2,LinearLayoutManager.VERTICAL,false));
+        }else {
+            // Set the layout manager
+            mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        }
 
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
@@ -270,6 +276,17 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                 tv.setText(message);
             }
         }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        if(getContext().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            mRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(),2,LinearLayoutManager.VERTICAL,false));
+        }else {
+            // Set the layout manager
+            mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        }
+        super.onConfigurationChanged(newConfig);
     }
 
     @Override

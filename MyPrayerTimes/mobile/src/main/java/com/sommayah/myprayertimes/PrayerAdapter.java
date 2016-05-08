@@ -56,6 +56,12 @@ public class PrayerAdapter extends RecyclerView.Adapter<PrayerAdapter.PrayerAdap
             }
             View view = LayoutInflater.from(parent.getContext()).inflate(layoutId, parent, false);
             view.setFocusable(true);
+            /*WindowManager wm = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
+            Display display = wm.getDefaultDisplay();
+            Point size = new Point();
+            display.getSize(size);
+            int height = size.y;
+            //view.setMinimumHeight(height/10); if screen is too small just fill as much as we can from the screen*/
             final PrayerAdapterViewHolder vh = new PrayerAdapterViewHolder(view);
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
