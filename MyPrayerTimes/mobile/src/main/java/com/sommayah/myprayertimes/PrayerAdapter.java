@@ -2,11 +2,14 @@ package com.sommayah.myprayertimes;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Point;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -56,12 +59,12 @@ public class PrayerAdapter extends RecyclerView.Adapter<PrayerAdapter.PrayerAdap
             }
             View view = LayoutInflater.from(parent.getContext()).inflate(layoutId, parent, false);
             view.setFocusable(true);
-            /*WindowManager wm = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
+            WindowManager wm = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
             Display display = wm.getDefaultDisplay();
             Point size = new Point();
             display.getSize(size);
             int height = size.y;
-            //view.setMinimumHeight(height/10); if screen is too small just fill as much as we can from the screen*/
+            view.setMinimumHeight(height/12);// if screen is too small just fill as much as we can from the screen
             final PrayerAdapterViewHolder vh = new PrayerAdapterViewHolder(view);
             view.setOnClickListener(new View.OnClickListener() {
                 @Override

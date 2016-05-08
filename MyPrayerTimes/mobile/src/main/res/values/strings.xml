@@ -20,6 +20,7 @@
     <string name="compass_image">Compass Dial</string>
     <string name="compass_arrow">Compass Arrow</string>
     <string name="image_masjid">Masjid image</string>
+    <string name="title_not_supported">Your device does not support the compass</string>
 
 
     <!-- Strings related to Settings -->

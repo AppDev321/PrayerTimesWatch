@@ -2,6 +2,8 @@
 
 package com.sommayah.myprayertimes;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -13,6 +15,9 @@ import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -44,6 +49,18 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
         ButterKnife.bind(this);
         // initialize your android device sensor capabilities
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        AdView mAdView = (AdView) findViewById(R.id.adView);
+        // Create an ad request. Check logcat output for the hashed device ID to
+        // get test ads on a physical device. e.g.
+        // "Use AdRequest.Builder.addTestDevice("ABCDEF012345") to get test ads on this device."
+//        Bundle extras = new Bundle();
+//        extras.putBoolean("is_designed_for_families", true);
+        AdRequest adRequest = new AdRequest.Builder()
+                /*.addNetworkExtrasBundle(AdMobAdapter.class, extras)*/
+                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                /*.tagForChildDirectedTreatment(true)*/
+                .build();
+        mAdView.loadAd(adRequest);
     }
 
     @Override
@@ -52,8 +69,25 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
         // for the system's orientation sensor registered listeners
         qiblaDegree = Utility.getQiblaDirection(getApplicationContext());
         textQibla.setText(getString(R.string.qibla_direction)+ ": " + String.format(getString(R.string.format_qibla_dir),qiblaDegree));
-        mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION),
+        boolean sensor = mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION),
                 SensorManager.SENSOR_DELAY_GAME);
+        if(!sensor){
+            //device doesn't  support compass
+            displayNotSupported();
+        }
+    }
+
+    private void displayNotSupported() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        String messageText = getResources().getString(R.string.title_not_supported);
+        String okText = getResources().getString(R.string.ok_no_device_connected);
+        builder.setMessage(messageText)
+                .setCancelable(false)
+                .setPositiveButton(okText, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) { }
+                });
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 
     @Override
