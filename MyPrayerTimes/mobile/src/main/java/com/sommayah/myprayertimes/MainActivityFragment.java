@@ -17,7 +17,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.sommayah.myprayertimes.broadcastReceivers.PrayerAlarmReceiver;
 import com.sommayah.myprayertimes.data.PrayerContract;
@@ -104,10 +103,14 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         // Create an ad request. Check logcat output for the hashed device ID to
         // get test ads on a physical device. e.g.
         // "Use AdRequest.Builder.addTestDevice("ABCDEF012345") to get test ads on this device."
-        AdRequest adRequest = new AdRequest.Builder()
+        Bundle extras = new Bundle();
+        extras.putBoolean("is_designed_for_families", true);
+        /*AdRequest adRequest = new AdRequest.Builder()
+                .addNetworkExtrasBundle(AdMobAdapter.class, extras)
                 .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                .tagForChildDirectedTreatment(true)
                 .build();
-        mAdView.loadAd(adRequest);
+        mAdView.loadAd(adRequest);*/
         return rootView;
     }
 

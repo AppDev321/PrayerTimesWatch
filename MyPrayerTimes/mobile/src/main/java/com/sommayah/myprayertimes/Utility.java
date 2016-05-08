@@ -718,8 +718,6 @@ public class Utility {
                     null,
                     null);
         }
-
-
         if(cur.moveToFirst()){
             Log.d("In adding to DB", "Error, not deleted");
         }
