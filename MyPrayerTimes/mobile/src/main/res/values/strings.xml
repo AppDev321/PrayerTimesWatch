@@ -21,6 +21,7 @@
     <string name="compass_arrow">Compass Arrow</string>
     <string name="image_masjid">Masjid image</string>
     <string name="title_not_supported">Your device does not support the compass</string>
+    <string name="press_on_circle">Press on adjacent circle to retrieve current location</string>
 
 
     <!-- Strings related to Settings -->

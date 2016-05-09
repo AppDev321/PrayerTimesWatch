@@ -32,9 +32,7 @@ public class PrayerNotificationService extends IntentService {
     public static final int NOTIFICATION_ID = 1;
     public static final String ACTION_NEXT_PRAYER_UPDATED = "com.sommayah.myprayertimes.ACTION_NEXT_PRAYER_UPDATED";
     private NotificationManager mNotificationManager;
-
     private PendingIntent mAlarmIntent;
-
 
     public PrayerNotificationService() {
         super("PrayerNotificationService");

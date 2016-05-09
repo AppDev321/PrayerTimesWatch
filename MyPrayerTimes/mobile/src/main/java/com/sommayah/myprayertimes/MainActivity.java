@@ -38,15 +38,20 @@ public class MainActivity extends AppCompatActivity {
 
     public static final String TAG = MainActivity.class.getSimpleName();
 
-    public static final int MIN_TIME =1000 * 60 * 120; //two hours
+    public static final int MIN_TIME = 1000 * 60 * 120; //two hours
     public static final int MIN_DIST = 20000; //set to 20 kilometers
     LocationManager mLocationManager;
     LocationListener mLocationListener;
-    @Bind(R.id.title) TextView mTitleText;
-    @Bind(R.id.dateTextView) TextView mhijriDateText;
-    @Bind(R.id.toolbar) Toolbar toolbar;
-    @Bind(R.id.fab) FloatingActionButton fab;
-    @Bind(R.id.imageView)ImageView backgroundImage;
+    @Bind(R.id.title)
+    TextView mTitleText;
+    @Bind(R.id.dateTextView)
+    TextView mhijriDateText;
+    @Bind(R.id.toolbar)
+    Toolbar toolbar;
+    @Bind(R.id.fab)
+    FloatingActionButton fab;
+    @Bind(R.id.imageView)
+    ImageView backgroundImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,10 +71,8 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(),CompassActivity.class);
+                Intent intent = new Intent(getApplicationContext(), CompassActivity.class);
                 startActivity(intent);
-
-
             }
         });
 
@@ -81,13 +84,13 @@ public class MainActivity extends AppCompatActivity {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             Log.d(TAG, "no permission granted yet");
-            Utility.setLocationStatus(getApplicationContext(),Utility.LOCATION_STATUS_UNKNOWN);
+            Utility.setLocationStatus(getApplicationContext(), Utility.LOCATION_STATUS_UNKNOWN);
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION) &&
                     (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_COARSE_LOCATION))) {
                 // If the user has previously denied permission , and do not check marked " never show this warning
                 // We can show an alert explaining to the user because permission is important.
                 Log.d(TAG, "permissions are denied");
-                Utility.setLocationStatus(getApplicationContext(),Utility.LOCATION_STATUS_PERMISSION_DENIED);
+                Utility.setLocationStatus(getApplicationContext(), Utility.LOCATION_STATUS_PERMISSION_DENIED);
                 mTitleText.setText(getString(R.string.location_not_found));
             } else {
 
@@ -105,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
             Location lastKnownLocation = mLocationManager.getLastKnownLocation(locationProvider);
 
             if (lastKnownLocation != null) {
-                if(!Utility.isManualLocation(getApplicationContext())) {
+                if (!Utility.isManualLocation(getApplicationContext())) {
                     makeUseOfNewLocation(lastKnownLocation);
                     Log.d("known location long", String.valueOf(lastKnownLocation.getLongitude()));
                     Log.d("known location lat", String.valueOf(lastKnownLocation.getLatitude()));
@@ -113,31 +116,30 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 //location null no previous location
                 Log.d(TAG, "last known location null");
-                Utility.setLocationStatus(getApplicationContext(),Utility.LOCATION_STATUS_UNKNOWN);
+                Utility.setLocationStatus(getApplicationContext(), Utility.LOCATION_STATUS_UNKNOWN);
             }
         }
-
 
 
         // Define a listener that responds to location updates
         mLocationListener = new LocationListener() {
             public void onLocationChanged(Location location) {
                 // Called when a new location is found by the network location provider.
-                if(!Utility.isManualLocation(getApplicationContext())){
+                if (!Utility.isManualLocation(getApplicationContext())) {
                     makeUseOfNewLocation(location);
                 }
             }
 
             public void onStatusChanged(String provider, int status, Bundle extras) {
-                Log.d(TAG,"on status changed");
+                Log.d(TAG, "on status changed");
             }
 
             public void onProviderEnabled(String provider) {
-                Log.d(TAG,"on provider enabled");
+                Log.d(TAG, "on provider enabled");
             }
 
             public void onProviderDisabled(String provider) {
-                Log.d(TAG,"on provider disabled");
+                Log.d(TAG, "on provider disabled");
             }
 
         };
@@ -147,31 +149,29 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         mhijriDateText.setText(Utility.getHijriDate(getApplicationContext()));
-        SharedPreferences prefs
-                = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        boolean isManualLocation = prefs.getBoolean(getApplicationContext().getString(R.string.pref_loc_manual_set), false);
-        if(isManualLocation == false) {
+        boolean isManualLocation = Utility.isManualLocation(getApplicationContext());
+        if (isManualLocation == false) {
             if (Utility.isLocationLatLonAvailable(getApplicationContext())) {
                 mTitleText.setText(Utility.getPreferredLocation(getApplicationContext()));
             }
-        }else{ //set manual location
+        } else { //set manual location
             mTitleText.setText(Utility.getManualLocation(getApplicationContext()));
         }
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             Log.d(TAG, "no permission");
-            Utility.setLocationStatus(getApplicationContext(),Utility.LOCATION_STATUS_PERMISSION_DENIED);
+            Utility.setLocationStatus(getApplicationContext(), Utility.LOCATION_STATUS_PERMISSION_DENIED);
             mTitleText.setText(getString(R.string.location_not_found));
 
-        }else {
-            if(isManualLocation == false){
+        } else {
+            if (isManualLocation == false) {
                 //check if location setting is on if we don't have good location, if not open settings to enable
                 checkLocationSettings();
             }
             mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME, MIN_DIST, mLocationListener);
         }
-        int temp = getResources().getIdentifier("backgroundmosque"+Utility.getNextPos(this), "drawable", getPackageName());
+        int temp = getResources().getIdentifier("backgroundmosque" + Utility.getNextPos(this), "drawable", getPackageName());
         backgroundImage.setImageResource(temp);
 
     }
@@ -182,7 +182,7 @@ public class MainActivity extends AppCompatActivity {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             //location cannot be caught
 
-        }else {
+        } else {
             mLocationManager.removeUpdates(mLocationListener);
         }
     }
@@ -193,7 +193,6 @@ public class MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
-
 
 
     @Override
@@ -213,15 +212,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
     private void makeUseOfNewLocation(Location location) {
-        int temp = getResources().getIdentifier("backgroundmosque"+Utility.getNextPos(this), "drawable", getPackageName());
+        int temp = getResources().getIdentifier("backgroundmosque" + Utility.getNextPos(this), "drawable", getPackageName());
         backgroundImage.setImageResource(temp);
         double longitude = location.getLongitude();
         double latitude = location.getLatitude();
         String address = Utility.getLocationAddress(getApplicationContext(), longitude, latitude);
-        if(!((float)longitude == Utility.getLocationLongitude(getApplicationContext())
-                && (float)latitude == Utility.getLocationLatitude(getApplicationContext()))){ //check if it is really new location
+        float ulong = Utility.getLocationLongitude(getApplicationContext());
+        float ulat = Utility.getLocationLatitude(getApplicationContext());
+        if (!((Math.abs((float) longitude - Utility.getLocationLongitude(getApplicationContext())) < 0.1)
+                && (Math.abs((float) latitude - Utility.getLocationLatitude(getApplicationContext())) < 0.1))) { //check if it is really new location
             SharedPreferences sharedPreferences =
                     PreferenceManager.getDefaultSharedPreferences(this);
             SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -231,7 +231,7 @@ public class MainActivity extends AppCompatActivity {
             editor.putFloat(getString(R.string.pref_location_longitude),
                     (float) longitude);
             editor.commit();
-            if(Utility.isLocationLatLonAvailable(getApplicationContext())) {
+            if (Utility.isLocationLatLonAvailable(getApplicationContext())) {
                 mTitleText.setText(Utility.getPreferredLocation(getApplicationContext()));
             }
             if (Utility.isAlarmEnabled(getApplicationContext())) {
@@ -239,7 +239,7 @@ public class MainActivity extends AppCompatActivity {
                 Date now = new Date();
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(now);
-                new LoadPrayersAsyncTask(this,cal).execute();
+                new LoadPrayersAsyncTask(this, cal).execute();
                 alarm.cancelAlarm(getApplicationContext());
                 alarm.addPrayerAlarm(getApplicationContext());
             }
@@ -247,11 +247,10 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void checkLocationSettings(){
-        if(Utility.getPreferredLocation(getApplicationContext()).equals("")) {
+    public void checkLocationSettings() {
+        if (Utility.getPreferredLocation(getApplicationContext()).equals("")) {
             boolean gps_enabled = false;
             boolean network_enabled = false;
-
             try {
                 gps_enabled = mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
             } catch (Exception ex) {

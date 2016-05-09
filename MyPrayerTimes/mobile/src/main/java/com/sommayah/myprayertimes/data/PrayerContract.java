@@ -38,10 +38,6 @@ public class PrayerContract {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
-        public static Uri buildPrayerWithNameUri(String name){
-            return CONTENT_URI.buildUpon().appendPath(name).build();
-        }
-
         public static String getPrayerFromUri(Uri uri) {
             return uri.getPathSegments().get(1);
         }

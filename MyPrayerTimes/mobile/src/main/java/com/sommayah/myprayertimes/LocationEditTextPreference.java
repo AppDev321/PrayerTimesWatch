@@ -113,9 +113,6 @@ public class LocationEditTextPreference extends EditTextPreference {
         if(valid == false){
             et.setText("");
         }
-
-
-
         super.onDialogClosed(positiveResult);
     }
 

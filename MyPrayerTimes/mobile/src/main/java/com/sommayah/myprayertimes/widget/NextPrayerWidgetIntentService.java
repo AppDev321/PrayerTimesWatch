@@ -67,10 +67,6 @@ public class NextPrayerWidgetIntentService extends IntentService {
                     return;
                 }
                 int nextPrayer = Utility.getNextPos(getApplicationContext());
-//                ArrayList<String> prayTimes = new ArrayList<>();
-//                do{
-//                    prayTimes.add(data.getString(COL_PRAYER_TIME));
-//                }while (data.moveToNext());
                 data.moveToPosition(nextPrayer);
                 String prayName = data.getString(COL_PRAYER_NAME);
                 String prayTime = data.getString(COL_PRAYER_TIME);

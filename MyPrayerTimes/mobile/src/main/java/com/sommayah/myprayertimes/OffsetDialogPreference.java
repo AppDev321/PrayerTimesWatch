@@ -23,8 +23,6 @@ import android.widget.EditText;
 public class OffsetDialogPreference extends DialogPreference {
 
     private static final int DEFAULTVALUE = 0;
-    private int mMinutes = 60;
-    private String minutes;
     EditText editText1;
     EditText editText2;
     EditText editText3;
@@ -84,10 +82,8 @@ public class OffsetDialogPreference extends DialogPreference {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
-
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
             }
 
             @Override

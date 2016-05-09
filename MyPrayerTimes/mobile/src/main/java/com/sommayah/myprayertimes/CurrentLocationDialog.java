@@ -28,7 +28,11 @@ public class CurrentLocationDialog extends DialogPreference {
             // Add the get current location widget to our location preference
             setEnabled(true);
             setWidgetLayoutResource(R.layout.pref_current_location);
-            setDialogMessage(Utility.getPreferredLocation(context));
+            String dialogmessage = Utility.getPreferredLocation(context);
+            if(dialogmessage.equals("")){
+                dialogmessage = context.getString(R.string.press_on_circle);
+            }
+            setDialogMessage(dialogmessage);
         }else{
             setDialogMessage(context.getString(R.string.automatic_location_disabled));
         }

@@ -123,8 +123,6 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
         raArrow.setFillAfter(true);
         imageArrow.startAnimation(raArrow);
         currentDegree = -degree;
-
-
     }
 
     @Override

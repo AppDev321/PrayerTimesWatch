@@ -65,7 +65,6 @@ public class PrayerProvider extends ContentProvider {
         final int match = sUriMatcher.match(uri);
 
         switch (match) {
-            // Student: Uncomment and fill out these two cases
             case PRAYER_WITH_NAME:
                 return PrayerContract.PrayerEntry.CONTENT_ITEM_TYPE;
             case PRAYER:

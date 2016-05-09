@@ -54,10 +54,6 @@ public class PassiveLocationChangeReceiver extends BroadcastReceiver {
                 Date now = new Date();
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(now);
-                /*ArrayList<String> prayerTimes = new ArrayList<>();
-                prayerTimes = Utility.getPrayTimes(cal,context);
-                Utility.addPrayersToDB(context,prayerTimes);
-                context.getContentResolver().notifyChange(PrayerContract.PrayerEntry.CONTENT_URI,null);*/
                 new LoadPrayersAsyncTask(context,cal).execute();
                 alarm.cancelAlarm(context);
                 alarm.addPrayerAlarm(context);

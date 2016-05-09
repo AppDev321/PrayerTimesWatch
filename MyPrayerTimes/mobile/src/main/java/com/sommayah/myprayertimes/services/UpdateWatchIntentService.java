@@ -49,9 +49,6 @@ public class UpdateWatchIntentService extends IntentService implements  GoogleAp
         if (!mResolvingError) {
             mGoogleApiClient.connect();
         }
-        if (intent != null) {
-
-        }
     }
 
     @Override
@@ -64,7 +61,8 @@ public class UpdateWatchIntentService extends IntentService implements  GoogleAp
 
     @Override
     public void onConnectionSuspended(int i) {
-
+        Log.e("in watch service", "Connection to Google API client suspended");
+        PrayerAlarmReceiver.completeWakefulIntent(mIntent);
     }
 
     @Override
@@ -81,8 +79,9 @@ public class UpdateWatchIntentService extends IntentService implements  GoogleAp
 //                mGoogleApiClient.connect();
 //            }
         } else {
-            Log.e("in SyncAdapter", "Connection to Google API client has failed");
+            Log.e("in watch service", "Connection to Google API client has failed");
             mResolvingError = false;
         }
+        PrayerAlarmReceiver.completeWakefulIntent(mIntent); //we want to end service if not connected
     }
 }

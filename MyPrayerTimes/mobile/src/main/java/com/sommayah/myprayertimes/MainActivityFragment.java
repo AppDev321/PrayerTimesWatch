@@ -21,9 +21,7 @@ import android.widget.TextView;
 
 import com.sommayah.myprayertimes.broadcastReceivers.PrayerAlarmReceiver;
 import com.sommayah.myprayertimes.data.PrayerContract;
-import com.sommayah.myprayertimes.dataModels.PrayTime;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -38,11 +36,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     @Bind(R.id.recyclerview_prayer) RecyclerView mRecyclerView;
     @Bind(R.id.recyclerview_prayer_empty) View mEmptyView;
 
-    private boolean mUseNextPrayerLayout;
-    private PrayTime mPraytime;
     private PrayerAdapter mAdapter;
-    private ArrayList<String> mPrayerTimes;
-
     private static final int PRAYER_LOADER = 0;
     // Specify the columns we need.
     private static final String[] PRAYER_COLUMNS = {
@@ -51,7 +45,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
             PrayerContract.PrayerEntry.COLUMN_PRAYERTIME,
     };
 
-    // These indices are tied to FORECAST_COLUMNS.  If FORECAST_COLUMNS changes, these
+    // These indices are tied to PRAYER_COLUMNS.  If PRAYER_COLUMNS changes, these
     // must change.
     static final int COL_PRAYER_NAME = 0;
     static final int COL_PRAYER_TIME = 1;
@@ -83,12 +77,9 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
             // Set the layout manager
             mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         }
-
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
         mRecyclerView.setHasFixedSize(true);
-
-
 
         if(!Utility.isAlarmInitiated(getContext())){
             SharedPreferences sharedPreferences =
@@ -105,11 +96,6 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         return rootView;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
     }
 
     @Override
@@ -144,7 +130,6 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
     private void onChangedSettings(SharedPreferences prefs, String key){
 
-        //ss: so badly implemented has to change this if statement
         if (key.equals(getString(R.string.pref_calculation_methods_key))
                 || key.equals(getString(R.string.pref_asr_calculation_key))
                 || key.equals(getString(R.string.pref_dst_value))
@@ -158,9 +143,11 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                 Date now = new Date();
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(now);
-               /* mPrayerTimes = Utility.getPrayTimes(cal, getContext());
-                Utility.addPrayersToDB(getContext(), mPrayerTimes);*/
+                PrayerAlarmReceiver alarm = new PrayerAlarmReceiver();
                 new LoadPrayersAsyncTask(getContext(),cal).execute();
+                //restart the alarm for next prayer based on new times
+                alarm.cancelAlarm(getContext());
+                alarm.addPrayerAlarm(getContext());
 
             }
             if(key.equals(getString(R.string.pref_location_status_key))){
@@ -171,23 +158,8 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                 getContext().getContentResolver().notifyChange(PrayerContract.PrayerEntry.CONTENT_URI,null);
                 Utility.updateWidgets(getContext());
             }
-
-
         }
-        /*if (!key.equals(getString(R.string.pref_time_format_key)) && !key.equals(getString(R.string.pref_location_latitude))
-        && !key.equals(getString(R.string.pref_location_longitude))) { //in case of format we dont need to grab data again
-            Date now = new Date();
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(now);
-            mPrayerTimes = Utility.getPrayTimes(cal, getContext());
-            Utility.addPrayersToDB(getContext(), mPrayerTimes);
 
-        }
-        //update ui
-        if (mAdapter != null) {
-            getContext().getContentResolver().notifyChange(PrayerContract.PrayerEntry.CONTENT_URI,null);
-            Utility.updateWidgets(getContext());
-        }*/
         //no need to listen to hijri date adjustment because we display the new one onresume
         if(key.equals(getString(R.string.pref_widget_transparency_key))
                 || key.equals(getString(R.string.widget_pref_bg_key))
@@ -198,13 +170,6 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         if (key.equals(getString(R.string.pref_location_status_key))) {
             updateEmptyView();
         }
-
-        if(key.equals(getString(R.string.watch_pref_bg_key))
-                ||key.equals(getString(R.string.pref_twentyfour_switch_key))
-                ||key.equals(getString(R.string.pref_show_hijri_switch_key))){
-            //start service that sends these data to watch
-        }
-
     }
 
     private boolean isKeyOffset(String key) {
@@ -222,7 +187,6 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Uri prayerUri = PrayerContract.PrayerEntry.CONTENT_URI;
-
         return new CursorLoader(getActivity(),
                 prayerUri,
                 PRAYER_COLUMNS,
@@ -236,7 +200,6 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         if (data != null)
             mAdapter.swapCursor(data);
         updateEmptyView();
-
     }
 
     private void updateEmptyView() {

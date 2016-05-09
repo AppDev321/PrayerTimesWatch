@@ -41,7 +41,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.TimeZone;
 import java.util.Vector;
 
 
@@ -602,8 +601,9 @@ public class Utility {
                 name = context.getString(R.string.sunrise);
                 break;
             case 2:
-                Calendar cal = Calendar.getInstance(TimeZone.getDefault());
-                name = (cal.get(Calendar.DAY_OF_WEEK) == 6)?context.getString(R.string.jumuah):context.getString(R.string.dhuhr);
+                /*Calendar cal = Calendar.getInstance(TimeZone.getDefault());
+                name = (cal.get(Calendar.DAY_OF_WEEK) == 6)?context.getString(R.string.jumuah):context.getString(R.string.dhuhr);*/
+                name = context.getString(R.string.dhuhr);
                 break;
             case 3:
                 name = context.getString(R.string.asr);
@@ -790,7 +790,7 @@ public class Utility {
                 });
     }
 
-    public static void sendPreferenceInfoToWatch(Boolean hijriDate, Boolean twentyfour, int color, GoogleApiClient client){
+    public static void sendPreferenceInfoToWatch(Boolean hijriDate, Boolean twentyfour, GoogleApiClient client){
         PutDataMapRequest dataMap = PutDataMapRequest.create(Utility.PREF_PATH);
         dataMap.getDataMap().putBoolean(Utility.HIJRI_KEY, hijriDate);
         dataMap.getDataMap().putBoolean(Utility.TWENTYFOUR_KEY, twentyfour);

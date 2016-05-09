@@ -4,7 +4,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Point;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -141,7 +140,7 @@ public class PrayerAdapter extends RecyclerView.Adapter<PrayerAdapter.PrayerAdap
         return (position == Utility.getNextPos(mContext) && mUseNextPrayerLayout) ? VIEW_TYPE_NEXT : VIEW_TYPE_ALL;
     }
 
-    public int getNextPos(){
+    /*public int getNextPos(){
         int pos = 0;
         LocalTime now = LocalTime.now();
         Log.d("get current time",now.toString());
@@ -164,7 +163,7 @@ public class PrayerAdapter extends RecyclerView.Adapter<PrayerAdapter.PrayerAdap
         return pos;
 
 
-    }
+    }*/
 
     public class PrayerAdapterViewHolder extends RecyclerView.ViewHolder  {
         @Bind(R.id.prayer_name) TextView mPrayerName;
