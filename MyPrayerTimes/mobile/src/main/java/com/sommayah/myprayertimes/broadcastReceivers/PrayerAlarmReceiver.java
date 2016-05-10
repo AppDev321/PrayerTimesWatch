@@ -105,7 +105,7 @@ public class PrayerAlarmReceiver extends WakefulBroadcastReceiver{
                 PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
                 PackageManager.DONT_KILL_APP);
     }
-    
+
     private Prayer getNextPrayer(Context context) {
         Calendar now = Calendar.getInstance(TimeZone.getDefault());
         now.setTimeInMillis(System.currentTimeMillis());
