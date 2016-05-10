@@ -22,7 +22,7 @@
             android:background="@android:color/transparent"
             android:text="@string/appwidget_text"
             android:textColor="@color/colorAccent"
-            android:textSize="12sp"
+            android:textSize="@dimen/widget_date_text_size"
             android:textStyle="bold|italic" />
 
         <LinearLayout
