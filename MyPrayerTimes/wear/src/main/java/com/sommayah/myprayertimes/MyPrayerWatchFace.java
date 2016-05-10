@@ -638,31 +638,33 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
                             .build();
 
                     DataApi.DataItemResult result = Wearable.DataApi.getDataItem(mGoogleApiClient, uri).await();
-
-                    String path = uri.getPath();
-                    if (PRAYER_PATH.equals(path)) {
-                        DataMapItem dataItem = DataMapItem.fromDataItem(result.getDataItem());
-                        prayer_name = dataItem.getDataMap()
-                                .getString(PRAYER_NAME_KEY);
-                        prayer_date = dataItem.getDataMap()
-                                .getString(HIJRI_DATE_KEY);
-                        prayer_time = dataItem.getDataMap()
-                                .getString(PRAYER_TIME_KEY);
-                    } else if(DigitalWatchFaceUtil.PATH_WITH_FEATURE.equals(path)){
-                        DataMapItem dataMapItem = DataMapItem.fromDataItem(result.getDataItem());
-                        DataMap config = dataMapItem.getDataMap();
-                        if (Log.isLoggable(TAG, Log.DEBUG)) {
-                            Log.d(TAG, "Config DataItem updated:" + config);
+                    if(result != null || result.getDataItem() != null) {
+                        String path = uri.getPath();
+                        if (PRAYER_PATH.equals(path)) {
+                            DataMapItem dataItem = DataMapItem.fromDataItem(result.getDataItem());
+                            prayer_name = dataItem.getDataMap()
+                                    .getString(PRAYER_NAME_KEY);
+                            prayer_date = dataItem.getDataMap()
+                                    .getString(HIJRI_DATE_KEY);
+                            prayer_time = dataItem.getDataMap()
+                                    .getString(PRAYER_TIME_KEY);
+                        } else if (DigitalWatchFaceUtil.PATH_WITH_FEATURE.equals(path)) {
+                            DataMapItem dataItem = DataMapItem.fromDataItem(result.getDataItem());
+                            DataMap config = dataItem.getDataMap();
+                            if (Log.isLoggable(TAG, Log.DEBUG)) {
+                                Log.d(TAG, "Config DataItem updated:" + config);
+                            }
+                            updateUiForConfigDataMap(config);
+                        } else if (PREF_PATH.equals(path)) {
+                            DataMapItem dataItem = DataMapItem.fromDataItem(result.getDataItem());
+                            showHijri = dataItem.getDataMap()
+                                    .getBoolean(HIJRI_KEY);
+                            format24 = dataItem.getDataMap()
+                                    .getBoolean(TWENTYFOUR_KEY);
+                        } else {
+                            Log.d(TAG, "Unrecognized path: " + path);
                         }
-                        updateUiForConfigDataMap(config);
-                    }else if(PREF_PATH.equals(path)){
-                        DataMapItem dataMapItem = DataMapItem.fromDataItem(result.getDataItem());
-                        showHijri = dataMapItem.getDataMap()
-                                .getBoolean(HIJRI_KEY);
-                        format24 = dataMapItem.getDataMap()
-                                .getBoolean(TWENTYFOUR_KEY);
-                    }else {
-                        Log.d(TAG, "Unrecognized path: " + path);
+
                     }
 
                 }

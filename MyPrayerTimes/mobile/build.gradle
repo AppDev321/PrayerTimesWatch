@@ -13,10 +13,7 @@ android {
     }
     signingConfigs {
         release {
-            keyAlias 'udacity'
-            keyPassword 'password'
-            storeFile file('keystore.jks')
-            storePassword 'password'
+            
         }
     }
     buildTypes {
