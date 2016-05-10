@@ -15,7 +15,7 @@ android {
         release {
             keyAlias 'udacity'
             keyPassword 'password'
-            storeFile file('/Users/sommayahsoliman/Documents/MyPrayerTimes/keystore.jks')
+            storeFile file('keystore.jks')
             storePassword 'password'
         }
     }
