@@ -53,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
     @Bind(R.id.imageView)
     ImageView backgroundImage;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,12 +98,6 @@ public class MainActivity extends AppCompatActivity {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 0);
             }
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-//               public void onRequestPermissionsResult(int requestCode, String[] permissions,
-//                                                      int[] grantResults)
-//             to handle the case where the user grants the permission. See the documentation
-//             for ActivityCompat#requestPermissions for more details.
 
         } else {
             Location lastKnownLocation = mLocationManager.getLastKnownLocation(locationProvider);
@@ -213,15 +208,13 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void makeUseOfNewLocation(Location location) {
-        int temp = getResources().getIdentifier("backgroundmosque" + Utility.getNextPos(this), "drawable", getPackageName());
-        backgroundImage.setImageResource(temp);
         double longitude = location.getLongitude();
         double latitude = location.getLatitude();
         String address = Utility.getLocationAddress(getApplicationContext(), longitude, latitude);
         float ulong = Utility.getLocationLongitude(getApplicationContext());
         float ulat = Utility.getLocationLatitude(getApplicationContext());
-        if (!((Math.abs((float) longitude - Utility.getLocationLongitude(getApplicationContext())) < 0.1)
-                && (Math.abs((float) latitude - Utility.getLocationLatitude(getApplicationContext())) < 0.1))) { //check if it is really new location
+        if (!((Math.abs((float) longitude - Utility.getLocationLongitude(getApplicationContext())) < 0.01)
+                && (Math.abs((float) latitude - Utility.getLocationLatitude(getApplicationContext())) < 0.01))) { //check if it is really new location
             SharedPreferences sharedPreferences =
                     PreferenceManager.getDefaultSharedPreferences(this);
             SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -243,6 +236,8 @@ public class MainActivity extends AppCompatActivity {
                 alarm.cancelAlarm(getApplicationContext());
                 alarm.addPrayerAlarm(getApplicationContext());
             }
+            int temp = getResources().getIdentifier("backgroundmosque" + Utility.getNextPos(this), "drawable", getPackageName());
+            backgroundImage.setImageResource(temp);
         }
 
     }

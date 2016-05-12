@@ -450,11 +450,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity  {
                 editor.putFloat(getString(R.string.pref_location_longitude),
                         (float) latLong.longitude);
                 editor.commit();
-
-                // Tell the SyncAdapter that we've changed the location, so that we can update
-                // our UI with new values. We need to do this manually because we are responding
-                // to the PlacePicker widget result here instead of allowing the
-                // LocationEditTextPreference to handle these changes and invoke our callbacks.
                 Preference locationPreference = findPreference(getString(R.string.pref_location_key));
                 //  setPreferenceSummary(locationPreference, address);
 
@@ -468,13 +463,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity  {
                             Snackbar.LENGTH_LONG).show();
                 }
 
-                //    Utility.resetLocationStatus(this);
-                //    SunshineSyncAdapter.syncImmediately(this);
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
-
-
 }
