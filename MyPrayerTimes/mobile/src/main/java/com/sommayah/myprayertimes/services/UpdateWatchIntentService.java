@@ -54,7 +54,7 @@ public class UpdateWatchIntentService extends IntentService implements  GoogleAp
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         mResolvingError = false;
-        Utility.sendPrayerInfoToWatch(prayer_name, prayer_time, mdate, mGoogleApiClient);
+        Utility.sendPrayerInfoToWatch(getApplicationContext(),prayer_name, prayer_time, mdate, mGoogleApiClient);
         PrayerAlarmReceiver.completeWakefulIntent(mIntent);
 
     }

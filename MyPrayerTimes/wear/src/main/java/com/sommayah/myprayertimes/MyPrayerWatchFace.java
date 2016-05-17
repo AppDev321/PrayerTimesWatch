@@ -141,6 +141,7 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
 
         float mXOffset;
         float mYOffset;
+        float mXSmallOffset;
 
         int mInteractiveBackgroundColor =
                 DigitalWatchFaceUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_BACKGROUND;
@@ -269,6 +270,7 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
                     ? R.dimen.digital_name_size_round : R.dimen.digital_name_size);
             float timeSize = resources.getDimension(isRound
                     ? R.dimen.digital_time_size_round : R.dimen.digital_time_size);
+            mXSmallOffset =  resources.getDimension(R.dimen.digital_x_offset_round_7dp);
 
             mTextPaint.setTextSize(textSize);
             mDatePaint.setTextSize(dateTextSize);
@@ -383,13 +385,13 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
             if(!isInAmbientMode()) {
                 if (!prayer_date.equals("") && showHijri == true) {
                     canvas.drawText(prayer_date,
-                            bounds.width() / 3 , mYOffset + 0.6f*  mLineHeight, mDatePaint);
+                            bounds.width() / 3 - mXSmallOffset, mYOffset + 0.6f*  mLineHeight, mDatePaint);
                 }
             }
             if (getPeekCardPosition().isEmpty()) {
                 if (!prayer_name.equals("")) {
                     canvas.drawText(prayer_name,
-                            bounds.width() / 3, mYOffset + mLineHeight * 1.25f, mNamePaint);
+                            bounds.width() / 3 - mXSmallOffset, mYOffset + mLineHeight * 1.25f, mNamePaint);
                 }
 
                 if (!prayer_time.equals("")) {
@@ -399,7 +401,7 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
                         DateTimeFormatter fmt = DateTimeFormat.forPattern("h:mm aa");
                         showtime =fmt.print(time);
                     }
-                    canvas.drawText(showtime, bounds.width() * 1 / 2, mYOffset + 1.25f * mLineHeight, mTimePaint);
+                    canvas.drawText(showtime, bounds.width() * 1 / 2 - mXSmallOffset, mYOffset + 1.25f * mLineHeight, mTimePaint);
                 }
 
 
@@ -539,6 +541,7 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
 
         private void updateUiOnStartup() {
             new GetDataTask().execute();
+
         }
 
 
@@ -563,31 +566,33 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
             for (DataEvent event : dataEvents) {
                 if (event.getType() == DataEvent.TYPE_CHANGED) {
                     String path = event.getDataItem().getUri().getPath();
-                    if (PRAYER_PATH.equals(path)) {
-                        DataMapItem dataMapItem = DataMapItem.fromDataItem(event.getDataItem());
-                        prayer_name = dataMapItem.getDataMap()
-                                .getString(PRAYER_NAME_KEY);
-                        prayer_date = dataMapItem.getDataMap()
-                                .getString(HIJRI_DATE_KEY);
-                        prayer_time = dataMapItem.getDataMap()
-                                .getString(PRAYER_TIME_KEY);
-                    } else if(DigitalWatchFaceUtil.PATH_WITH_FEATURE.equals(path)){
-                        DataMapItem dataMapItem = DataMapItem.fromDataItem(event.getDataItem());
-                        DataMap config = dataMapItem.getDataMap();
-                        if (Log.isLoggable(TAG, Log.DEBUG)) {
-                            Log.d(TAG, "Config DataItem updated:" + config);
-                        }
-                        updateUiForConfigDataMap(config);
-                    }else if(PREF_PATH.equals(path)){
-                        DataMapItem dataMapItem = DataMapItem.fromDataItem(event.getDataItem());
-                        showHijri = dataMapItem.getDataMap()
-                                .getBoolean(HIJRI_KEY);
-                        format24 = dataMapItem.getDataMap()
-                                .getBoolean(TWENTYFOUR_KEY);
+                    if(event.getDataItem() != null) {
+                        if (PRAYER_PATH.equals(path)) {
+                            DataMapItem dataMapItem = DataMapItem.fromDataItem(event.getDataItem());
+                            prayer_name = dataMapItem.getDataMap()
+                                    .getString(PRAYER_NAME_KEY);
+                            prayer_date = dataMapItem.getDataMap()
+                                    .getString(HIJRI_DATE_KEY);
+                            prayer_time = dataMapItem.getDataMap()
+                                    .getString(PRAYER_TIME_KEY);
+                        } else if (DigitalWatchFaceUtil.PATH_WITH_FEATURE.equals(path)) {
+                            DataMapItem dataMapItem = DataMapItem.fromDataItem(event.getDataItem());
+                            DataMap config = dataMapItem.getDataMap();
+                            if (Log.isLoggable(TAG, Log.DEBUG)) {
+                                Log.d(TAG, "Config DataItem updated:" + config);
+                            }
+                            updateUiForConfigDataMap(config);
+                        } else if (PREF_PATH.equals(path)) {
+                            DataMapItem dataMapItem = DataMapItem.fromDataItem(event.getDataItem());
+                            showHijri = dataMapItem.getDataMap()
+                                    .getBoolean(HIJRI_KEY);
+                            format24 = dataMapItem.getDataMap()
+                                    .getBoolean(TWENTYFOUR_KEY);
 //                        byte[] rawData = dataMapItem.getDataMap()
 //                                .getByteArray(WATCH_BG_COLOR);
 //                        DataMap configKeysToOverwrite = DataMap.fromByteArray(rawData);
 //                        DigitalWatchFaceUtil.overwriteKeysInConfigDataMap(mGoogleApiClient, configKeysToOverwrite);
+                        }
                     }
                     else {
                         Log.d(TAG, "Unrecognized path: " + path);
@@ -624,11 +629,12 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
             return null;
         }
 
+
         private class GetDataTask extends AsyncTask<Void, Void, Void> {
 
             @Override
             protected Void doInBackground(Void... args) {
-                Log.d(TAG,"in background task");
+                Log.d(TAG, "in background task");
                 String node = getRemoteNodeId();
                 if (node != null) {
                     Uri uri = new Uri.Builder()
@@ -638,7 +644,7 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
                             .build();
 
                     DataApi.DataItemResult result = Wearable.DataApi.getDataItem(mGoogleApiClient, uri).await();
-                    if(result != null || result.getDataItem() != null) {
+                    if (result != null && null!= result.getDataItem()) {
                         String path = uri.getPath();
                         if (PRAYER_PATH.equals(path)) {
                             DataMapItem dataItem = DataMapItem.fromDataItem(result.getDataItem());
@@ -664,9 +670,7 @@ public class MyPrayerWatchFace extends CanvasWatchFaceService {
                         } else {
                             Log.d(TAG, "Unrecognized path: " + path);
                         }
-
                     }
-
                 }
                 return null;
             }

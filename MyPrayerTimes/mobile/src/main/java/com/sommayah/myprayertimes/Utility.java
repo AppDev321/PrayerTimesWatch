@@ -771,7 +771,7 @@ public class Utility {
                 activeNetwork.isConnectedOrConnecting();
     }
 
-    public static void sendPrayerInfoToWatch(String prayer_name,String prayer_time,String hijri_date, GoogleApiClient client) {
+    public static void sendPrayerInfoToWatch(final Context context, String prayer_name, String prayer_time, String hijri_date, GoogleApiClient client) {
         PutDataMapRequest dataMap = PutDataMapRequest.create(Utility.PRAYER_PATH);
         dataMap.getDataMap().putString(Utility.PRAYER_NAME_KEY, prayer_name);
         dataMap.getDataMap().putString(Utility.PRAYER_TIME_KEY, prayer_time);
@@ -779,7 +779,6 @@ public class Utility {
         dataMap.getDataMap().putLong("time", new Date().getTime());
         PutDataRequest request = dataMap.asPutDataRequest();
         request.setUrgent();
-
         Wearable.DataApi.putDataItem(client, request)
                 .setResultCallback(new ResultCallback<DataApi.DataItemResult>() {
                     @Override
@@ -789,6 +788,7 @@ public class Utility {
                     }
                 });
     }
+
 
     public static void sendPreferenceInfoToWatch(Boolean hijriDate, Boolean twentyfour, GoogleApiClient client){
         PutDataMapRequest dataMap = PutDataMapRequest.create(Utility.PREF_PATH);

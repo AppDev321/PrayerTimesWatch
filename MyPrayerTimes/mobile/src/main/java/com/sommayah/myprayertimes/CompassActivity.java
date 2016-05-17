@@ -53,12 +53,12 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
         // Create an ad request. Check logcat output for the hashed device ID to
         // get test ads on a physical device. e.g.
         // "Use AdRequest.Builder.addTestDevice("ABCDEF012345") to get test ads on this device."
-//        Bundle extras = new Bundle();
-//        extras.putBoolean("is_designed_for_families", true);
+/*        Bundle extras = new Bundle();
+        extras.putBoolean("is_designed_for_families", true);*/
         AdRequest adRequest = new AdRequest.Builder()
                 /*.addNetworkExtrasBundle(AdMobAdapter.class, extras)*/
                 .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
-                /*.tagForChildDirectedTreatment(true)*/
+                .tagForChildDirectedTreatment(true)
                 .build();
         mAdView.loadAd(adRequest);
     }
