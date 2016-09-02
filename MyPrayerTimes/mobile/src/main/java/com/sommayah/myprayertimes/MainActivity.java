@@ -1,7 +1,6 @@
 package com.sommayah.myprayertimes;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -14,6 +13,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
@@ -26,6 +27,9 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.sommayah.myprayertimes.broadcastReceivers.PrayerAlarmReceiver;
 
 import java.util.Calendar;
@@ -34,7 +38,8 @@ import java.util.Date;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     public static final String TAG = MainActivity.class.getSimpleName();
 
@@ -42,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
     public static final int MIN_DIST = 20000; //set to 20 kilometers
     LocationManager mLocationManager;
     LocationListener mLocationListener;
+    GoogleApiClient mGoogleApiClient;
     @Bind(R.id.title)
     TextView mTitleText;
     @Bind(R.id.dateTextView)
@@ -77,67 +83,91 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Acquire a reference to the system Location Manager
-        mLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        //String locationProvider = LocationManager.NETWORK_PROVIDER;
-        String locationProvider = LocationManager.GPS_PROVIDER;
-        //ss: check here if location is null
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            Log.d(TAG, "no permission granted yet");
-            Utility.setLocationStatus(getApplicationContext(), Utility.LOCATION_STATUS_UNKNOWN);
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION) &&
-                    (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_COARSE_LOCATION))) {
-                // If the user has previously denied permission , and do not check marked " never show this warning
-                // We can show an alert explaining to the user because permission is important.
-                Log.d(TAG, "permissions are denied");
-                Utility.setLocationStatus(getApplicationContext(), Utility.LOCATION_STATUS_PERMISSION_DENIED);
-                mTitleText.setText(getString(R.string.location_not_found));
-            } else {
-
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 0);
-            }
-
-        } else {
-            Location lastKnownLocation = mLocationManager.getLastKnownLocation(locationProvider);
-
-            if (lastKnownLocation != null) {
-                if (!Utility.isManualLocation(getApplicationContext())) {
-                    makeUseOfNewLocation(lastKnownLocation);
-                    Log.d("known location long", String.valueOf(lastKnownLocation.getLongitude()));
-                    Log.d("known location lat", String.valueOf(lastKnownLocation.getLatitude()));
-                }
-            } else {
-                //location null no previous location
-                Log.d(TAG, "last known location null");
-                Utility.setLocationStatus(getApplicationContext(), Utility.LOCATION_STATUS_UNKNOWN);
-            }
+        // Create an instance of GoogleAPIClient.
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
         }
 
+//        // Acquire a reference to the system Location Manager
+//        mLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+//        //String locationProvider = LocationManager.NETWORK_PROVIDER;
+//        String locationProvider = LocationManager.GPS_PROVIDER;
+//        String locationNetworkProvider = LocationManager.NETWORK_PROVIDER;
+//        //ss: check here if location is null
+//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//            // TODO: Consider calling
+//            Log.d(TAG, "no permission granted yet");
+//            Utility.setLocationStatus(getApplicationContext(), Utility.LOCATION_STATUS_UNKNOWN);
+//            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION) &&
+//                    (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_COARSE_LOCATION))) {
+//                // If the user has previously denied permission , and do not check marked " never show this warning
+//                // We can show an alert explaining to the user because permission is important.
+//                Log.d(TAG, "permissions are denied");
+//                Utility.setLocationStatus(getApplicationContext(), Utility.LOCATION_STATUS_PERMISSION_DENIED);
+//                mTitleText.setText(getString(R.string.location_not_found));
+//            } else {
+//
+//                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
+//                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 0);
+//            }
+//
+//        } else {
+//            Location lastKnownLocation = mLocationManager.getLastKnownLocation(locationProvider);
+//            if(lastKnownLocation == null)
+//                lastKnownLocation = mLocationManager.getLastKnownLocation(locationNetworkProvider);
+//
+//            if (lastKnownLocation != null) {
+//                if (!Utility.isManualLocation(getApplicationContext())) {
+//                    makeUseOfNewLocation(lastKnownLocation);
+//                    Log.d("known location long", String.valueOf(lastKnownLocation.getLongitude()));
+//                    Log.d("known location lat", String.valueOf(lastKnownLocation.getLatitude()));
+//                }
+//            } else {
+//                //location null no previous location
+//                Log.d(TAG, "last known location null");
+//                Utility.setLocationStatus(getApplicationContext(), Utility.LOCATION_STATUS_UNKNOWN);
+//            }
+//        }
 
-        // Define a listener that responds to location updates
-        mLocationListener = new LocationListener() {
-            public void onLocationChanged(Location location) {
-                // Called when a new location is found by the network location provider.
-                if (!Utility.isManualLocation(getApplicationContext())) {
-                    makeUseOfNewLocation(location);
-                }
-            }
 
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-                Log.d(TAG, "on status changed");
-            }
+//        // Define a listener that responds to location updates
+//        mLocationListener = new LocationListener() {
+//            public void onLocationChanged(Location location) {
+//                // Called when a new location is found by the network location provider.
+//                if (!Utility.isManualLocation(getApplicationContext())) {
+//                    makeUseOfNewLocation(location);
+//                }
+//            }
+//
+//            public void onStatusChanged(String provider, int status, Bundle extras) {
+//                Log.d(TAG, "on status changed");
+//            }
+//
+//            public void onProviderEnabled(String provider) {
+//                Log.d(TAG, "on provider enabled");
+//            }
+//
+//            public void onProviderDisabled(String provider) {
+//                Log.d(TAG, "on provider disabled");
+//            }
+//
+//        };
+    }
 
-            public void onProviderEnabled(String provider) {
-                Log.d(TAG, "on provider enabled");
-            }
+    @Override
+    protected void onStart() {
+        mGoogleApiClient.connect();
+        super.onStart();
+    }
 
-            public void onProviderDisabled(String provider) {
-                Log.d(TAG, "on provider disabled");
-            }
-
-        };
+    @Override
+    protected void onStop() {
+        mGoogleApiClient.disconnect();
+        super.onStop();
     }
 
     @Override
@@ -162,9 +192,9 @@ public class MainActivity extends AppCompatActivity {
         } else {
             if (isManualLocation == false) {
                 //check if location setting is on if we don't have good location, if not open settings to enable
-                checkLocationSettings();
+              //checkLocationSettings();
             }
-            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME, MIN_DIST, mLocationListener);
+          //  mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME, MIN_DIST, mLocationListener);
         }
         int temp = getResources().getIdentifier("backgroundmosque" + Utility.getNextPos(this), "drawable", getPackageName());
         backgroundImage.setImageResource(temp);
@@ -174,12 +204,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            //location cannot be caught
-
-        } else {
-            mLocationManager.removeUpdates(mLocationListener);
-        }
+//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//            //location cannot be caught
+//
+//        } else {
+//            mLocationManager.removeUpdates(mLocationListener);
+//        }
     }
 
     @Override
@@ -282,5 +312,56 @@ public class MainActivity extends AppCompatActivity {
                 dialog.show();
             }
         }
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            Log.d(TAG, "no permission granted yet");
+            Utility.setLocationStatus(getApplicationContext(), Utility.LOCATION_STATUS_UNKNOWN);
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION) &&
+                    (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_COARSE_LOCATION))) {
+                // If the user has previously denied permission , and do not check marked " never show this warning
+                // We can show an alert explaining to the user because permission is important.
+                Log.d(TAG, "permissions are denied");
+                Utility.setLocationStatus(getApplicationContext(), Utility.LOCATION_STATUS_PERMISSION_DENIED);
+                mTitleText.setText(getString(R.string.location_not_found));
+            } else {
+
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 0);
+            }
+            return;
+        }
+        Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                mGoogleApiClient);
+        if (mLastLocation != null) {
+            if (!Utility.isManualLocation(getApplicationContext())) {
+                makeUseOfNewLocation(mLastLocation);
+                Log.d("known location long", String.valueOf(mLastLocation.getLongitude()));
+                Log.d("known location lat", String.valueOf(mLastLocation.getLatitude()));
+            }
+        } else {
+            //location null no previous location
+            Log.d(TAG, "last known location null");
+            Utility.setLocationStatus(getApplicationContext(), Utility.LOCATION_STATUS_UNKNOWN);
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Utility.setLocationStatus(getApplicationContext(), Utility.LOCATION_STATUS_UNKNOWN);
     }
 }

@@ -2,6 +2,7 @@ package com.sommayah.myprayertimes.widget;
 
 import android.app.IntentService;
 import android.app.PendingIntent;
+import android.app.TaskStackBuilder;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Intent;
@@ -120,7 +121,15 @@ public class PrayerWidgetIntentService extends IntentService {
 
                 // Create an Intent to launch MainActivity
                 Intent launchIntent = new Intent(this, MainActivity.class);
-                PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, launchIntent, 0);
+                TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+                stackBuilder.addNextIntent(launchIntent);
+                PendingIntent pendingIntent =
+                        stackBuilder.getPendingIntent(
+                                0,
+                                PendingIntent.FLAG_UPDATE_CURRENT
+                        );
+//                Intent launchIntent = new Intent(this, MainActivity.class);
+//                PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, launchIntent, 0);
                 views.setOnClickPendingIntent(R.id.widget, pendingIntent);
 
                 // Tell the AppWidgetManager to perform an update on the current app widget

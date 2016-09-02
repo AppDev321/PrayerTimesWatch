@@ -21,6 +21,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".CompassActivity" android:label="@string/title_activity_compass"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".SettingsActivity"
             android:label="@string/title_activity_settings" />
