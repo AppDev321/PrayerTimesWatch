@@ -1,23 +1,19 @@
 package com.sommayah.myprayertimes;
 
 import android.Manifest;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -29,8 +25,12 @@ import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.sommayah.myprayertimes.broadcastReceivers.PrayerAlarmReceiver;
+
+import net.danlew.android.joda.JodaTimeAndroid;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -39,14 +39,31 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity implements
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     public static final String TAG = MainActivity.class.getSimpleName();
 
-    public static final int MIN_TIME = 1000 * 60 * 120; //two hours
-    public static final int MIN_DIST = 20000; //set to 20 kilometers
+    /**
+     * The desired interval for location updates. Inexact. Updates may be more or less frequent.
+     */
+    public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 4320000;
+
+    /**
+     * The fastest rate for active location updates. Exact. Updates will never be more frequent
+     * than this value.
+     */
+    public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS =
+            UPDATE_INTERVAL_IN_MILLISECONDS / 2;
+
+    // Keys for storing activity state in the Bundle.
+    protected final static String REQUESTING_LOCATION_UPDATES_KEY = "requesting-location-updates-key";
+    protected final static String LOCATION_KEY = "location-key";
+    protected final static String LAST_UPDATED_TIME_STRING_KEY = "last-updated-time-string-key";
+
+    //    public static final int MIN_TIME = 1000 * 60 * 120; //two hours
+//    public static final int MIN_DIST = 20000; //set to 20 kilometers
     LocationManager mLocationManager;
-    LocationListener mLocationListener;
+    LocationRequest mLocationRequest;
     GoogleApiClient mGoogleApiClient;
     @Bind(R.id.title)
     TextView mTitleText;
@@ -63,6 +80,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        JodaTimeAndroid.init(this);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
@@ -83,79 +101,38 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
 
-        // Create an instance of GoogleAPIClient.
-        if (mGoogleApiClient == null) {
-            mGoogleApiClient = new GoogleApiClient.Builder(this)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(LocationServices.API)
-                    .build();
-        }
+        buildGoogleApiClient();
 
-//        // Acquire a reference to the system Location Manager
-//        mLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-//        //String locationProvider = LocationManager.NETWORK_PROVIDER;
-//        String locationProvider = LocationManager.GPS_PROVIDER;
-//        String locationNetworkProvider = LocationManager.NETWORK_PROVIDER;
-//        //ss: check here if location is null
-//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//            // TODO: Consider calling
-//            Log.d(TAG, "no permission granted yet");
-//            Utility.setLocationStatus(getApplicationContext(), Utility.LOCATION_STATUS_UNKNOWN);
-//            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION) &&
-//                    (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_COARSE_LOCATION))) {
-//                // If the user has previously denied permission , and do not check marked " never show this warning
-//                // We can show an alert explaining to the user because permission is important.
-//                Log.d(TAG, "permissions are denied");
-//                Utility.setLocationStatus(getApplicationContext(), Utility.LOCATION_STATUS_PERMISSION_DENIED);
-//                mTitleText.setText(getString(R.string.location_not_found));
-//            } else {
-//
-//                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
-//                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 0);
-//            }
-//
-//        } else {
-//            Location lastKnownLocation = mLocationManager.getLastKnownLocation(locationProvider);
-//            if(lastKnownLocation == null)
-//                lastKnownLocation = mLocationManager.getLastKnownLocation(locationNetworkProvider);
-//
-//            if (lastKnownLocation != null) {
-//                if (!Utility.isManualLocation(getApplicationContext())) {
-//                    makeUseOfNewLocation(lastKnownLocation);
-//                    Log.d("known location long", String.valueOf(lastKnownLocation.getLongitude()));
-//                    Log.d("known location lat", String.valueOf(lastKnownLocation.getLatitude()));
-//                }
-//            } else {
-//                //location null no previous location
-//                Log.d(TAG, "last known location null");
-//                Utility.setLocationStatus(getApplicationContext(), Utility.LOCATION_STATUS_UNKNOWN);
-//            }
-//        }
+    }
 
+    /**
+     * Builds a GoogleApiClient. Uses the {@code #addApi} method to request the
+     * LocationServices API.
+     */
+    protected synchronized void buildGoogleApiClient() {
+        Log.i(TAG, "Building GoogleApiClient");
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+        createLocationRequest();
+    }
 
-//        // Define a listener that responds to location updates
-//        mLocationListener = new LocationListener() {
-//            public void onLocationChanged(Location location) {
-//                // Called when a new location is found by the network location provider.
-//                if (!Utility.isManualLocation(getApplicationContext())) {
-//                    makeUseOfNewLocation(location);
-//                }
-//            }
-//
-//            public void onStatusChanged(String provider, int status, Bundle extras) {
-//                Log.d(TAG, "on status changed");
-//            }
-//
-//            public void onProviderEnabled(String provider) {
-//                Log.d(TAG, "on provider enabled");
-//            }
-//
-//            public void onProviderDisabled(String provider) {
-//                Log.d(TAG, "on provider disabled");
-//            }
-//
-//        };
+    protected void createLocationRequest() {
+        mLocationRequest = new LocationRequest();
+
+        // Sets the desired interval for active location updates. This interval is
+        // inexact. You may not receive updates at all if no location sources are available, or
+        // you may receive them slower than requested. You may also receive updates faster than
+        // requested if other applications are requesting location at a faster interval.
+        mLocationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
+
+        // Sets the fastest rate for active location updates. This interval is exact, and your
+        // application will never receive updates faster than this value.
+        mLocationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS);
+
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
     @Override
@@ -173,6 +150,9 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onResume() {
         super.onResume();
+        if (mGoogleApiClient.isConnected()) {
+            startLocationUpdates();
+        }
         mhijriDateText.setText(Utility.getHijriDate(getApplicationContext()));
         boolean isManualLocation = Utility.isManualLocation(getApplicationContext());
         if (isManualLocation == false) {
@@ -192,9 +172,9 @@ public class MainActivity extends AppCompatActivity implements
         } else {
             if (isManualLocation == false) {
                 //check if location setting is on if we don't have good location, if not open settings to enable
-              //checkLocationSettings();
+                //checkLocationSettings();
             }
-          //  mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME, MIN_DIST, mLocationListener);
+            //  mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME, MIN_DIST, mLocationListener);
         }
         int temp = getResources().getIdentifier("backgroundmosque" + Utility.getNextPos(this), "drawable", getPackageName());
         backgroundImage.setImageResource(temp);
@@ -204,12 +184,9 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onPause() {
         super.onPause();
-//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//            //location cannot be caught
-//
-//        } else {
-//            mLocationManager.removeUpdates(mLocationListener);
-//        }
+        if (mGoogleApiClient.isConnected()) {
+            stopLocationUpdates();
+        }
     }
 
     @Override
@@ -272,47 +249,38 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
-    public void checkLocationSettings() {
-        if (Utility.getPreferredLocation(getApplicationContext()).equals("")) {
-            boolean gps_enabled = false;
-            boolean network_enabled = false;
-            try {
-                gps_enabled = mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-            } catch (Exception ex) {
-            }
-
-            try {
-                network_enabled = mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-            } catch (Exception ex) {
-            }
-
-            if (!gps_enabled && !network_enabled) {
-                // notify user
-                AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-                dialog.setMessage(getResources().getString(R.string.gps_network_not_enabled));
-                dialog.setPositiveButton(getResources().getString(R.string.enable), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface paramDialogInterface, int paramInt) {
-                        Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                        startActivity(myIntent);
-                        //get gps
-                    }
-
-                });
-                dialog.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface paramDialogInterface, int paramInt) {
-                        // TODO Auto-generated method stub
-                        Utility.setLocationStatus(getApplicationContext(), Utility.LOCATION_STATUS_DISABLED);
-                        mTitleText.setText(getString(R.string.location_not_found));
-
-                    }
-                });
-                dialog.show();
-            }
+    /**
+     * Requests location updates from the FusedLocationApi.
+     */
+    protected void startLocationUpdates() {
+        // The final argument to {@code requestLocationUpdates()} is a LocationListener
+        // (http://developer.android.com/reference/com/google/android/gms/location/LocationListener.html).
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
         }
+        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
     }
+
+    /**
+     * Removes location updates from the FusedLocationApi.
+     */
+    protected void stopLocationUpdates() {
+        // It is a good practice to remove location requests when the activity is in a paused or
+        // stopped state. Doing so helps battery performance and is especially
+        // recommended in applications that request frequent location updates.
+
+        // The final argument to {@code requestLocationUpdates()} is a LocationListener
+        // (http://developer.android.com/reference/com/google/android/gms/location/LocationListener.html).
+        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+    }
+
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
@@ -353,10 +321,16 @@ public class MainActivity extends AppCompatActivity implements
             Log.d(TAG, "last known location null");
             Utility.setLocationStatus(getApplicationContext(), Utility.LOCATION_STATUS_UNKNOWN);
         }
+        startLocationUpdates();
     }
+
 
     @Override
     public void onConnectionSuspended(int i) {
+        // The connection to Google Play services was lost for some reason. We call connect() to
+        // attempt to re-establish the connection.
+        Log.i(TAG, "Connection suspended");
+        mGoogleApiClient.connect();
 
     }
 
@@ -364,4 +338,11 @@ public class MainActivity extends AppCompatActivity implements
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         Utility.setLocationStatus(getApplicationContext(), Utility.LOCATION_STATUS_UNKNOWN);
     }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        makeUseOfNewLocation(location);
+    }
+
+
 }

@@ -18,8 +18,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="20dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
         android:text="Current Heading: 0.0" />
 
     <TextView
@@ -28,8 +28,18 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/tvHeading"
         android:layout_centerHorizontal="true"
+        android:layout_marginBottom="10dp"
         android:text="Qibla Direction: 0.0"
         android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <TextView
+        android:id="@+id/compassInstructions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="70dp"
+        android:layout_centerHorizontal="true"
+        android:textAlignment="center"
+        android:text="@string/compass_instructions" />
 
     <ImageView
         android:id="@+id/imageViewCompass"

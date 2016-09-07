@@ -28,6 +28,7 @@ import butterknife.ButterKnife;
 public class PrayerAdapter extends RecyclerView.Adapter<PrayerAdapter.PrayerAdapterViewHolder> {
     private static final int VIEW_TYPE_NEXT = 0; //representing the next prayer
     private static final int VIEW_TYPE_ALL = 1;  //representing all other prayers
+    private static final String INVALIDTIME = "-----"; //incase time is invalid
 
 
     private boolean mUseNextPrayerLayout = true; //for the coming prayer use a bigger list item with time remaining
@@ -71,13 +72,15 @@ public class PrayerAdapter extends RecyclerView.Adapter<PrayerAdapter.PrayerAdap
                     mCursor.moveToPosition(vh.getAdapterPosition());
                     String name = mCursor.getString(MainActivityFragment.COL_PRAYER_NAME);
                     String timeString = mCursor.getString(MainActivityFragment.COL_PRAYER_TIME);
-                    LocalTime time = new LocalTime(timeString);
-                    DateTimeFormatter fmt = DateTimeFormat.forPattern("h:mm aa");
-                    if(Utility.getPreferredTimeFormat(mContext) == PrayTime.TIME12) { //12 hr or 24 formate
-                        String str = fmt.print(time);
-                        timeString = str;
+                    if(!timeString.equals(INVALIDTIME)) { //don't show invalid times
+                        LocalTime time = new LocalTime(timeString);
+                        DateTimeFormatter fmt = DateTimeFormat.forPattern("h:mm aa");
+                        if (Utility.getPreferredTimeFormat(mContext) == PrayTime.TIME12) { //12 hr or 24 formate
+                            String str = fmt.print(time);
+                            timeString = str;
+                        }
+                        Toast.makeText(mContext, name + " is at " + timeString, Toast.LENGTH_SHORT).show();
                     }
-                    Toast.makeText(mContext,name + " is at " + timeString , Toast.LENGTH_SHORT).show();
 
                 }
             });
@@ -94,18 +97,23 @@ public class PrayerAdapter extends RecyclerView.Adapter<PrayerAdapter.PrayerAdap
         String name = mCursor.getString(MainActivityFragment.COL_PRAYER_NAME);
         holder.mPrayerName.setText(name);
         String timeString = mCursor.getString(MainActivityFragment.COL_PRAYER_TIME);
-        LocalTime time = new LocalTime(timeString);
-        DateTimeFormatter fmt = DateTimeFormat.forPattern("h:mm aa");
-        if(Utility.getPreferredTimeFormat(mContext) == PrayTime.TIME12) { //12 hr or 24 formate
-            String str = fmt.print(time);
-            holder.mPrayerTime.setText(str);
-        }else{
-            holder.mPrayerTime.setText(timeString);
-        }
-        if(getItemViewType(position) == VIEW_TYPE_NEXT){
-            LocalTime now = LocalTime.now();
-            int minutes = Minutes.minutesBetween(now, time).getMinutes();
-            holder.mTimeRemaining.setText(getFriendlyTimeString(minutes));
+        if(timeString.equals(INVALIDTIME)){ //fixed crash incase of invalid time
+            holder.mPrayerTime.setText(mContext.getString(R.string.invalid_time));
+            holder.mTimeRemaining.setText("");
+        }else {
+            LocalTime time = new LocalTime(timeString);
+            DateTimeFormatter fmt = DateTimeFormat.forPattern("h:mm aa");
+            if (Utility.getPreferredTimeFormat(mContext) == PrayTime.TIME12) { //12 hr or 24 formate
+                String str = fmt.print(time);
+                holder.mPrayerTime.setText(str);
+            } else {
+                holder.mPrayerTime.setText(timeString);
+            }
+            if (getItemViewType(position) == VIEW_TYPE_NEXT) {
+                LocalTime now = LocalTime.now();
+                int minutes = Minutes.minutesBetween(now, time).getMinutes();
+                holder.mTimeRemaining.setText(getFriendlyTimeString(minutes));
+            }
         }
 
     }

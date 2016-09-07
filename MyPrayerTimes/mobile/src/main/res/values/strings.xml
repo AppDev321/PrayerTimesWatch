@@ -19,6 +19,7 @@
     <string name="title_activity_settings">Settings</string>
     <string name="compass_image">Compass Dial</string>
     <string name="compass_arrow">Compass Arrow</string>
+    <string name="compass_instructions">To calibrate the compass, wave your phone in the shape of letter 8 before using.</string>
     <string name="image_masjid">Masjid image</string>
     <string name="title_not_supported">Your device does not support the compass</string>
     <string name="press_on_circle">Press on adjacent circle to retrieve current location</string>
@@ -134,6 +135,7 @@
     <string name="ok_no_device_connected">OK</string>
     <string name="digital_config_background">Background</string>
     <string name="digital_config_text">Digital watch face configuration</string>
+    <string name="invalid_time">invalid</string>
 
     <!--translatable strings-->
     <string name="fajr">Fajr</string>
@@ -158,5 +160,6 @@
     <string name="dhulhija">Dhu-l Hija</string>
     <string name="appwidget_text">LOADING...</string>
     <string name="add_widget">Add widget</string>
-
+    <string name="banner_ad_unit_id">ca-app-pub-5354035105604852/1485980921</string>
+   <!-- <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>-->
 </resources>

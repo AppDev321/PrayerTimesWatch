@@ -3,7 +3,6 @@ package com.sommayah.myprayertimes;
 import android.content.Context;
 import android.os.AsyncTask;
 
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.sommayah.myprayertimes.data.PrayerContract;
 
 import java.util.ArrayList;
@@ -15,8 +14,6 @@ import java.util.Calendar;
 public class LoadPrayersAsyncTask extends AsyncTask<Void, Void, Void> {
     Context context;
     Calendar cal;
-    public GoogleApiClient mGoogleApiClient;
-    private boolean mResolvingError = false;
 
     public LoadPrayersAsyncTask(Context context, Calendar cal){
         this.context = context;
