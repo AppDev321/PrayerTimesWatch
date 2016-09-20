@@ -20,6 +20,7 @@ public class PrayerOnBootReceiver extends BroadcastReceiver {
         String action = intent.getAction();
         if (action.equals("android.intent.action.BOOT_COMPLETED")) {
             if (Utility.isAlarmEnabled(context)) {
+                prayerAlarm.cancelAlarm(context);
                 prayerAlarm.addPrayerAlarm(context);
             }
         } else if (action.equals("android.intent.action.TIMEZONE_CHANGED") ||

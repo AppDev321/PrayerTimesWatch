@@ -97,12 +97,12 @@ public class PrayerAdapter extends RecyclerView.Adapter<PrayerAdapter.PrayerAdap
         String name = mCursor.getString(MainActivityFragment.COL_PRAYER_NAME);
         holder.mPrayerName.setText(name);
         String timeString = mCursor.getString(MainActivityFragment.COL_PRAYER_TIME);
+        LocalTime time = new LocalTime(timeString);
+        DateTimeFormatter fmt = DateTimeFormat.forPattern("h:mm aa");
         if(timeString.equals(INVALIDTIME)){ //fixed crash incase of invalid time
             holder.mPrayerTime.setText(mContext.getString(R.string.invalid_time));
             holder.mTimeRemaining.setText("");
         }else {
-            LocalTime time = new LocalTime(timeString);
-            DateTimeFormatter fmt = DateTimeFormat.forPattern("h:mm aa");
             if (Utility.getPreferredTimeFormat(mContext) == PrayTime.TIME12) { //12 hr or 24 formate
                 String str = fmt.print(time);
                 holder.mPrayerTime.setText(str);
@@ -113,6 +113,8 @@ public class PrayerAdapter extends RecyclerView.Adapter<PrayerAdapter.PrayerAdap
                 LocalTime now = LocalTime.now();
                 int minutes = Minutes.minutesBetween(now, time).getMinutes();
                 holder.mTimeRemaining.setText(getFriendlyTimeString(minutes));
+                //ss: just for debugging
+                //holder.mTimeRemaining.setText(now.toString()+"+ "+ timeString+"p"+String.valueOf(position));
             }
         }
 

@@ -81,7 +81,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         // in content do not change the layout size of the RecyclerView
         mRecyclerView.setHasFixedSize(true);
 
-        if(!Utility.isAlarmInitiated(getContext())){
+        if(!Utility.isAlarmInitiated(getContext()) && Utility.isLocationLatLonAvailable(getContext())){
             SharedPreferences sharedPreferences =
                     PreferenceManager.getDefaultSharedPreferences(getContext());
             SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -118,9 +118,17 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        getContext().getContentResolver().notifyChange(PrayerContract.PrayerEntry.CONTENT_URI,null); //update ui, next prayer time remaining
+    }
+
+    @Override
     public void onPause() {
         super.onPause();
     }
+
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

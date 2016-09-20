@@ -30,8 +30,6 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.sommayah.myprayertimes.broadcastReceivers.PrayerAlarmReceiver;
 
-import net.danlew.android.joda.JodaTimeAndroid;
-
 import java.util.Calendar;
 import java.util.Date;
 
@@ -54,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements
      */
     public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS =
             UPDATE_INTERVAL_IN_MILLISECONDS / 2;
+    private static final int DISPLACEMENT = 4000; //4 kms
 
     // Keys for storing activity state in the Bundle.
     protected final static String REQUESTING_LOCATION_UPDATES_KEY = "requesting-location-updates-key";
@@ -80,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        JodaTimeAndroid.init(this);
+     //   JodaTimeAndroid.init(this);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
@@ -131,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements
         // Sets the fastest rate for active location updates. This interval is exact, and your
         // application will never receive updates faster than this value.
         mLocationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS);
-
+        mLocationRequest.setSmallestDisplacement(DISPLACEMENT);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
@@ -249,6 +248,8 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
+
+
     /**
      * Requests location updates from the FusedLocationApi.
      */
@@ -341,7 +342,10 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onLocationChanged(Location location) {
-        makeUseOfNewLocation(location);
+        if (!Utility.isManualLocation(getApplicationContext())) {
+            if (location != null)
+                makeUseOfNewLocation(location);
+        }
     }
 
 

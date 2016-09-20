@@ -583,7 +583,7 @@ public class Utility {
                 monthName = context.getString(R.string.dhulqe3da);
                 break;
             case 12:
-                monthName = context.getString(R.string.dhulqe3da);
+                monthName = context.getString(R.string.dhulhija);
                 break;
             default:
                 break;
