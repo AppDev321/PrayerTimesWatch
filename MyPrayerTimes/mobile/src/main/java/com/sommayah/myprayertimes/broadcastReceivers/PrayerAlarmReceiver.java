@@ -89,8 +89,11 @@ public class PrayerAlarmReceiver extends WakefulBroadcastReceiver{
         Intent watchIntent = new Intent(context, UpdateWatchIntentService.class);
         watchIntent.putExtra(EXTRA_PRAYER_NAME,next_prayer_time.getName());
         watchIntent.putExtra(EXTRA_PRAYER_TIME,next_prayer_time.getTime());
-        // ss: temporary disabling watch service on fear of eating out battery
-        // startWakefulService(context,watchIntent);
+        SharedPreferences sharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences(context);
+        Boolean is_watch_enabled = sharedPreferences.getBoolean(context.getString(R.string.pref_enable_watch_key),true);
+        if(is_watch_enabled)
+            startWakefulService(context,watchIntent);
 
         // SET PASSIVE LOCATION RECEIVER
         Intent passiveIntent = new Intent(context, PassiveLocationChangeReceiver.class);

@@ -110,11 +110,10 @@ public class PrayerAdapter extends RecyclerView.Adapter<PrayerAdapter.PrayerAdap
                 holder.mPrayerTime.setText(timeString);
             }
             if (getItemViewType(position) == VIEW_TYPE_NEXT) {
+                //LocalTime now = LocalTime.now(DateTimeZone.forTimeZone(TimeZone.getDefault()));
                 LocalTime now = LocalTime.now();
                 int minutes = Minutes.minutesBetween(now, time).getMinutes();
                 holder.mTimeRemaining.setText(getFriendlyTimeString(minutes));
-                //ss: just for debugging
-                //holder.mTimeRemaining.setText(now.toString()+"+ "+ timeString+"p"+String.valueOf(position));
             }
         }
 

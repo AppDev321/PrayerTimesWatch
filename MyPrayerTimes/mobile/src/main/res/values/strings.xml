@@ -73,6 +73,11 @@
     <!--<string name="pref_alarm_enabled">alarm-enabled</string>-->
     <string name="pref_alarm_initiated">alarm-initated</string>
 
+    <!--Enable watch settings-->
+    <string name="pref_enable_watch_key">enable_watch_key</string>
+    <string name="pref_description_watch_switch">Enable or disable watch connection</string>
+    <string name="pref_title_enable_watch">Enable watch connection</string>
+
     <string name="pref_current_location_desc">Use my current location</string>
     <!-- For Google Places API Attributions -->
     <string name="attribution_text">Powered by Google</string>
@@ -160,5 +165,5 @@
     <string name="dhulhija">Dhu-l Hija</string>
     <string name="appwidget_text">LOADING...</string>
     <string name="add_widget">Add widget</string>
-
+   
 </resources>

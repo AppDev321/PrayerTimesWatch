@@ -81,16 +81,16 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         // in content do not change the layout size of the RecyclerView
         mRecyclerView.setHasFixedSize(true);
 
-        if(!Utility.isAlarmInitiated(getContext()) && Utility.isLocationLatLonAvailable(getContext())){
-            SharedPreferences sharedPreferences =
-                    PreferenceManager.getDefaultSharedPreferences(getContext());
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putBoolean(getString(R.string.pref_alarm_initiated), true);
-            editor.commit();
-            PrayerAlarmReceiver prayerAlarmReceiver = new PrayerAlarmReceiver();
-            prayerAlarmReceiver.addPrayerAlarm(getContext());
-
-        }
+//        if(!Utility.isAlarmInitiated(getContext()) && Utility.isLocationLatLonAvailable(getContext())){
+//            SharedPreferences sharedPreferences =
+//                    PreferenceManager.getDefaultSharedPreferences(getContext());
+//            SharedPreferences.Editor editor = sharedPreferences.edit();
+//            editor.putBoolean(getString(R.string.pref_alarm_initiated), true);
+//            editor.commit();
+//            PrayerAlarmReceiver prayerAlarmReceiver = new PrayerAlarmReceiver();
+//            prayerAlarmReceiver.addPrayerAlarm(getContext());
+//
+//        }
 
         mAdapter = new PrayerAdapter(getActivity(), mEmptyView);
         mRecyclerView.setAdapter(mAdapter);
