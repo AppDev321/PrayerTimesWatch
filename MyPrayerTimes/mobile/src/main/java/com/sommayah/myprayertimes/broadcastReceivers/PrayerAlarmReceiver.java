@@ -114,12 +114,16 @@ public class PrayerAlarmReceiver extends WakefulBroadcastReceiver{
         Calendar now = Calendar.getInstance(TimeZone.getDefault());
         now.setTimeInMillis(System.currentTimeMillis());
         int pos = 0;
-        LocalTime nowLocal = LocalTime.now();
-        LocalTime limit;
+//        LocalTime nowLocal = LocalTime.now();
+//        LocalTime limit;
+        Calendar then = Calendar.getInstance(TimeZone.getDefault());
+        then.setTimeInMillis(System.currentTimeMillis());
         ArrayList<String> prayerTimes = Utility.getPrayTimes(now,context);
         for(int i=0; i<prayerTimes.size(); i++){
-            limit = new LocalTime(prayerTimes.get(i));
-            Boolean isLate = nowLocal.isAfter(limit);
+//            limit = new LocalTime(prayerTimes.get(i));
+//            Boolean isLate = nowLocal.isAfter(limit);
+            then = getCalendarFromPrayerTime(then,prayerTimes.get(i));
+            Boolean isLate = now.after(then);
             if(isLate)
                 pos++;
         }
@@ -218,5 +222,15 @@ public class PrayerAlarmReceiver extends WakefulBroadcastReceiver{
             Log.w("SetAlarmReceiver", se.getMessage(), se);
             //do nothing. We should always have permision in order to reach this screen.
         }
+    }
+
+    /*https://github.com/alphamu/PrayTime-Android*/
+    private Calendar getCalendarFromPrayerTime(Calendar cal, String prayerTime) {
+        String[] time = prayerTime.split(":");
+        cal.set(Calendar.HOUR_OF_DAY, Integer.valueOf(time[0]));
+        cal.set(Calendar.MINUTE, Integer.valueOf(time[1]));
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal;
     }
 }
