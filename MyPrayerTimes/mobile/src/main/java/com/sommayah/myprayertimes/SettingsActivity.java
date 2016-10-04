@@ -251,6 +251,12 @@ public class SettingsActivity extends AppCompatPreferenceActivity  {
             // guidelines.
 
             bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_notification_ringtone_key)));
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_fajr_notification_methods_key)));
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_dhuhr_notification_methods_key)));
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_asr_notification_methods_key)));
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_maghrib_notification_methods_key)));
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_isha_notification_methods_key)));
+
 
         }
 

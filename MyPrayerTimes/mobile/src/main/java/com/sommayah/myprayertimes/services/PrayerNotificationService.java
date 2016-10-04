@@ -81,10 +81,31 @@ public class PrayerNotificationService extends IntentService {
             mBuilder.setContentIntent(resultPendingIntent);
             Uri defaultRingURI = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-            String ringURIString = preferences.getString(getString(R.string.pref_notification_ringtone_key), defaultRingURI.toString());
-            if (ringURIString != null) {
-                mBuilder.setSound(Uri.parse(ringURIString));
+            //check which prayer and check kind of notification sound accordingly
+            int notification = getPrayerNotificationSound(prayer);
+            String uriString = preferences.getString(getString(R.string.pref_notification_ringtone_key), defaultRingURI.toString());
+            if(notification == 1){
+                uriString = "android.resource://"
+                        + context.getPackageName() + "/" + R.raw.allahakbar;
+            }else if(notification == 2){
+                uriString = "android.resource://"
+                        + context.getPackageName() + "/" + R.raw.azan20;
+            }else if(notification == 3){
+                uriString = "android.resource://"
+                        + context.getPackageName() + "/" + R.raw.azan20;
             }
+            if(uriString != null){
+                mBuilder.setSound(Uri.parse(uriString));
+            }
+//            String ringURIString = preferences.getString(getString(R.string.pref_notification_ringtone_key), defaultRingURI.toString());
+//            String adhanURIString = "android.resource://"
+//                    + context.getPackageName() + "/" + R.raw.allahakbar;
+////            if (ringURIString != null) {
+////                mBuilder.setSound(Uri.parse(ringURIString));
+////            }
+//            if(adhanURIString != null){
+//                mBuilder.setSound(Uri.parse(adhanURIString));
+//            }
             long[] vibrate = new long[]{100, 100, 100};
             //check if user has vibration enabled.
             if (Utility.isVibrateEnabled(context)) {
@@ -108,6 +129,24 @@ public class PrayerNotificationService extends IntentService {
         Intent nextPrayerUpdatedIntent = new Intent(ACTION_NEXT_PRAYER_UPDATED).setPackage(context.getPackageName());
         context.sendBroadcast(nextPrayerUpdatedIntent);
 
+    }
+
+    private int getPrayerNotificationSound(String prayer){
+        int notification = 0;
+        SharedPreferences prefs
+                = PreferenceManager.getDefaultSharedPreferences(this);
+        if(prayer.equals(getString(R.string.fajr))){
+            notification = Integer.parseInt(prefs.getString(getString(R.string.pref_fajr_notification_methods_key),"0"));
+        }else if(prayer.equals(getString(R.string.dhuhr))){
+            notification = Integer.parseInt(prefs.getString(getString(R.string.pref_dhuhr_notification_methods_key),"0"));
+        }else if(prayer.equals(getString(R.string.asr))){
+            notification = Integer.parseInt(prefs.getString(getString(R.string.pref_asr_notification_methods_key),"0"));
+        }else if(prayer.equals(getString(R.string.maghrib))){
+            notification = Integer.parseInt(prefs.getString(getString(R.string.pref_maghrib_notification_methods_key),"0"));
+        }else if(prayer.equals(getString(R.string.isha))){
+            notification = Integer.parseInt(prefs.getString(getString(R.string.pref_isha_notification_methods_key),"0"));
+        }
+        return notification;
     }
 
 }
