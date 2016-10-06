@@ -87,25 +87,17 @@ public class PrayerNotificationService extends IntentService {
             if(notification == 1){
                 uriString = "android.resource://"
                         + context.getPackageName() + "/" + R.raw.allahakbar;
-            }else if(notification == 2){
+            }else if(notification == 2){ //Egypt
                 uriString = "android.resource://"
-                        + context.getPackageName() + "/" + R.raw.azan20;
-            }else if(notification == 3){
+                        + context.getPackageName() + "/" + R.raw.azanegypt;
+            }else if(notification == 3){ //haram
                 uriString = "android.resource://"
-                        + context.getPackageName() + "/" + R.raw.azan20;
+                        + context.getPackageName() + "/" + R.raw.azanharam;
             }
-            if(uriString != null){
+            if(uriString != null && notification != 4){ //notifcation=4 no sound notification
                 mBuilder.setSound(Uri.parse(uriString));
             }
-//            String ringURIString = preferences.getString(getString(R.string.pref_notification_ringtone_key), defaultRingURI.toString());
-//            String adhanURIString = "android.resource://"
-//                    + context.getPackageName() + "/" + R.raw.allahakbar;
-////            if (ringURIString != null) {
-////                mBuilder.setSound(Uri.parse(ringURIString));
-////            }
-//            if(adhanURIString != null){
-//                mBuilder.setSound(Uri.parse(adhanURIString));
-//            }
+
             long[] vibrate = new long[]{100, 100, 100};
             //check if user has vibration enabled.
             if (Utility.isVibrateEnabled(context)) {
