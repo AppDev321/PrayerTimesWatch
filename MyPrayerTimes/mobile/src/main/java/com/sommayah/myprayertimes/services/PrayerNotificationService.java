@@ -89,10 +89,10 @@ public class PrayerNotificationService extends IntentService {
                         + context.getPackageName() + "/" + R.raw.allahakbar;
             }else if(notification == 2){ //Egypt
                 uriString = "android.resource://"
-                        + context.getPackageName() + "/" + R.raw.azanegypt;
+                        + context.getPackageName() + "/" + R.raw.hosariadhan;
             }else if(notification == 3){ //haram
                 uriString = "android.resource://"
-                        + context.getPackageName() + "/" + R.raw.azanharam;
+                        + context.getPackageName() + "/" + R.raw.azhanmecca;
             }
             if(uriString != null && notification != 4){ //notifcation=4 no sound notification
                 mBuilder.setSound(Uri.parse(uriString));

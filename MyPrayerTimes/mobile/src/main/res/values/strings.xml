@@ -145,7 +145,7 @@
     <string name="notification_sound">Notification sound</string>
     <string name="allahakbar">Allahu Akbar two times</string>
     <string name="adhan1">Adhan Egypt</string>
-    <string name="adhan2">Adhan Haram</string>
+    <string name="adhan2">Adhan Mecca</string>
     <string name="nosound">No sound</string>
     <string name="pref_fajr_notification_methods_key">fajr_notification_key</string>
     <string name="pref_fajr_title_notification_methods">Fajr notification method</string>
@@ -181,5 +181,7 @@
     <string name="dhulhija">Dhu-l Hija</string>
     <string name="appwidget_text">LOADING...</string>
     <string name="add_widget">Add widget</string>
-   
+
+
+
 </resources>
