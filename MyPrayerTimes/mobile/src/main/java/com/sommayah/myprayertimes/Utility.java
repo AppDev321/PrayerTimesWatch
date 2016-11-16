@@ -41,6 +41,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 import java.util.Vector;
 
 
@@ -430,7 +431,14 @@ public class Utility {
         if(dst_calculation != 2){
             praytime.setDst(dst_calculation);
         }else{
-            praytime.setDst(praytime.detectDaylightSaving());
+            TimeZone timez = TimeZone.getDefault();
+            Date date = new Date();
+            boolean isDST = timez.inDaylightTime(date);
+            if(isDST == false){
+               praytime.setDst(0.0);
+            }else {
+                praytime.setDst(praytime.detectDaylightSaving());
+            }
         }
 
     }

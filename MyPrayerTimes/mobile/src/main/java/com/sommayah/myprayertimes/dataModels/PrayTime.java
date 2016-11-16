@@ -277,6 +277,7 @@ public class PrayTime {
         TimeZone timez = TimeZone.getDefault();
         double hoursDiff = (timez.getDSTSavings() / 1000.0) / 3600;
         return hoursDiff;
+
     }
 
     // ---------------------- Julian Date Functions -----------------------
